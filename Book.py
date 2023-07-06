@@ -34,7 +34,7 @@ class Book:
         pages = []
         valid_images = [".jpg", ".png"]
 
-        if is_thumbnail == True:
+        if is_thumbnail:
             SINGLE_PAGE_SIZE = (175, 250)
             DOUBLE_PAGE_SIZE = (175, 250)
 
@@ -46,9 +46,9 @@ class Book:
             ext = os.path.splitext(f)[1]
             if ext.lower() not in valid_images:
                 continue
-            w,h = (Image.open(os.path.join(self.path, f))).size
+            w, h = (Image.open(os.path.join(self.path, f))).size
             if w < 1600:
-                images.append(Image.open(os.path.join(self.path, f)).resize(SINGLE_PAGE_SIZE)) # Image.open(os.path.join(path, f)).resize(COVER_SIZE) old: images.append(Image.open(os.path.join(self.path, f)))
+                images.append(Image.open(os.path.join(self.path, f)).resize(SINGLE_PAGE_SIZE))
             else:
                 images.append(Image.open(os.path.join(self.path, f)).resize(DOUBLE_PAGE_SIZE))
 
@@ -90,7 +90,6 @@ class Book:
         im.putalpha(alpha)
         return im
 
-
     def __init__(self, path, name, author, link, tagged):
         self.path = path
         self.name = name
@@ -98,7 +97,7 @@ class Book:
         self.link = link
         self.tagged = tagged
         self.cover = None
-        COVER_SIZE = (225, 300)
+        COVER_SIZE = (250, 350)
         VALID_IMAGES = (".jpg", ".png")
 
         cover_im = None

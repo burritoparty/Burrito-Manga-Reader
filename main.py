@@ -5,7 +5,6 @@ from Tag import *
 from Author import *
 # create database
 if os.path.exists("D:\Burrito Manga Reader\library.json") is False:
-    print("made json")
     file = open("D:\Burrito Manga Reader\library.json", "x")
     with open("D:\Burrito Manga Reader\library.json", 'w') as f:
         books_json = {
@@ -17,7 +16,6 @@ if os.path.exists("D:\Burrito Manga Reader\library.json") is False:
 
 # create tag database
 if os.path.exists("D:\\Burrito Manga Reader\\tags.json") is False:
-    print("made json")
     file = open("D:\\Burrito Manga Reader\\tags.json", "x")
     with open("D:\\Burrito Manga Reader\\tags.json", 'w') as f:
         books_json = {
@@ -46,7 +44,7 @@ root.attributes('-topmost', 0)
 root.bookDisplayTabs = BookFrame(master=root, width=1625, height=1025)
 root.tagFrame = TagFrame(bookframe=root.bookDisplayTabs, master=root)
 root.authorFrame = AuthorFrame(master=root)
-root.importFrame = ImportFrame(master=root)
+root.importFrame = ImportFrame(bookframe=root.bookDisplayTabs, master=root)
 
 # place frames
 root.tagFrame.grid(row=0, column=0, padx=20, pady=20)
