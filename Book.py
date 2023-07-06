@@ -42,7 +42,6 @@ class Book:
             SINGLE_PAGE_SIZE = (950, 1300)
             DOUBLE_PAGE_SIZE = (1600, 1200)
 
-        # FIXME need to account for double pages
         for f in os.listdir(self.path):
             ext = os.path.splitext(f)[1]
             if ext.lower() not in valid_images:
