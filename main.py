@@ -41,15 +41,17 @@ root.geometry('%dx%d+%d+%d' % (1920, 1080,
 root.attributes('-topmost', 0)
 
 # make frames
-root.bookDisplayTabs = BookFrame(master=root, width=1625, height=1025)
+root.bookDisplayTabs = BookFrame(master=root, width=1650, height=1000)
 root.tagFrame = TagFrame(bookframe=root.bookDisplayTabs, master=root)
 root.authorFrame = AuthorFrame(master=root)
 root.importFrame = ImportFrame(bookframe=root.bookDisplayTabs, master=root)
+root.tab_nav = TabNavigator(bookframe=root.bookDisplayTabs, master=root)
 
 # place frames
-root.tagFrame.grid(row=0, column=0, padx=20, pady=20)
-root.authorFrame.grid(row=1, column=0, padx=20, pady=20)
-root.importFrame.grid(row=2, column=0, padx=20, pady=0)
-root.bookDisplayTabs.grid(row=0, column=1, rowspan=10, sticky="nsew", padx=20, pady=20)
+root.tagFrame.grid(row=0, column=0, padx=20, pady=20, rowspan=2)
+root.authorFrame.grid(row=2, column=0, padx=20, pady=20)
+root.importFrame.grid(row=3, column=0, padx=20, pady=0)
+root.bookDisplayTabs.grid(row=1, column=1, rowspan=10, sticky="nsew", padx=5, pady=5)
+root.tab_nav.grid(row=0, column=1, padx=5, pady=5)
 
 root.mainloop()
