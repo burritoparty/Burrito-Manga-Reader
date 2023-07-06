@@ -42,11 +42,16 @@ class Book:
             SINGLE_PAGE_SIZE = (950, 1300)
             DOUBLE_PAGE_SIZE = (1600, 1200)
 
+        # FIXME need to account for double pages
         for f in os.listdir(self.path):
             ext = os.path.splitext(f)[1]
             if ext.lower() not in valid_images:
                 continue
-            images.append(Image.open(os.path.join(self.path, f)))
+            w,h = (Image.open(os.path.join(self.path, f))).size
+            if w < 1600:
+                images.append(Image.open(os.path.join(self.path, f)).resize(SINGLE_PAGE_SIZE)) # Image.open(os.path.join(path, f)).resize(COVER_SIZE) old: images.append(Image.open(os.path.join(self.path, f)))
+            else:
+                images.append(Image.open(os.path.join(self.path, f)).resize(DOUBLE_PAGE_SIZE))
 
         for i in images:
             w, h = i.size
@@ -60,6 +65,19 @@ class Book:
     def get_cover(self):
         return self.cover
 
+    def get_full_cover(self):
+        VALID_IMAGES = (".jpg", ".png")
+        cover_im = None
+        for f in os.listdir(self.path):
+            ext = os.path.splitext(f)[1]
+            if ext.lower() not in VALID_IMAGES:
+                continue
+            cover_im = Image.open(os.path.join(self.path, f)).resize((400, 550))
+            break
+
+        return customtkinter.CTkImage(
+            dark_image=self.add_corners(cover_im, 10), size=(400, 550))
+
     def add_corners(self, im, rad):
         circle = Image.new('L', (rad * 2, rad * 2), 0)
         draw = ImageDraw.Draw(circle)
@@ -72,6 +90,7 @@ class Book:
         alpha.paste(circle.crop((rad, rad, rad * 2, rad * 2)), (w - rad, h - rad))
         im.putalpha(alpha)
         return im
+
 
     def __init__(self, path, name, author, link, tagged):
         self.path = path
@@ -88,9 +107,9 @@ class Book:
             ext = os.path.splitext(f)[1]
             if ext.lower() not in VALID_IMAGES:
                 continue
-            cover_im = Image.open(os.path.join(path, f))
+            cover_im = Image.open(os.path.join(path, f)).resize(COVER_SIZE)
             break
 
         # set cover
         self.cover = customtkinter.CTkImage(
-            dark_image=self.add_corners(cover_im, 25), size=COVER_SIZE)
+            dark_image=self.add_corners(cover_im, 10), size=COVER_SIZE)

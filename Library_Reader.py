@@ -1,17 +1,22 @@
 import copy
 import gc
 import json
+import math
 from os import path
 import customtkinter
 import keyboard
 from Book import Book
 from Database import *
 from Functions import *
+
+
 # test line
 
 class BookFrame(customtkinter.CTkScrollableFrame):
 
     def close_reader(self):
+        # yeet dem hotkeys
+        keyboard.clear_all_hotkeys()
         # lift description window back up
         self.reader_window.destroy()
         self.book_window.attributes('-topmost', 1)
@@ -113,7 +118,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         # yeet that memory into the stratosphere!
         gc.collect()
 
-    def open_book_description(self, book, json_index):
+    def open_book_description(self, book):
         if self.book_window is None or not self.book_window.winfo_exists():
             self.reader_window = None
             self.book_window = customtkinter.CTkToplevel()
@@ -127,11 +132,10 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
             # make widgets
             # read button, making new cover to resize
-            cover = copy.copy(book.get_cover())
-            cover.configure(size=(400, 550))
             read_button = customtkinter.CTkButton(self.book_window, compound="top", fg_color="transparent",
                                                   hover_color=dark_pink, text_color=light_pink,
-                                                  image=cover, command=lambda x=book: self.open_reader(x),
+                                                  image=book.get_full_cover(),
+                                                  command=lambda x=book: self.open_reader(x),
                                                   text=indent_string(book.get_name()))
 
             # labels
@@ -224,7 +228,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
             # FIXME for some reason, if this isn't here then after you close the window and try to reopen the book,
             #  it crashes, seems like book's data gets fucked, it is also taking some memory
-            self.refresh_library()
+            self.load_page()
 
             # the reason this is all the way down here is cause
             # it keeps it on the bottom so the user doesn't see till done
@@ -257,7 +261,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 for i in book:
                     book_button = customtkinter.CTkButton(self, compound="top", image=i.get_cover(),
                                                           command=lambda
-                                                              x=i, y=num_loops: self.open_book_description(x, y),
+                                                              x=books[index_to_start_at]: self.open_book_description(x),
                                                           fg_color="transparent", hover_color=dark_pink,
                                                           text=indent_string(i.get_name()), text_color=light_pink,
                                                           font=("Roboto", 16))
@@ -271,17 +275,127 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                         c += 1
                     num_loops += 1
 
+    def next_tab(self):
+        if self.current_tab != math.ceil((self.book_count -1) / 10):
+            self.current_tab += 1
+            self.load_page()
+
+    def prev_tab(self):
+        if self.current_tab != 0:
+            self.current_tab -= 1
+            self.load_page()
+
+    def load_page(self):
+
+        # if the library already has books, destroy them
+        for i in self.book_buttons:
+            i.destroy()
+        self.book_buttons.clear()
+
+        # load the  json
+        if path.isfile("D:\Burrito Manga Reader\library.json") is False:
+            print("FILE NOT FOUND")
+        else:
+            with open("D:\Burrito Manga Reader\library.json") as f:
+                books_json = json.load(f)
+
+        books = []
+        # load all the books (metadata) into memory
+        for i in books_json['book']:
+            books.append(Book(i['path'], i['name'], i['author'], i['link'], i['tagged']))
+
+        # call sorting tags or authors functions here maybe?
+        # maybe i'll need to make a library loading function inside the tab or author class to do this
+
+        # multiply the current page number to find the starting index to grab the books
+        index_to_start_at = self.current_tab * 10
+
+        page_count = math.ceil(len(books) / 10)
+        # excess books so say the library is 35, then this comes to 5 to grab the last few for the last page
+
+        counter = 0
+        if page_count != self.current_tab + 1:
+            # create the book objects
+            while counter < 10:
+                button = customtkinter.CTkButton(self, compound="top",
+                                                 image=books[index_to_start_at].get_cover(),
+                                                 command=lambda
+                                                     x=books[index_to_start_at]: self.open_book_description(x),
+                                                 fg_color="transparent", hover_color=dark_pink,
+                                                 text=indent_string(books[index_to_start_at].get_name()),
+                                                 text_color=light_pink,
+                                                 font=("Roboto", 16))
+
+                self.book_buttons.append(button)
+                index_to_start_at += 1
+                counter += 1
+        else:
+            # create the book objects
+            while counter < self.excess_books:
+                button = customtkinter.CTkButton(self, compound="top",
+                                                 image=books[index_to_start_at].get_cover(),
+                                                 command=lambda
+                                                     x=books[index_to_start_at]: self.open_book_description(x),
+                                                 fg_color="transparent", hover_color=dark_pink,
+                                                 text=indent_string(books[index_to_start_at].get_name()),
+                                                 text_color=light_pink,
+                                                 font=("Roboto", 16))
+
+                self.book_buttons.append(button)
+                index_to_start_at += 1
+                counter += 1
+
+        self.print_page()
+
+        gc.collect()
+
+    def print_page(self):
+        i = 0
+        r = 1
+        c = 0
+        for i in self.book_buttons:
+            i.grid(row=r, column=c)
+            if c == 5:
+                c = 0
+                r += 1
+            else:
+                c += 1
+
+    def initialize_self(self):
+        if path.isfile("D:\Burrito Manga Reader\library.json") is False:
+            print("FILE NOT FOUND")
+        else:
+            with open("D:\Burrito Manga Reader\library.json") as f:
+                books_json = json.load(f)
+                book = []
+                # grab the metadata
+                for i in books_json['book']:
+                    book.append(Book(i['path'], i['name'], i['author'], i['link'], i['tagged']))
+
+        self.book_count = len(book)
+        self.excess_books = 10 - (math.ceil(len(book) / 10) * 10 - len(book))
+
         # FIXME i need to fix something about this function to take less memory
 
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         self.book_window = None
-
         self.book_buttons = []
+        self.current_tab = 0
+        self.initialize_self()
 
+        self.load_page()
+
+        next_tab = customtkinter.CTkButton(self, command=self.next_tab, text="next")
+        prev_tab = customtkinter.CTkButton(self, command=self.prev_tab)
+        next_tab.grid(row=0, column=1)
+        prev_tab.grid(row=0, column=0)
+
+        '''
+        
         refresh_library = customtkinter.CTkButton(self, text="Refresh Library", command=self.refresh_library,
                                                   hover_color=dark_pink, fg_color=light_pink, text_color=black)
 
         refresh_library.grid(row=0, column=0)
-
-        self.refresh_library()
+        
+        '''
