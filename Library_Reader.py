@@ -21,7 +21,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.reader_window.destroy()
         self.book_window.attributes('-topmost', 1)
 
-    def next_page_call(self):
+    def next_page(self):
         if self.current_page_num < len(self.page_list) - 1:
             # destroy current items
             self.page.destroy()
@@ -40,7 +40,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.pagenum_label = customtkinter.CTkLabel(self.reader_window, text=self.pagenum_text, font=("Roboto", 20))
             self.pagenum_label.grid(row=1, column=1)
 
-    def prev_page_call(self):
+    def prev_page(self):
         if self.current_page_num != 0:
             # destroy current items
             self.page.destroy()
@@ -63,10 +63,11 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         if self.reader_window is None or not self.reader_window.winfo_exists():
 
             # make hotkeys
-            keyboard.add_hotkey('a', self.prev_page_call)
-            keyboard.add_hotkey('left arrow', self.prev_page_call)
-            keyboard.add_hotkey('d', self.next_page_call)
-            keyboard.add_hotkey('right arrow', self.next_page_call)
+            keyboard.add_hotkey('a', self.prev_page)
+            keyboard.add_hotkey('left arrow', self.prev_page)
+            keyboard.add_hotkey('d', self.next_page)
+            keyboard.add_hotkey('right arrow', self.next_page)
+            # FIXME only the esc throws an error
             keyboard.add_hotkey('esc', self.close_reader)
 
             self.reader_window = customtkinter.CTkToplevel()
@@ -90,9 +91,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.pagenum_label = customtkinter.CTkLabel(self.reader_window, text=self.pagenum_text, font=("Roboto", 20))
 
             # buttons
-            next_page = customtkinter.CTkButton(self.reader_window, text="->", command=self.next_page_call,
+            next_page = customtkinter.CTkButton(self.reader_window, text="->", command=self.next_page,
                                                 hover_color=dark_pink, fg_color=light_pink, text_color=black)
-            prev_page = customtkinter.CTkButton(self.reader_window, text="<-", command=self.prev_page_call,
+            prev_page = customtkinter.CTkButton(self.reader_window, text="<-", command=self.prev_page,
                                                 hover_color=dark_pink, fg_color=light_pink, text_color=black)
             close = customtkinter.CTkButton(self.reader_window, text="EXIT", command=self.close_reader,
                                             hover_color=dark_pink, fg_color=light_pink, text_color=black)
@@ -123,6 +124,12 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.reader_window = None
             self.book_window = customtkinter.CTkToplevel()
             self.book_window.geometry(f"{1920}x{1080}")
+            #  sets to the center of the screen
+            # print("width: " + str(self.winfo_width()) + " screenwidth: " + str(self.winfo_screenwidth()))
+            # print("height: " + str(self.winfo_height()) + " screenheight: " + str(self.winfo_screenheight()))
+            self.book_window.geometry('%d+%d' % (
+                340, 220
+            ))
             # FIXME for fucks sake for the life of me i cannot center this fucking window i'm losing my mind
 
             # center shit
@@ -228,7 +235,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
             # FIXME for some reason, if this isn't here then after you close the window and try to reopen the book,
             #  it crashes, seems like book's data gets fucked, it is also taking some memory
-            self.load_page()
+            self.load_tab()
 
             # the reason this is all the way down here is cause
             # it keeps it on the bottom so the user doesn't see till done
@@ -237,55 +244,18 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         else:
             self.book_window.focus()  # if window exists focus it
 
-    def refresh_library(self):
-        # import from json
-        book = []
-        if path.isfile("D:\Burrito Manga Reader\library.json") is False:
-            print("FILE NOT FOUND")
-        else:
-            with open("D:\Burrito Manga Reader\library.json") as f:
-                books_json = json.load(f)
-
-                # grab the metadata
-                for i in books_json['book']:
-                    book.append(Book(i['path'], i['name'], i['author'], i['link'], i['tagged']))
-
-                for i in self.book_buttons:
-                    i.destroy()
-                self.book_buttons.clear()
-
-                num_loops = 0
-                r = 1
-                c = 0
-
-                for i in book:
-                    book_button = customtkinter.CTkButton(self, compound="top", image=i.get_cover(),
-                                                          command=lambda
-                                                              x=books[index_to_start_at]: self.open_book_description(x),
-                                                          fg_color="transparent", hover_color=dark_pink,
-                                                          text=indent_string(i.get_name()), text_color=light_pink,
-                                                          font=("Roboto", 16))
-                    book_button.grid(row=r, column=c, padx=15, pady=10)
-                    self.book_buttons.append(book_button)
-
-                    if c == 5:
-                        c = 0
-                        r += 1
-                    else:
-                        c += 1
-                    num_loops += 1
-
     def next_tab(self):
-        if self.current_tab != math.ceil((self.book_count -1) / 10):
+        print(str(self.current_tab) + " < " + str(math.ceil((self.book_count - 1) / 10)))
+        if self.current_tab < math.ceil((self.book_count) / self.books_per_page) - 1:
             self.current_tab += 1
-            self.load_page()
+            self.load_tab()
 
     def prev_tab(self):
         if self.current_tab != 0:
             self.current_tab -= 1
-            self.load_page()
+            self.load_tab()
 
-    def load_page(self):
+    def load_tab(self):
 
         # if the library already has books, destroy them
         for i in self.book_buttons:
@@ -304,19 +274,30 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         for i in books_json['book']:
             books.append(Book(i['path'], i['name'], i['author'], i['link'], i['tagged']))
 
-        # call sorting tags or authors functions here maybe?
-        # maybe i'll need to make a library loading function inside the tab or author class to do this
+        # TODO
+        #  call sorting tags or authors functions here maybe?
+        #  maybe i'll need to make a library loading function inside the tab or author class to do this
 
-        # multiply the current page number to find the starting index to grab the books
-        index_to_start_at = self.current_tab * 10
+        # multiply number of books per page by the current page number
+        # to find the starting index to grab the books
+        #print("index to start at: " + str(self.current_tab * self.books_per_page))
+        index_to_start_at = self.current_tab * self.books_per_page
 
-        page_count = math.ceil(len(books) / 10)
+        #print("tab count: " + str(math.ceil(len(books) / self.books_per_page)))
+        tab_count = math.ceil(len(books) / self.books_per_page)
         # excess books so say the library is 35, then this comes to 5 to grab the last few for the last page
 
         counter = 0
-        if page_count != self.current_tab + 1:
+        #print("current tab: " + str(self.current_tab))
+        #print("books per page: " + str(self.books_per_page))
+        #print(str(tab_count) + " != " + str(self.current_tab+1))
+        if self.book_count == 0:
+            # TODO  works but, make the conditional be less shit
+            num = None
+
+        elif tab_count != self.current_tab + 1:
             # create the book objects
-            while counter < 10:
+            while counter < self.books_per_page:
                 button = customtkinter.CTkButton(self, compound="top",
                                                  image=books[index_to_start_at].get_cover(),
                                                  command=lambda
@@ -350,7 +331,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         gc.collect()
 
     def print_page(self):
-        i = 0
         r = 1
         c = 0
         for i in self.book_buttons:
@@ -375,27 +355,51 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.book_count = len(book)
         self.excess_books = 10 - (math.ceil(len(book) / 10) * 10 - len(book))
 
-        # FIXME i need to fix something about this function to take less memory
+    # FIXME these throw an error and i can't figure out why
+    def make_hotkeys(self):
+        keyboard.add_hotkey('a', self.prev_tab)
+        keyboard.add_hotkey('left arrow', self.prev_page)
+        keyboard.add_hotkey('d', self.next_tab)
+        keyboard.add_hotkey('right arrow', self.next_tab)
+
+    def kill_hotkeys(self):
+        keyboard.clear_all_hotkeys()
 
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+
+        # keyboard.clear_all_hotkeys()
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(2, weight=1)
+        self.grid_columnconfigure(3, weight=1)
+        self.grid_columnconfigure(4, weight=1)
+        self.grid_columnconfigure(5, weight=1)
+
         self.book_window = None
         self.book_buttons = []
         self.current_tab = 0
         self.initialize_self()
+        # TODO i'd like to make this display more than 10 at a time
+        self.books_per_page = 10
 
-        self.load_page()
+        self.load_tab()
 
-        next_tab = customtkinter.CTkButton(self, command=self.next_tab, text="next")
-        prev_tab = customtkinter.CTkButton(self, command=self.prev_tab)
-        next_tab.grid(row=0, column=1)
-        prev_tab.grid(row=0, column=0)
+        refresh = customtkinter.CTkButton(self, command=self.load_tab, text="refresh... replace w count?",
+                                          fg_color=light_pink,
+                                          text_color=black,
+                                          hover_color=dark_pink)
+        next_tab = customtkinter.CTkButton(self, command=self.next_tab, text="next",
+                                           fg_color=light_pink,
+                                           text_color=black,
+                                           hover_color=dark_pink, )
+        prev_tab = customtkinter.CTkButton(self, command=self.prev_tab, text="prev",
+                                           fg_color=light_pink,
+                                           text_color=black,
+                                           hover_color=dark_pink, )
 
-        '''
-        
-        refresh_library = customtkinter.CTkButton(self, text="Refresh Library", command=self.refresh_library,
-                                                  hover_color=dark_pink, fg_color=light_pink, text_color=black)
-
-        refresh_library.grid(row=0, column=0)
-        
-        '''
+        pad = 10
+        prev_tab.grid(row=0, column=0, columnspan=2, sticky="nswe", padx=pad, pady=pad)
+        refresh.grid(row=0, column=2, columnspan=2, sticky="nswe", padx=pad, pady=pad)
+        next_tab.grid(row=0, column=4, columnspan=2, sticky="nswe", padx=pad, pady=pad)

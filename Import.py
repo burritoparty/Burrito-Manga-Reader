@@ -7,18 +7,18 @@ from PIL import Image
 from Book import Book
 from Database import *
 from Functions import *
-# test line
+
 
 class ImportFrame(customtkinter.CTkFrame):
 
-    def open_import_window(self):
+    def open_import_window(self, library_frame):
 
         if self.import_window is None or not self.import_window.winfo_exists():
-            self.import_window = ImportWindow(self)  # create window if its None or destroyed
+            self.import_window = ImportWindow(book_frame=library_frame, master=self)  # create window if its None or destroyed
         else:
             self.import_window.focus()  # if window exists focus it
 
-    def __init__(self, master, **kwargs):
+    def __init__(self, bookframe, master, **kwargs):
         super().__init__(master, **kwargs)
 
         self.label = customtkinter.CTkLabel(self, text="Library", text_color=light_pink)
@@ -29,7 +29,7 @@ class ImportFrame(customtkinter.CTkFrame):
                                                    fg_color=light_pink,
                                                    text_color=black,
                                                    hover_color=dark_pink,
-                                                   command=self.open_import_window)
+                                                   command=lambda x=bookframe: self.open_import_window(x))
         self.import_window = None
 
         self.import_library = customtkinter.CTkButton(self,
@@ -54,6 +54,7 @@ class ImportWindow(customtkinter.CTkToplevel):
     def input_path(self):
         self.path = askdirectory()
 
+
         images = []
         valid_images = [".jpg", ".png"]
 
@@ -64,7 +65,7 @@ class ImportWindow(customtkinter.CTkToplevel):
                 continue
             images.append(Image.open(os.path.join(self.path, f)))
 
-        cover = customtkinter.CTkImage(dark_image=images[0], size=(150, 250))
+        cover = customtkinter.CTkImage(dark_image=add_corners(images[0], 25), size=(200, 275))
         cover = customtkinter.CTkLabel(self, image=cover, text=None)
         cover.grid(row=0, column=0, rowspan=3, padx=20, pady=20)
 
@@ -74,7 +75,7 @@ class ImportWindow(customtkinter.CTkToplevel):
     def input_tag(self, tag):
         self.tagged.append(tag)
 
-    def finalize_book(self):
+    def finalize_book(self, book_frame):
         if self.path is not None and self.author_cbox.get() != "" and self.name_entry.get() != "" and self.link_entry.get() != "":
             self.author = self.author_cbox.get()
             self.name = self.name_entry.get()
@@ -85,8 +86,10 @@ class ImportWindow(customtkinter.CTkToplevel):
             library_path = "D:\Burrito Manga Reader"
             book = Book(self.path, self.name, self.author, self.link, self.tagged)
 
-            # make new path based on name
-            newpath = (library_path + "\\" + self.name)
+            # TODO need to restrict how long the name is for formatting reasons
+            # make new path based on name / .strip() to remove the whitespace from the end
+            self.name = self.name.strip()
+            newpath = (library_path.strip() + "\\" + self.name)
             os.mkdir(library_path + "\\" + self.name)
 
             # copy from old path to new path
@@ -115,26 +118,36 @@ class ImportWindow(customtkinter.CTkToplevel):
                 with open("D:\Burrito Manga Reader\library.json", 'w') as f:
                     json.dump(books_json, f, indent=4)
 
+                # update the library count here
+                book_frame.load_tab()
+                book_frame.initialize_self()
+                book_frame.load_tab()
+
             self.destroy()
 
         else:
             self.lower()
             error_window = customtkinter.CTkToplevel()
             error_window.attributes('-topmost', 2)
-            error_window.geometry('1275+720')
-            label = customtkinter.CTkLabel(error_window, text="Missing an attribute")
-            label.pack()
+            error_window.geometry('150x100+1275+720')
+            error_window.grid_columnconfigure(0, weight=1)
+            error_window.columnconfigure(0, weight=1)
+            label = customtkinter.CTkLabel(error_window, text="Missing either: \nLink, \nName, \nAuthor, \nPath")
+            label.grid(row=0, column=0, padx=10, pady=10)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, book_frame, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # this is keeping the window at the top
         self.attributes('-topmost', 1)
         self.title("Import Book")
         # TODO not very centered :/
+        # print("width: " + str(self.winfo_width()) + " screenwidth: " + str(self.winfo_screenwidth()))
+        # print("height: " + str(self.winfo_height()) + " screenheight: " + str(self.winfo_screenheight()))
+        # print("x: " + str(get_x_coordinates(self.winfo_width(), self.winfo_screenwidth())))
+        # print("y: " + str(get_y_coordinates(self.winfo_height(), self.winfo_screenheight())))
         self.geometry('%d+%d' % (
-            get_x_coordinates(self.winfo_width(), self.winfo_screenwidth()),
-            get_y_coordinates(self.winfo_height(), self.winfo_screenheight())
+            800, 400
         ))
 
         # make attributes for new book
@@ -147,11 +160,11 @@ class ImportWindow(customtkinter.CTkToplevel):
         label = customtkinter.CTkLabel(self, text="placeholder image")
         label.grid(row=0, column=0, padx=20, pady=20, rowspan=3)
 
-        self.link_entry = customtkinter.CTkEntry(self, placeholder_text="Enter Link")
+        self.link_entry = customtkinter.CTkEntry(self, placeholder_text="Enter Link", width=750)
         self.link_entry.grid(row=0, column=1, padx=20, pady=20)
 
         # TODO set string limit to 65 chars
-        self.name_entry = customtkinter.CTkEntry(self, placeholder_text="Enter Name")
+        self.name_entry = customtkinter.CTkEntry(self, placeholder_text="Enter Name", width=750)
         self.name_entry.grid(row=1, column=1, padx=20, pady=20)
 
         # TODO add autocomplete, https://github.com/TomSchimansky/CustomTkinter/issues/255
@@ -167,7 +180,7 @@ class ImportWindow(customtkinter.CTkToplevel):
 
         # TODO long tag names do not fit
         self.tag_frame = customtkinter.CTkScrollableFrame(self, label_text="Select Tags",
-                                                          width=450, label_text_color=light_pink)
+                                                          width=1100, label_text_color=light_pink)
         self.tag_frame.grid(row=4, column=0, columnspan=4, padx=20, pady=20)
 
         num_loops = 0
@@ -180,14 +193,14 @@ class ImportWindow(customtkinter.CTkToplevel):
                                                       text_color=light_pink)
             self.checkbox.grid(row=r, column=c, pady=(20, 0), padx=20)
 
-            if c == 2:
+            if c == 7:
                 c = 0
                 r += 1
             else:
                 c += 1
             num_loops += 1
 
-        self.submit_button = customtkinter.CTkButton(self, text="Submit", command=self.finalize_book,
+        self.submit_button = customtkinter.CTkButton(self, text="Submit", command=lambda x=book_frame: self.finalize_book(x),
                                                      fg_color=light_pink, hover_color=dark_pink, text_color=black)
         self.submit_button.grid(row=1, column=3, padx=20, pady=20)
 

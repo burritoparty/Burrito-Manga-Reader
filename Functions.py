@@ -62,6 +62,10 @@ def indent_string(title):
     fifty = False
     seventy = False
     hundred = False
+    hun_25 = False
+    hun_50 = False
+    hun_75 = False
+    twohun = False
     # lol there's def a better way to do this, but it works so whatever
     for i in title:
         if index > 25 and twentyfive is False and str(title[index]).isspace():
@@ -73,9 +77,21 @@ def indent_string(title):
         elif index > 75 and seventy is False and str(title[index]).isspace():
             title = title[:index + 1] + "\n" + title[index + 1:]
             seventy = True
-        elif index > 100 and hundred is False and str(title[index]).index():
+        elif index > 100 and hundred is False and str(title[index]).isspace():
             title = title[:index + 1] + "\n" + title[index + 1:]
             hundred = True
+        elif index > 125 and hun_25 is False and str(title[index]).isspace():
+            title = title[:index + 1] + "\n" + title[index + 1:]
+            hun_25 = True
+        elif index > 150 and hun_50 is False and str(title[index]).isspace():
+            title = title[:index + 1] + "\n" + title[index + 1:]
+            hun_50 = True
+        elif index > 175 and hun_75 is False and str(title[index]).isspace():
+            title = title[:index + 1] + "\n" + title[index + 1:]
+            hun_75 = True
+        elif index > 200 and twohun is False and str(title[index]).isspace():
+            title = title[:index + 1] + "\n" + title[index + 1:]
+            twohun = True
         index += 1
 
     return title
