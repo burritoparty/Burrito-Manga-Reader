@@ -130,7 +130,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.book_window.geometry('%d+%d' % (
                 340, 220
             ))
-            # FIXME for fucks sake for the life of me i cannot center this fucking window i'm losing my mind
 
             # center shit
             self.book_window.grid_columnconfigure(0, weight=1)
@@ -140,7 +139,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # make widgets
             # read button, making new cover to resize
             read_button = customtkinter.CTkButton(self.book_window, compound="top", fg_color="transparent",
-                                                  hover_color=dark_pink, text_color=light_pink,
+                                                  hover_color=dark_pink,font=("Roboto", 16),
                                                   image=book.get_full_cover(),
                                                   command=lambda x=book: self.open_reader(x),
                                                   text=indent_string(book.get_name()))
@@ -233,9 +232,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
             self.book_window.protocol('WM_DELETE_WINDOW', self.close_book_description)
 
-            # FIXME for some reason, if this isn't here then after you close the window and try to reopen the book,
-            #  it crashes, seems like book's data gets fucked, it is also taking some memory
-            self.load_tab()
+            # self.load_tab()
 
             # the reason this is all the way down here is cause
             # it keeps it on the bottom so the user doesn't see till done
@@ -245,8 +242,8 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.book_window.focus()  # if window exists focus it
 
     def next_tab(self):
-        print(str(self.current_tab) + " < " + str(math.ceil((self.book_count - 1) / 10)))
-        if self.current_tab < math.ceil((self.book_count) / self.books_per_page) - 1:
+        # print(str(self.current_tab) + " < " + str(math.ceil((self.book_count - 1) / 10)))
+        if self.current_tab < math.ceil(self.book_count / self.books_per_page) - 1:
             self.current_tab += 1
             self.load_tab()
 
@@ -280,17 +277,18 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
         # multiply number of books per page by the current page number
         # to find the starting index to grab the books
-        #print("index to start at: " + str(self.current_tab * self.books_per_page))
+        # print("index to start at: " + str(self.current_tab * self.books_per_page))
         index_to_start_at = self.current_tab * self.books_per_page
 
-        #print("tab count: " + str(math.ceil(len(books) / self.books_per_page)))
+        # print(str(len(books)))
+        # print("tab count: " + str(math.ceil(len(books) / self.books_per_page)))
         tab_count = math.ceil(len(books) / self.books_per_page)
         # excess books so say the library is 35, then this comes to 5 to grab the last few for the last page
 
         counter = 0
-        #print("current tab: " + str(self.current_tab))
-        #print("books per page: " + str(self.books_per_page))
-        #print(str(tab_count) + " != " + str(self.current_tab+1))
+        # print("current tab: " + str(self.current_tab))
+        # print("books per page: " + str(self.books_per_page))
+        # print(str(tab_count) + " != " + str(self.current_tab+1))
         if self.book_count == 0:
             # TODO  works but, make the conditional be less shit
             num = None
@@ -304,8 +302,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                      x=books[index_to_start_at]: self.open_book_description(x),
                                                  fg_color="transparent", hover_color=dark_pink,
                                                  text=indent_string(books[index_to_start_at].get_name()),
-                                                 text_color=light_pink,
-                                                 font=("Roboto", 16))
+                                                 font=("Roboto", 18))
 
                 self.book_buttons.append(button)
                 index_to_start_at += 1
@@ -319,8 +316,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                      x=books[index_to_start_at]: self.open_book_description(x),
                                                  fg_color="transparent", hover_color=dark_pink,
                                                  text=indent_string(books[index_to_start_at].get_name()),
-                                                 text_color=light_pink,
-                                                 font=("Roboto", 16))
+                                                 font=("Roboto", 18))
 
                 self.book_buttons.append(button)
                 index_to_start_at += 1
@@ -331,8 +327,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         gc.collect()
 
     def print_page(self):
-        r = 1
+        r = 0
         c = 0
+        # print(str(len(self.book_buttons)))
         for i in self.book_buttons:
             i.grid(row=r, column=c)
             if c == 5:
@@ -353,18 +350,21 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                     book.append(Book(i['path'], i['name'], i['author'], i['link'], i['tagged']))
 
         self.book_count = len(book)
-        self.excess_books = 10 - (math.ceil(len(book) / 10) * 10 - len(book))
+        self.excess_books = self.books_per_page - (math.ceil(len(book) / self.books_per_page)
+                                                   * self.books_per_page - len(book))
 
-    # FIXME these throw an error and i can't figure out why
+    # FIXME these randomly throw an error and i can't figure out why
     def make_hotkeys(self):
         keyboard.add_hotkey('a', self.prev_tab)
-        keyboard.add_hotkey('left arrow', self.prev_page)
+        keyboard.add_hotkey('left arrow', self.prev_tab)
         keyboard.add_hotkey('d', self.next_tab)
         keyboard.add_hotkey('right arrow', self.next_tab)
 
     def kill_hotkeys(self):
         keyboard.clear_all_hotkeys()
 
+    def get_current_tab(self):
+        return self.current_tab
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
 
@@ -377,29 +377,32 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.grid_columnconfigure(4, weight=1)
         self.grid_columnconfigure(5, weight=1)
 
+        # books_per_page should be divisible by 12
+        self.books_per_page = 12
         self.book_window = None
         self.book_buttons = []
         self.current_tab = 0
         self.initialize_self()
-        # TODO i'd like to make this display more than 10 at a time
-        self.books_per_page = 10
 
         self.load_tab()
 
-        refresh = customtkinter.CTkButton(self, command=self.load_tab, text="refresh... replace w count?",
-                                          fg_color=light_pink,
-                                          text_color=black,
-                                          hover_color=dark_pink)
-        next_tab = customtkinter.CTkButton(self, command=self.next_tab, text="next",
-                                           fg_color=light_pink,
-                                           text_color=black,
-                                           hover_color=dark_pink, )
-        prev_tab = customtkinter.CTkButton(self, command=self.prev_tab, text="prev",
-                                           fg_color=light_pink,
-                                           text_color=black,
-                                           hover_color=dark_pink, )
+        # keyboard.clear_all_hotkeys()
+        # self.make_hotkeys()
 
-        pad = 10
-        prev_tab.grid(row=0, column=0, columnspan=2, sticky="nswe", padx=pad, pady=pad)
-        refresh.grid(row=0, column=2, columnspan=2, sticky="nswe", padx=pad, pady=pad)
-        next_tab.grid(row=0, column=4, columnspan=2, sticky="nswe", padx=pad, pady=pad)
+
+
+
+class TabNavigator(customtkinter.CTkFrame):
+    def __init__(self, bookframe, master, **kwargs):
+        super().__init__(master, **kwargs)
+        next_tab = customtkinter.CTkButton(self, text="Next Page", command=bookframe.next_tab, width=400,
+                                           fg_color=light_pink,
+                                           text_color=black,
+                                           hover_color=dark_pink)
+        prev_tab = customtkinter.CTkButton(self, text="Last Page", command=bookframe.prev_tab, width=400,
+                                           fg_color=light_pink,
+                                           text_color=black,
+                                           hover_color=dark_pink)
+
+        prev_tab.grid(row=0, column=0, padx=100, pady=10)
+        next_tab.grid(row=0, column=2, padx=100, pady=10)
