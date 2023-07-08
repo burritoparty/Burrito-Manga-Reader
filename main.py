@@ -9,7 +9,8 @@ from Tag import *
 
 arg_parser = argparse.ArgumentParser(prog='Burrito-Manga-Reader')
 arg_parser.add_argument('mangaloc', type=pathlib.Path,
-                        default="D:\\Burrito Manga Reader")
+                        default="D:\\Burrito Manga Reader",
+                        nargs='?')
 args = arg_parser.parse_args()
 
 # create database
