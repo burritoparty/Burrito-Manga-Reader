@@ -55,7 +55,8 @@ root.attributes('-topmost', 0)
 # make frames
 root.bookDisplayTabs = BookFrame(
     library_json=library_json, master=root, width=1650, height=1000)
-root.tagFrame = TagFrame(bookframe=root.bookDisplayTabs, master=root)
+root.tagFrame = TagFrame(
+    tag_json=tags_json, bookframe=root.bookDisplayTabs, master=root)
 root.authorFrame = AuthorFrame(master=root)
 root.importFrame = ImportFrame(
     library_json=library_json, library_path=args.mangaloc, bookframe=root.bookDisplayTabs, master=root)
