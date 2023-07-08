@@ -1,13 +1,21 @@
+import argparse
+import pathlib
+
 from Author import *
 from Database import *
 from Import import *
 from Library_Reader import *
 from Tag import *
 
+arg_parser = argparse.ArgumentParser(prog='Burrito-Manga-Reader')
+arg_parser.add_argument('mangaloc', type=pathlib.Path)
+args = arg_parser.parse_args()
+
 # create database
-if os.path.exists("D:\Burrito Manga Reader\library.json") is False:
-    file = open("D:\Burrito Manga Reader\library.json", "x")
-    with open("D:\Burrito Manga Reader\library.json", 'w') as f:
+library_json = os.path.join(args.mangaloc, "library.json")
+if os.path.exists(library_json) is False:
+    file = open(library_json, "x")
+    with open(library_json, "w") as f:
         books_json = {
             "book": [
             ]
@@ -16,9 +24,10 @@ if os.path.exists("D:\Burrito Manga Reader\library.json") is False:
     file.close()
 
 # create tag database
-if os.path.exists("D:\\Burrito Manga Reader\\tags.json") is False:
-    file = open("D:\\Burrito Manga Reader\\tags.json", "x")
-    with open("D:\\Burrito Manga Reader\\tags.json", 'w') as f:
+tags_json = os.path.join(args.mangaloc, "tags.json")
+if os.path.exists(tags_json) is False:
+    file = open(tags_json, "x")
+    with open(tags_json, "w") as f:
         books_json = {
             "tags": [
             ]
@@ -42,10 +51,12 @@ root.geometry('%dx%d+%d+%d' % (1920, 1080,
 root.attributes('-topmost', 0)
 
 # make frames
-root.bookDisplayTabs = BookFrame(master=root, width=1650, height=1000)
+root.bookDisplayTabs = BookFrame(
+    library_json=library_json, master=root, width=1650, height=1000)
 root.tagFrame = TagFrame(bookframe=root.bookDisplayTabs, master=root)
 root.authorFrame = AuthorFrame(master=root)
-root.importFrame = ImportFrame(bookframe=root.bookDisplayTabs, master=root)
+root.importFrame = ImportFrame(
+    library_json=library_json, library_path=args.mangaloc, bookframe=root.bookDisplayTabs, master=root)
 root.tab_nav = TabNavigator(bookframe=root.bookDisplayTabs, master=root)
 
 # place frames

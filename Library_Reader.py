@@ -31,7 +31,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # update page nymber
             self.current_page_num += 1
 
-            # change the page
+            # change
             self.page = customtkinter.CTkLabel(self.reader_window,
                                                image=self.page_list[self.current_page_num], text=None)
             self.page.grid(row=0, column=0, columnspan=3)
@@ -281,10 +281,10 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.book_buttons.clear()
 
         # load the  json
-        if path.isfile("D:\Burrito Manga Reader\library.json") is False:
+        if path.isfile(self.library_json) is False:
             print("FILE NOT FOUND")
         else:
-            with open("D:\Burrito Manga Reader\library.json") as f:
+            with open(self.library_json) as f:
                 books_json = json.load(f)
 
         books = []
@@ -365,10 +365,10 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 c += 1
 
     def initialize_self(self):
-        if path.isfile("D:\Burrito Manga Reader\library.json") is False:
+        if path.isfile(self.library_json) is False:
             print("FILE NOT FOUND")
         else:
-            with open("D:\Burrito Manga Reader\library.json") as f:
+            with open(self.library_json) as f:
                 books_json = json.load(f)
                 book = []
                 # grab the metadata
@@ -393,7 +393,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
     def get_current_tab(self):
         return self.current_tab
 
-    def __init__(self, master, **kwargs):
+    def __init__(self, library_json, master, **kwargs):
         super().__init__(master, **kwargs)
 
         # keyboard.clear_all_hotkeys()
@@ -410,6 +410,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.book_window = None
         self.book_buttons = []
         self.current_tab = 0
+        self.library_json = library_json
         self.initialize_self()
 
         self.load_tab()

@@ -18,12 +18,16 @@ class ImportFrame(customtkinter.CTkFrame):
         if self.import_window is None or not self.import_window.winfo_exists():
             # create window if its None or destroyed
             self.import_window = ImportWindow(
+                library_json=self.library_json,
+                library_path=self.library_path,
                 book_frame=library_frame, master=self)
         else:
             self.import_window.focus()  # if window exists focus it
 
-    def __init__(self, bookframe, master, **kwargs):
+    def __init__(self, library_path, library_json, bookframe, master, **kwargs):
         super().__init__(master, **kwargs)
+        self.library_path = library_path
+        self.library_json = library_json
 
         self.label = customtkinter.CTkLabel(
             self, text="Library", text_color=light_pink)
@@ -88,29 +92,30 @@ class ImportWindow(customtkinter.CTkToplevel):
 
             # now create and store book?
             # TODO get access to program files?
-            library_path = "D:\Burrito Manga Reader"
+            library_path = self.library_path
             book = Book(self.path, self.name, self.author,
                         self.link, self.tagged)
 
             # TODO need to restrict how long the name is for formatting reasons
             # make new path based on name / .strip() to remove the whitespace from the end
             self.name = self.name.strip()
-            newpath = (library_path.strip() + "\\" + self.name)
-            os.mkdir(library_path + "\\" + self.name)
+            newpath = os.path.join(library_path, self.name)
+            os.mkdir(os.path.join(library_path, self.name))
 
             # copy from old path to new path
             files = os.listdir(self.path)
             for i in files:
-                shutil.copy(self.path + "\\" + i, newpath + "\\" + i)
+                shutil.copy(os.path.join(self.path, i),
+                            os.path.join(newpath, i))
 
             # now update object's path
             book.path = newpath
 
             # import to json
-            if os.path.isfile("D:\Burrito Manga Reader\library.json") is False:
+            if os.path.isfile(self.library_json) is False:
                 print("FILE NOT FOUND")
             else:
-                with open("D:\Burrito Manga Reader\library.json") as f:
+                with open(self.library_json) as f:
                     books_json = json.load(f)
 
                 books_json['book'].append({
@@ -121,7 +126,7 @@ class ImportWindow(customtkinter.CTkToplevel):
                     "tagged": book.get_tags()
                 })
 
-                with open("D:\Burrito Manga Reader\library.json", 'w') as f:
+                with open(self.library_json, 'w') as f:
                     json.dump(books_json, f, indent=4)
 
                 # update the library count here
@@ -142,7 +147,7 @@ class ImportWindow(customtkinter.CTkToplevel):
                 error_window, text="Missing either: \nLink, \nName, \nAuthor, \nPath")
             label.grid(row=0, column=0, padx=10, pady=10)
 
-    def __init__(self, book_frame, *args, **kwargs):
+    def __init__(self, library_path, library_json, book_frame, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # this is keeping the window at the top
@@ -163,6 +168,8 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.author = None
         self.link = None
         self.tagged = []
+        self.library_path = library_path
+        self.library_json = library_json
 
         label = customtkinter.CTkLabel(self, text="placeholder image")
         label.grid(row=0, column=0, padx=20, pady=20, rowspan=3)
