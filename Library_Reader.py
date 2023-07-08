@@ -136,6 +136,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.book_window.geometry('%d+%d' % (
                 340, 220
             ))
+            # FIXME for fucks sake for the life of me i cannot center this fucking window i'm losing my mind
 
             # center shit
             self.book_window.grid_columnconfigure(0, weight=1)
@@ -253,7 +254,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.book_window.protocol(
                 'WM_DELETE_WINDOW', self.close_book_description)
 
-            # self.load_tab()
+            # FIXME for some reason, if this isn't here then after you close the window and try to reopen the book,
+            #  it crashes, seems like book's data gets fucked, it is also taking some memory
+            self.load_tab()
 
             # the reason this is all the way down here is cause
             # it keeps it on the bottom so the user doesn't see till done
@@ -380,10 +383,10 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.excess_books = self.books_per_page - (math.ceil(len(book) / self.books_per_page)
                                                    * self.books_per_page - len(book))
 
-    # FIXME these randomly throw an error and i can't figure out why
+    # FIXME these throw an error and i can't figure out why
     def make_hotkeys(self):
         keyboard.add_hotkey('a', self.prev_tab)
-        keyboard.add_hotkey('left arrow', self.prev_tab)
+        keyboard.add_hotkey('left arrow', self.prev_page)
         keyboard.add_hotkey('d', self.next_tab)
         keyboard.add_hotkey('right arrow', self.next_tab)
 
@@ -414,9 +417,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.initialize_self()
 
         self.load_tab()
-
-        # keyboard.clear_all_hotkeys()
-        # self.make_hotkeys()
 
 
 class TabNavigator(customtkinter.CTkFrame):
