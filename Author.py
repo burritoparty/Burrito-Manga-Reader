@@ -1,4 +1,5 @@
 import customtkinter
+
 from Database import *
 from Functions import *
 
@@ -10,13 +11,15 @@ class AuthorFrame(customtkinter.CTkFrame):
 
     def delete_author(self):
         if self.delete_author is None or not self.delete_author.winfo_exists():
-            self.delete_author = DeleteAuthor(self)  # create window if its None or destroyed
+            # create window if its None or destroyed
+            self.delete_author = DeleteAuthor(self)
         else:
             self.delete_author.focus()  # if window exists focus it
 
     def rename_author(self):
         if self.rename_author is None or not self.rename_author.winfo_exists():
-            self.rename_author = RenameAuthor(self)  # create window if its None or destroyed
+            # create window if its None or destroyed
+            self.rename_author = RenameAuthor(self)
         else:
             self.RenameAuthor.focus()  # if window exists focus it
 
@@ -132,7 +135,8 @@ class DeleteAuthor(customtkinter.CTkToplevel):
                 index += 1
 
         else:
-            self.label = customtkinter.CTkLabel(self, text="There are no existing authors.")
+            self.label = customtkinter.CTkLabel(
+                self, text="There are no existing authors.")
             self.label.grid(row=0, column=0, padx=20, pady=20)
 
 
@@ -190,5 +194,6 @@ class RenameAuthor(customtkinter.CTkToplevel):
 
         # TODO change to gray out buttons instead
         else:
-            self.label = customtkinter.CTkLabel(self, text="There are no existing authors.")
+            self.label = customtkinter.CTkLabel(
+                self, text="There are no existing authors.")
             self.label.grid(row=0, column=0, padx=20, pady=20)

@@ -1,8 +1,7 @@
 import gc
-import json
-import sys
-import customtkinter
 import os
+
+import customtkinter
 from PIL import Image, ImageDraw
 
 
@@ -48,16 +47,20 @@ class Book:
                 continue
             w, h = (Image.open(os.path.join(self.path, f))).size
             if w < 1600:
-                images.append(Image.open(os.path.join(self.path, f)).resize(SINGLE_PAGE_SIZE))
+                images.append(Image.open(os.path.join(
+                    self.path, f)).resize(SINGLE_PAGE_SIZE))
             else:
-                images.append(Image.open(os.path.join(self.path, f)).resize(DOUBLE_PAGE_SIZE))
+                images.append(Image.open(os.path.join(
+                    self.path, f)).resize(DOUBLE_PAGE_SIZE))
 
         for i in images:
             w, h = i.size
             if w < 1600:
-                pages.append((customtkinter.CTkImage(dark_image=i, size=SINGLE_PAGE_SIZE)))
+                pages.append((customtkinter.CTkImage(
+                    dark_image=i, size=SINGLE_PAGE_SIZE)))
             else:
-                pages.append((customtkinter.CTkImage(dark_image=i, size=DOUBLE_PAGE_SIZE)))
+                pages.append((customtkinter.CTkImage(
+                    dark_image=i, size=DOUBLE_PAGE_SIZE)))
 
         return pages
 
@@ -71,7 +74,8 @@ class Book:
             ext = os.path.splitext(f)[1]
             if ext.lower() not in VALID_IMAGES:
                 continue
-            cover_im = Image.open(os.path.join(self.path, f)).resize((400, 550))
+            cover_im = Image.open(os.path.join(
+                self.path, f)).resize((400, 550))
             break
 
         return customtkinter.CTkImage(
@@ -86,7 +90,8 @@ class Book:
         alpha.paste(circle.crop((0, 0, rad, rad)), (0, 0))
         alpha.paste(circle.crop((0, rad, rad, rad * 2)), (0, h - rad))
         alpha.paste(circle.crop((rad, 0, rad * 2, rad)), (w - rad, 0))
-        alpha.paste(circle.crop((rad, rad, rad * 2, rad * 2)), (w - rad, h - rad))
+        alpha.paste(circle.crop((rad, rad, rad * 2, rad * 2)),
+                    (w - rad, h - rad))
         im.putalpha(alpha)
         return im
 
