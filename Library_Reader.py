@@ -1,16 +1,17 @@
-import copy
 import gc
 import json
 import math
 from os import path
+
 import customtkinter
 import keyboard
+
 from Book import Book
 from Database import *
 from Functions import *
 
-
 # test line
+
 
 class BookFrame(customtkinter.CTkScrollableFrame):
 
@@ -30,14 +31,16 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # update page nymber
             self.current_page_num += 1
 
-            # change the page
+            # change
             self.page = customtkinter.CTkLabel(self.reader_window,
                                                image=self.page_list[self.current_page_num], text=None)
             self.page.grid(row=0, column=0, columnspan=3)
 
             # update the user's page counter
-            self.pagenum_text = str(str(self.current_page_num + 1) + " / " + str(len(self.page_list)))
-            self.pagenum_label = customtkinter.CTkLabel(self.reader_window, text=self.pagenum_text, font=("Roboto", 20))
+            self.pagenum_text = str(
+                str(self.current_page_num + 1) + " / " + str(len(self.page_list)))
+            self.pagenum_label = customtkinter.CTkLabel(
+                self.reader_window, text=self.pagenum_text, font=("Roboto", 20))
             self.pagenum_label.grid(row=1, column=1)
 
     def prev_page(self):
@@ -55,8 +58,10 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.page.grid(row=0, column=0, columnspan=3)
 
             # update the user's page counter
-            self.pagenum_text = str(str(self.current_page_num + 1) + " / " + str(len(self.page_list)))
-            self.pagenum_label = customtkinter.CTkLabel(self.reader_window, text=self.pagenum_text, font=("Roboto", 20))
+            self.pagenum_text = str(
+                str(self.current_page_num + 1) + " / " + str(len(self.page_list)))
+            self.pagenum_label = customtkinter.CTkLabel(
+                self.reader_window, text=self.pagenum_text, font=("Roboto", 20))
             self.pagenum_label.grid(row=1, column=1)
 
     def open_reader(self, book):
@@ -87,8 +92,10 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
             # counting shit
             self.current_page_num = 0
-            self.pagenum_text = str(str(self.current_page_num + 1) + " / " + str(len(self.page_list)))
-            self.pagenum_label = customtkinter.CTkLabel(self.reader_window, text=self.pagenum_text, font=("Roboto", 20))
+            self.pagenum_text = str(
+                str(self.current_page_num + 1) + " / " + str(len(self.page_list)))
+            self.pagenum_label = customtkinter.CTkLabel(
+                self.reader_window, text=self.pagenum_text, font=("Roboto", 20))
 
             # buttons
             next_page = customtkinter.CTkButton(self.reader_window, text="->", command=self.next_page,
@@ -99,7 +106,8 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                             hover_color=dark_pink, fg_color=light_pink, text_color=black)
 
             # page
-            self.page = customtkinter.CTkLabel(self.reader_window, text=None, image=self.page_list[0], compound="n")
+            self.page = customtkinter.CTkLabel(
+                self.reader_window, text=None, image=self.page_list[0], compound="n")
 
             # place all the shit
             pad = 5
@@ -108,8 +116,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.pagenum_label.grid(row=1, column=1, padx=pad, pady=pad)
             next_page.grid(row=1, column=2, padx=pad, pady=pad)
             close.grid(row=2, column=1, padx=pad, pady=10)
-
-
 
         else:
             self.reader_window.focus()
@@ -139,9 +145,11 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # make widgets
             # read button, making new cover to resize
             read_button = customtkinter.CTkButton(self.book_window, compound="top", fg_color="transparent",
-                                                  hover_color=dark_pink,font=("Roboto", 16),
+                                                  hover_color=dark_pink, font=(
+                                                      "Roboto", 16),
                                                   image=book.get_full_cover(),
-                                                  command=lambda x=book: self.open_reader(x),
+                                                  command=lambda x=book: self.open_reader(
+                                                      x),
                                                   text=indent_string(book.get_name()))
 
             # labels
@@ -162,16 +170,21 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
             # entry
             w = 925
-            book_link_entry = customtkinter.CTkEntry(self.book_window, placeholder_text="LINK", width=w)
-            book_name_entry = customtkinter.CTkEntry(self.book_window, placeholder_text="NAME", width=w)
-            book_author_entry = customtkinter.CTkEntry(self.book_window, placeholder_text="AUTHOR", width=w)
+            book_link_entry = customtkinter.CTkEntry(
+                self.book_window, placeholder_text="LINK", width=w)
+            book_name_entry = customtkinter.CTkEntry(
+                self.book_window, placeholder_text="NAME", width=w)
+            book_author_entry = customtkinter.CTkEntry(
+                self.book_window, placeholder_text="AUTHOR", width=w)
             book_link_entry.insert(0, book.get_link())
             book_name_entry.insert(0, book.get_name())
             book_author_entry.insert(0, book.get_author())
 
             # scrollable frame
-            tag_scroller = customtkinter.CTkScrollableFrame(self.book_window, width=400, height=300)
-            page_scroller = customtkinter.CTkScrollableFrame(self.book_window, width=1850, height=440)
+            tag_scroller = customtkinter.CTkScrollableFrame(
+                self.book_window, width=400, height=300)
+            page_scroller = customtkinter.CTkScrollableFrame(
+                self.book_window, width=1850, height=440)
 
             # get pages
             page_thumbs = book.get_pages(True)
@@ -219,18 +232,26 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             book_name_label.grid(row=2, column=1, padx=pad, pady=pad)
             book_author_label.grid(row=4, column=1, padx=pad, pady=pad)
 
-            book_link_entry.grid(row=1, column=1, columnspan=2, padx=pad, pady=pad)
-            book_name_entry.grid(row=3, column=1, columnspan=2, padx=pad, pady=pad)
-            book_author_entry.grid(row=5, column=1, columnspan=2, padx=pad, pady=pad)
+            book_link_entry.grid(
+                row=1, column=1, columnspan=2, padx=pad, pady=pad)
+            book_name_entry.grid(
+                row=3, column=1, columnspan=2, padx=pad, pady=pad)
+            book_author_entry.grid(
+                row=5, column=1, columnspan=2, padx=pad, pady=pad)
 
-            book_link_button.grid(row=0, column=2, sticky="ns", padx=pad, pady=pad)
-            book_name_button.grid(row=2, column=2, sticky="ns", padx=pad, pady=pad)
-            book_author_button.grid(row=4, column=2, sticky="ns", padx=pad, pady=pad)
+            book_link_button.grid(
+                row=0, column=2, sticky="ns", padx=pad, pady=pad)
+            book_name_button.grid(
+                row=2, column=2, sticky="ns", padx=pad, pady=pad)
+            book_author_button.grid(
+                row=4, column=2, sticky="ns", padx=pad, pady=pad)
 
             tag_scroller.grid(row=0, column=3, rowspan=6, padx=pad, pady=pad)
-            page_scroller.grid(row=6, column=0, columnspan=4, padx=pad, pady=pad)
+            page_scroller.grid(
+                row=6, column=0, columnspan=4, padx=pad, pady=pad)
 
-            self.book_window.protocol('WM_DELETE_WINDOW', self.close_book_description)
+            self.book_window.protocol(
+                'WM_DELETE_WINDOW', self.close_book_description)
 
             # self.load_tab()
 
@@ -260,16 +281,17 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.book_buttons.clear()
 
         # load the  json
-        if path.isfile("D:\Burrito Manga Reader\library.json") is False:
+        if path.isfile(self.library_json) is False:
             print("FILE NOT FOUND")
         else:
-            with open("D:\Burrito Manga Reader\library.json") as f:
+            with open(self.library_json) as f:
                 books_json = json.load(f)
 
         books = []
         # load all the books (metadata) into memory
         for i in books_json['book']:
-            books.append(Book(i['path'], i['name'], i['author'], i['link'], i['tagged']))
+            books.append(Book(i['path'], i['name'],
+                         i['author'], i['link'], i['tagged']))
 
         # TODO
         #  call sorting tags or authors functions here maybe?
@@ -297,11 +319,13 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # create the book objects
             while counter < self.books_per_page:
                 button = customtkinter.CTkButton(self, compound="top",
-                                                 image=books[index_to_start_at].get_cover(),
+                                                 image=books[index_to_start_at].get_cover(
+                                                 ),
                                                  command=lambda
-                                                     x=books[index_to_start_at]: self.open_book_description(x),
+                                                 x=books[index_to_start_at]: self.open_book_description(x),
                                                  fg_color="transparent", hover_color=dark_pink,
-                                                 text=indent_string(books[index_to_start_at].get_name()),
+                                                 text=indent_string(
+                                                     books[index_to_start_at].get_name()),
                                                  font=("Roboto", 18))
 
                 self.book_buttons.append(button)
@@ -311,11 +335,13 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # create the book objects
             while counter < self.excess_books:
                 button = customtkinter.CTkButton(self, compound="top",
-                                                 image=books[index_to_start_at].get_cover(),
+                                                 image=books[index_to_start_at].get_cover(
+                                                 ),
                                                  command=lambda
-                                                     x=books[index_to_start_at]: self.open_book_description(x),
+                                                 x=books[index_to_start_at]: self.open_book_description(x),
                                                  fg_color="transparent", hover_color=dark_pink,
-                                                 text=indent_string(books[index_to_start_at].get_name()),
+                                                 text=indent_string(
+                                                     books[index_to_start_at].get_name()),
                                                  font=("Roboto", 18))
 
                 self.book_buttons.append(button)
@@ -339,15 +365,16 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 c += 1
 
     def initialize_self(self):
-        if path.isfile("D:\Burrito Manga Reader\library.json") is False:
+        if path.isfile(self.library_json) is False:
             print("FILE NOT FOUND")
         else:
-            with open("D:\Burrito Manga Reader\library.json") as f:
+            with open(self.library_json) as f:
                 books_json = json.load(f)
                 book = []
                 # grab the metadata
                 for i in books_json['book']:
-                    book.append(Book(i['path'], i['name'], i['author'], i['link'], i['tagged']))
+                    book.append(Book(i['path'], i['name'],
+                                i['author'], i['link'], i['tagged']))
 
         self.book_count = len(book)
         self.excess_books = self.books_per_page - (math.ceil(len(book) / self.books_per_page)
@@ -365,7 +392,8 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
     def get_current_tab(self):
         return self.current_tab
-    def __init__(self, master, **kwargs):
+
+    def __init__(self, library_json, master, **kwargs):
         super().__init__(master, **kwargs)
 
         # keyboard.clear_all_hotkeys()
@@ -382,14 +410,13 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.book_window = None
         self.book_buttons = []
         self.current_tab = 0
+        self.library_json = library_json
         self.initialize_self()
 
         self.load_tab()
 
         # keyboard.clear_all_hotkeys()
         # self.make_hotkeys()
-
-
 
 
 class TabNavigator(customtkinter.CTkFrame):

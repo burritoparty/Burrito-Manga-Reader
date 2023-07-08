@@ -1,7 +1,10 @@
 import customtkinter
+
 from Database import *
 from Functions import *
+
 # test line# test e
+
 
 class TagFrame(customtkinter.CTkFrame):
 
@@ -29,13 +32,15 @@ class TagFrame(customtkinter.CTkFrame):
 
     def delete_tag(self):
         if self.delete_tag is None or not self.delete_tag.winfo_exists():
-            self.delete_tag = DeleteTag(self)  # create window if its None or destroyed
+            # create window if its None or destroyed
+            self.delete_tag = DeleteTag(self)
         else:
             self.delete_tag.focus()  # if window exists focus it
 
     def rename_tag(self):
         if self.rename_tag is None or not self.rename_tag.winfo_exists():
-            self.rename_tag = RenameTag(self)  # create window if its None or destroyed
+            # create window if its None or destroyed
+            self.rename_tag = RenameTag(self)
         else:
             self.rename_tag.focus()  # if window exists focus it
 
@@ -88,6 +93,7 @@ class TagFrame(customtkinter.CTkFrame):
         self.tagRenameButton.grid(row=4, column=0, padx=20, pady=20)
         self.rename_tag = None
 
+
 class DeleteTag(customtkinter.CTkToplevel):
 
     def removal(self, name_of_tag):
@@ -136,7 +142,8 @@ class DeleteTag(customtkinter.CTkToplevel):
                 index += 1
 
         else:
-            self.label = customtkinter.CTkLabel(self, text="There are no existing tags.")
+            self.label = customtkinter.CTkLabel(
+                self, text="There are no existing tags.")
             self.label.grid(row=0, column=0, padx=20, pady=20)
 
 
@@ -194,5 +201,6 @@ class RenameTag(customtkinter.CTkToplevel):
                 index += 1
 
         else:
-            self.label = customtkinter.CTkLabel(self, text="There are no existing tags.")
+            self.label = customtkinter.CTkLabel(
+                self, text="There are no existing tags.")
             self.label.grid(row=0, column=0, padx=20, pady=20)
