@@ -2,8 +2,10 @@ import json
 import os
 import shutil
 from tkinter.filedialog import askdirectory
+
 import customtkinter
 from PIL import Image
+
 from Book import Book
 from Database import *
 from Functions import *
@@ -14,14 +16,17 @@ class ImportFrame(customtkinter.CTkFrame):
     def open_import_window(self, library_frame):
 
         if self.import_window is None or not self.import_window.winfo_exists():
-            self.import_window = ImportWindow(book_frame=library_frame, master=self)  # create window if its None or destroyed
+            # create window if its None or destroyed
+            self.import_window = ImportWindow(
+                book_frame=library_frame, master=self)
         else:
             self.import_window.focus()  # if window exists focus it
 
     def __init__(self, bookframe, master, **kwargs):
         super().__init__(master, **kwargs)
 
-        self.label = customtkinter.CTkLabel(self, text="Library", text_color=light_pink)
+        self.label = customtkinter.CTkLabel(
+            self, text="Library", text_color=light_pink)
 
         # add new book button
         self.import_book = customtkinter.CTkButton(self,
@@ -54,7 +59,6 @@ class ImportWindow(customtkinter.CTkToplevel):
     def input_path(self):
         self.path = askdirectory()
 
-
         images = []
         valid_images = [".jpg", ".png"]
 
@@ -65,7 +69,8 @@ class ImportWindow(customtkinter.CTkToplevel):
                 continue
             images.append(Image.open(os.path.join(self.path, f)))
 
-        cover = customtkinter.CTkImage(dark_image=add_corners(images[0], 25), size=(200, 275))
+        cover = customtkinter.CTkImage(
+            dark_image=add_corners(images[0], 25), size=(200, 275))
         cover = customtkinter.CTkLabel(self, image=cover, text=None)
         cover.grid(row=0, column=0, rowspan=3, padx=20, pady=20)
 
@@ -84,7 +89,8 @@ class ImportWindow(customtkinter.CTkToplevel):
             # now create and store book?
             # TODO get access to program files?
             library_path = "D:\Burrito Manga Reader"
-            book = Book(self.path, self.name, self.author, self.link, self.tagged)
+            book = Book(self.path, self.name, self.author,
+                        self.link, self.tagged)
 
             # TODO need to restrict how long the name is for formatting reasons
             # make new path based on name / .strip() to remove the whitespace from the end
@@ -132,7 +138,8 @@ class ImportWindow(customtkinter.CTkToplevel):
             error_window.geometry('150x100+1275+720')
             error_window.grid_columnconfigure(0, weight=1)
             error_window.columnconfigure(0, weight=1)
-            label = customtkinter.CTkLabel(error_window, text="Missing either: \nLink, \nName, \nAuthor, \nPath")
+            label = customtkinter.CTkLabel(
+                error_window, text="Missing either: \nLink, \nName, \nAuthor, \nPath")
             label.grid(row=0, column=0, padx=10, pady=10)
 
     def __init__(self, book_frame, *args, **kwargs):
@@ -160,11 +167,13 @@ class ImportWindow(customtkinter.CTkToplevel):
         label = customtkinter.CTkLabel(self, text="placeholder image")
         label.grid(row=0, column=0, padx=20, pady=20, rowspan=3)
 
-        self.link_entry = customtkinter.CTkEntry(self, placeholder_text="Enter Link", width=750)
+        self.link_entry = customtkinter.CTkEntry(
+            self, placeholder_text="Enter Link", width=750)
         self.link_entry.grid(row=0, column=1, padx=20, pady=20)
 
         # TODO set string limit to 65 chars
-        self.name_entry = customtkinter.CTkEntry(self, placeholder_text="Enter Name", width=750)
+        self.name_entry = customtkinter.CTkEntry(
+            self, placeholder_text="Enter Name", width=750)
         self.name_entry.grid(row=1, column=1, padx=20, pady=20)
 
         # TODO add autocomplete, https://github.com/TomSchimansky/CustomTkinter/issues/255
@@ -188,7 +197,8 @@ class ImportWindow(customtkinter.CTkToplevel):
         c = 0
         for i in tags:
             self.checkbox = customtkinter.CTkCheckBox(self.tag_frame, text=i,
-                                                      command=lambda x=i: self.tagged.append(x),
+                                                      command=lambda x=i: self.tagged.append(
+                                                          x),
                                                       hover_color=light_pink, fg_color=dark_pink,
                                                       text_color=light_pink)
             self.checkbox.grid(row=r, column=c, pady=(20, 0), padx=20)

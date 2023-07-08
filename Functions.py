@@ -1,6 +1,7 @@
-from PIL import Image
-from PIL import ImageDraw
+from PIL import Image, ImageDraw
+
 # test line
+
 
 def add_corners(im, rad):
     circle = Image.new('L', (rad * 2, rad * 2), 0)
