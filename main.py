@@ -40,7 +40,7 @@ if os.path.exists(tags_json) is False:
 tags.sort()
 authors.sort()
 
-customtkinter.set_appearance_mode("system")
+customtkinter.set_appearance_mode("dark")
 root = customtkinter.CTk()  # main window
 root.title("Burrito Manga Reader")  # name of program
 # set dimensions and center window
