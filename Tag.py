@@ -1,30 +1,30 @@
 import json
-import os
 from os import path
+
 import customtkinter
+
+from Database import black, dark_pink, light_pink
 from Functions import *
-from Database import light_pink
-from Database import dark_pink
-from Database import hot_pink
-from Database import black
+from Library_Reader import BookFrame
 
 
 class TagFrame(customtkinter.CTkFrame):
 
-    def tag_append_call(self, tags_json):
-        tags = []
+    def tag_append_call(self, tags_json: str):
+        tags: list[str] = []
         if path.isfile(tags_json) is False:
             print("path dont exist")
         else:
             # create the dialogue box
-            tags_append_dialogue = customtkinter.CTkInputDialog(text="New tag: ", title="Append a new tag")
+            tags_append_dialogue = customtkinter.CTkInputDialog(
+                text="New tag: ", title="Append a new tag")
             tags_append_dialogue.geometry('0+0')
 
-            # load the json
+            # load the JSON
             with open(tags_json, 'r') as f:
                 load_tags = json.load(f)
 
-            # load the tag names from the json into an array
+            # load the tag names from the JSON into an array
             for i in load_tags['tags']:
                 tags.append(i['name'])
 
@@ -32,9 +32,9 @@ class TagFrame(customtkinter.CTkFrame):
             new_tag = tags_append_dialogue.get_input()
 
             # check if the input is valid
-            if new_tag == '':
+            if new_tag == '' or new_tag is None:
                 # user hit the cancel button
-                do_nothing = 0
+                pass
             elif check_exists(new_tag, tags, False) is False:
                 error = customtkinter.CTkToplevel()
                 error.geometry("0+0")
@@ -50,11 +50,11 @@ class TagFrame(customtkinter.CTkFrame):
                 # delete all the tags
                 del load_tags['tags']
 
-                # delete ['tags'] object from json
+                # delete ['tags'] object from JSON
                 with open(tags_json, 'w') as f:
                     json.dump(load_tags, f, indent=2)
 
-                # load the ['tags'] object back into json
+                # load the ['tags'] object back into JSON
                 with open(tags_json, 'w') as f:
                     t = {
                         "tags": [
@@ -63,7 +63,7 @@ class TagFrame(customtkinter.CTkFrame):
                     }
                     json.dump(t, f, indent=2)
 
-                # load the json back in
+                # load the JSON back in
                 with open(tags_json, 'r') as f:
                     load_tags = json.load(f)
 
@@ -73,14 +73,14 @@ class TagFrame(customtkinter.CTkFrame):
                         "name": i
                     })
 
-                # finalize json
+                # finalize JSON
                 with open(tags_json, 'w') as f:
                     json.dump(load_tags, f, indent=2)
 
-    def tag_delete_call(self, tags_json, window):
+    def tag_delete_call(self, tags_json: str, window: customtkinter.CTkToplevel | None):
         # TODO need to remove this tag from all entries in the library that have it
-        tags = []
-        buttons = []
+        tags: list[str] = []
+        buttons: list[customtkinter.CTkButton] = []
         index = 0
         num_loops = 0
         r = 0
@@ -96,11 +96,11 @@ class TagFrame(customtkinter.CTkFrame):
                 window.title("Delete tag")
                 window.geometry("0+0")
 
-                # load the json
+                # load the JSON
                 with open(tags_json, 'r') as f:
                     load_tags = json.load(f)
 
-                # load the tag names from the json into an array
+                # load the tag names from the JSON into an array
                 for i in load_tags['tags']:
                     tags.append(i['name'])
 
@@ -110,11 +110,11 @@ class TagFrame(customtkinter.CTkFrame):
                     for i in tags:
                         button = customtkinter.CTkButton(window, text=i,
                                                          command=lambda
-                                                             w=window,
-                                                             x=tags_json,
-                                                             y=i,
-                                                             z=tags,
-                                                             a=load_tags: self.tag_deleter(w, x, y, z, a))
+                                                         w=window,
+                                                         x=tags_json,
+                                                         y=i,
+                                                         z=tags,
+                                                         a=load_tags: self.tag_deleter(w, x, y, z, a))
                         buttons.append(button)
                         buttons[index].grid(row=r, column=c, padx=20, pady=20)
 
@@ -126,13 +126,16 @@ class TagFrame(customtkinter.CTkFrame):
                         num_loops += 1
                         index += 1
                 else:
-                    label = customtkinter.CTkLabel(window, text="There are no tags to delete")
+                    label = customtkinter.CTkLabel(
+                        window, text="There are no tags to delete")
                     label.grid(padx=10, pady=10)
 
             else:
                 window.focus()
 
-    def tag_deleter(self, window, tags_json, tag_to_delete, tag_array, tag_loader):
+    def tag_deleter(
+            self, window: customtkinter.CTkToplevel, tags_json: str,
+            tag_to_delete: str, tag_array: list[str], tag_loader: dict):
         # remove tag
         tag_array.remove(tag_to_delete)
         tag_array.sort()
@@ -140,11 +143,11 @@ class TagFrame(customtkinter.CTkFrame):
         # delete all the tags
         del tag_loader['tags']
 
-        # delete ['tags'] object from json
+        # delete ['tags'] object from JSON
         with open(tags_json, 'w') as f:
             json.dump(tag_loader, f, indent=2)
 
-        # load the ['tags'] object back into json
+        # load the ['tags'] object back into JSON
         with open(tags_json, 'w') as f:
             t = {
                 "tags": [
@@ -153,7 +156,7 @@ class TagFrame(customtkinter.CTkFrame):
             }
             json.dump(t, f, indent=2)
 
-        # load the json back in
+        # load the JSON back in
         with open(tags_json, 'r') as f:
             load_tags = json.load(f)
 
@@ -163,16 +166,16 @@ class TagFrame(customtkinter.CTkFrame):
                 "name": i
             })
 
-        # finalize json
+        # finalize JSON
         with open(tags_json, 'w') as f:
             json.dump(load_tags, f, indent=2)
 
         window.destroy()
 
-    def tag_rename_call(self, tags_json, window):
+    def tag_rename_call(self, tags_json: str, window: customtkinter.CTkToplevel | None):
         # TODO need to rename this tag in all entries in the library that have it
-        tags = []
-        buttons = []
+        tags: list[str] = []
+        buttons: list[customtkinter.CTkButton] = []
         index = 0
         num_loops = 0
         r = 0
@@ -188,11 +191,11 @@ class TagFrame(customtkinter.CTkFrame):
                 window.title("Rename tag")
                 window.geometry("0+0")
 
-                # load the json
+                # load the JSON
                 with open(tags_json, 'r') as f:
                     load_tags = json.load(f)
 
-                # load the tag names from the json into an array
+                # load the tag names from the JSON into an array
                 for i in load_tags['tags']:
                     tags.append(i['name'])
 
@@ -202,11 +205,11 @@ class TagFrame(customtkinter.CTkFrame):
                     for i in tags:
                         button = customtkinter.CTkButton(window, text=i,
                                                          command=lambda
-                                                             w=window,
-                                                             x=tags_json,
-                                                             y=i,
-                                                             z=tags,
-                                                             a=load_tags:
+                                                         w=window,
+                                                         x=tags_json,
+                                                         y=i,
+                                                         z=tags,
+                                                         a=load_tags:
                                                          self.tag_rename_dialogue(w, x, y, z, a))
                         buttons.append(button)
                         buttons[index].grid(row=r, column=c, padx=20, pady=20)
@@ -219,24 +222,28 @@ class TagFrame(customtkinter.CTkFrame):
                         num_loops += 1
                         index += 1
                 else:
-                    label = customtkinter.CTkLabel(window, text="There are no tags to rename")
+                    label = customtkinter.CTkLabel(
+                        window, text="There are no tags to rename")
                     label.grid(padx=10, pady=10)
 
             else:
                 window.focus()
 
-    def tag_rename_dialogue(self, window, tags_json, tag_to_rename, tag_array, tag_loader):
+    def tag_rename_dialogue(
+            self, window: customtkinter.CTkToplevel, tags_json: str,
+            tag_to_rename: str, tag_array: list[str], tag_loader: dict):
 
         # create dialogue entry
         text = "Rename tag: " + tag_to_rename
-        tags_rename_dialogue = customtkinter.CTkInputDialog(text=text, title="Rename a tag")
+        tags_rename_dialogue = customtkinter.CTkInputDialog(
+            text=text, title="Rename a tag")
         tags_rename_dialogue.geometry('0+0')
 
         # get the tag's new name
-        new_name = tags_rename_dialogue.get_input()
+        new_name = tags_rename_dialogue.get_input() or ""
 
         # check if the input is valid
-        if check_exists(new_name, tag_array, True) is False:
+        if not check_exists(new_name, tag_array, True):
             error = customtkinter.CTkToplevel()
             error.attributes('-topmost', 2)
             error.geometry("0+0")
@@ -255,11 +262,11 @@ class TagFrame(customtkinter.CTkFrame):
             # delete all the tags
             del tag_loader['tags']
 
-            # delete ['tags'] object from json
+            # delete ['tags'] object from JSON
             with open(tags_json, 'w') as f:
                 json.dump(tag_loader, f, indent=2)
 
-            # load the ['tags'] object back into json
+            # load the ['tags'] object back into JSON
             with open(tags_json, 'w') as f:
                 t = {
                     "tags": [
@@ -268,7 +275,7 @@ class TagFrame(customtkinter.CTkFrame):
                 }
                 json.dump(t, f, indent=2)
 
-            # load the json back in
+            # load the JSON back in
             with open(tags_json, 'r') as f:
                 load_tags = json.load(f)
 
@@ -278,13 +285,13 @@ class TagFrame(customtkinter.CTkFrame):
                     "name": i
                 })
 
-            # finalize json
+            # finalize JSON
             with open(tags_json, 'w') as f:
                 json.dump(load_tags, f, indent=2)
 
             window.destroy()
 
-    def __init__(self, tag_json, bookframe, master, **kwargs):
+    def __init__(self, tag_json: str, bookframe: BookFrame, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
 
         # make windows

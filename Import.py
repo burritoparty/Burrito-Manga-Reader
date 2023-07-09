@@ -2,12 +2,12 @@ import json
 import os
 import shutil
 from tkinter.filedialog import askdirectory
+
 import customtkinter
 from PIL import Image
+
 from Book import Book
-from Database import light_pink
-from Database import dark_pink
-from Database import black
+from Database import black, dark_pink, light_pink
 from Functions import *
 
 
@@ -41,8 +41,8 @@ class ImportFrame(customtkinter.CTkFrame):
                                                    text_color=black,
                                                    hover_color=dark_pink,
                                                    command=lambda
-                                                       x=bookframe,
-                                                       y=tag_json,
+                                                   x=bookframe,
+                                                   y=tag_json,
                                                    z=authors_json:
                                                    self.open_import_window(x, y, z))
         self.import_window = None
@@ -72,7 +72,7 @@ class ImportWindow(customtkinter.CTkToplevel):
         images = []
         valid_images = [".jpg", ".png"]
 
-        # idk how to get the first image in this path so.... this works... :shrug:
+        # IDK how to get the first image in this path so.... this works... :shrug:
         for f in os.listdir(self.path):
             ext = os.path.splitext(f)[1]
             if ext.lower() not in valid_images:
@@ -117,7 +117,7 @@ class ImportWindow(customtkinter.CTkToplevel):
             # now update object's path
             book.path = newpath
 
-            # import to json
+            # import to JSON
             if os.path.isfile(self.library_json) is False:
                 print("FILE NOT FOUND")
             else:
@@ -173,7 +173,7 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.name = None
         self.author = None
         self.link = None
-        self.tagged = []
+        self.tagged: list[str] = []
         self.library_path = library_path
         self.library_json = library_json
 
@@ -189,14 +189,14 @@ class ImportWindow(customtkinter.CTkToplevel):
             self, placeholder_text="Enter Name", width=750)
         self.name_entry.grid(row=1, column=1, padx=20, pady=20)
 
-        # get from json
-        # grab from the json and append to array
-        # load the json
+        # get from JSON
+        # grab from the JSON and append to array
+        # load the JSON
         authors = []
         with open(authors_json, 'r') as f:
             load_authors = json.load(f)
 
-        # load the tag names from the json into an array
+        # load the tag names from the JSON into an array
         for i in load_authors['authors']:
             authors.append(i['name'])
 
@@ -229,13 +229,13 @@ class ImportWindow(customtkinter.CTkToplevel):
         r = 0
         c = 0
 
-        # grab from the json and append to array
-        # load the json
+        # grab from the JSON and append to array
+        # load the JSON
         tags = []
         with open(tag_json, 'r') as f:
             load_tags = json.load(f)
 
-        # load the tag names from the json into an array
+        # load the tag names from the JSON into an array
         for i in load_tags['tags']:
             tags.append(i['name'])
 
@@ -255,7 +255,8 @@ class ImportWindow(customtkinter.CTkToplevel):
             num_loops += 1
 
         self.submit_button = customtkinter.CTkButton(self, text="Submit",
-                                                     command=lambda x=book_frame, y=tag_json: self.finalize_book(x, y),
+                                                     command=lambda x=book_frame, y=tag_json: self.finalize_book(
+                                                         x, y),
                                                      fg_color=light_pink, hover_color=dark_pink, text_color=black)
         self.submit_button.grid(row=1, column=3, padx=20, pady=20)
 

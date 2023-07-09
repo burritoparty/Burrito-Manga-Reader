@@ -3,11 +3,11 @@ from PIL import Image, ImageDraw
 # test line
 
 
-def add_corners(im, rad):
+def add_corners(im: Image.Image, rad: int):
     circle = Image.new('L', (rad * 2, rad * 2), 0)
     draw = ImageDraw.Draw(circle)
     draw.ellipse((0, 0, rad * 2 - 1, rad * 2 - 1), fill=255)
-    alpha = Image.new('L', im._size, 255)
+    alpha = Image.new('L', im.size, 255)
     w, h = im.size
     alpha.paste(circle.crop((0, 0, rad, rad)), (0, 0))
     alpha.paste(circle.crop((0, rad, rad, rad * 2)), (0, h - rad))
@@ -19,20 +19,20 @@ def add_corners(im, rad):
 
 # returns the x coordinate for use in centering window
 # ex: get_x_coordinates(1920, root.winfo_screenwidth())
-def get_x_coordinates(width, screen_width):
+def get_x_coordinates(width: int, screen_width: int):
     return (screen_width / 2) - (width / 2)
 
 
 # returns the y coordinate for use in centering window
 # ex: get_y_coordinates(1080, root.winfo_screenwidth())
-def get_y_coordinates(height, screen_height):
+def get_y_coordinates(height: int, screen_height: int):
     return (screen_height / 2) - (height / 2)
 
 
 # provide a string to check if it exists in a list
 # returns True if it exists in the provided list
 # check case is false if caps do not matter
-def check_exists(new_string, db_list, check_case):
+def check_exists(new_string: str, db_list: list, check_case: bool):
     is_new = True
 
     # caps do not matter
@@ -57,8 +57,7 @@ def check_exists(new_string, db_list, check_case):
 
 
 # indents a string at whitespace every thirty characters up to 100 chars and returns it
-def indent_string(title):
-    index = 0
+def indent_string(title: str):
     twentyfive = False
     fifty = False
     seventy = False
@@ -68,7 +67,7 @@ def indent_string(title):
     hun_75 = False
     twohun = False
     # lol there's def a better way to do this, but it works so whatever
-    for i in title:
+    for (index, _) in enumerate(title):
         if index > 25 and twentyfive is False and str(title[index]).isspace():
             title = title[:index + 1] + "\n" + title[index + 1:]
             twentyfive = True
@@ -93,6 +92,5 @@ def indent_string(title):
         elif index > 200 and twohun is False and str(title[index]).isspace():
             title = title[:index + 1] + "\n" + title[index + 1:]
             twohun = True
-        index += 1
 
     return title

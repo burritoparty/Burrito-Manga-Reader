@@ -5,25 +5,27 @@ import customtkinter
 
 from Database import *
 from Functions import *
+from Library_Reader import BookFrame
 
 
 class AuthorFrame(customtkinter.CTkFrame):
 
-    def author_append_call(self, authors_json):
+    def author_append_call(self, authors_json: str):
         print("add")
-        authors = []
+        authors: list[str] = []
         if path.isfile(authors_json) is False:
             print("path dont exist")
         else:
-            # create the dialogue box
-            authors_append_dialogue = customtkinter.CTkInputDialog(text="New Author: ", title="Append a new author")
+            # create the dialog box
+            authors_append_dialogue = customtkinter.CTkInputDialog(
+                text="New Author: ", title="Append a new author")
             authors_append_dialogue.geometry('0+0')
 
-            # load the json
+            # load the JSON
             with open(authors_json, 'r') as f:
                 load_authors = json.load(f)
 
-            # load the tag names from the json into an array
+            # load the tag names from the JSON into an array
             for i in load_authors['authors']:
                 authors.append(i['name'])
 
@@ -31,9 +33,9 @@ class AuthorFrame(customtkinter.CTkFrame):
             new_author = authors_append_dialogue.get_input()
 
             # check if the input is valid
-            if new_author == '':
+            if new_author == '' or new_author is None:
                 # user hit the cancel button
-                do_nothing = 0
+                pass
             elif check_exists(new_author, authors, False) is False:
                 error = customtkinter.CTkToplevel()
                 error.geometry("0+0")
@@ -49,11 +51,11 @@ class AuthorFrame(customtkinter.CTkFrame):
                 # delete all the authors
                 del load_authors['authors']
 
-                # delete ['authors'] object from json
+                # delete ['authors'] object from JSON
                 with open(authors_json, 'w') as f:
                     json.dump(load_authors, f, indent=2)
 
-                # load the ['authors'] object back into json
+                # load the ['authors'] object back into JSON
                 with open(authors_json, 'w') as f:
                     t = {
                         "authors": [
@@ -61,7 +63,7 @@ class AuthorFrame(customtkinter.CTkFrame):
                     }
                     json.dump(t, f, indent=2)
 
-                # load the json back in
+                # load the JSON back in
                 with open(authors_json, 'r') as f:
                     load_authors = json.load(f)
 
@@ -71,17 +73,17 @@ class AuthorFrame(customtkinter.CTkFrame):
                         "name": i
                     })
 
-                # finalize json
+                # finalize JSON
                 with open(authors_json, 'w') as f:
                     json.dump(load_authors, f, indent=2)
 
-    def author_delete_call(self, authors_json, window):
+    def author_delete_call(self, authors_json: str, window):
         print("delete")
 
-    def author_rename_call(self, authors_json, window):
+    def author_rename_call(self, authors_json: str, window):
         print("rename")
 
-    def __init__(self, authors_json, bookframe, master, **kwargs):
+    def __init__(self, authors_json: str, bookframe: BookFrame, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
 
         # make windows
