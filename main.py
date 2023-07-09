@@ -37,6 +37,20 @@ if os.path.exists(tags_json) is False:
         json.dump(books_json, f, indent=2)
     file.close()
 
+# create author database
+authors_json = os.path.join(args.mangaloc, "authors.json")
+if os.path.exists(authors_json) is False:
+    file = open(authors_json, "x")
+    with open(authors_json, "w") as f:
+        books_json = {
+            "authors": [
+            ]
+        }
+        json.dump(books_json, f, indent=2)
+        file.close()
+
+
+
 
 # sorting database
 tags.sort()
@@ -57,7 +71,8 @@ root.bookDisplayTabs = BookFrame(
     library_json=library_json, tag_json=tags_json, master=root, width=1650, height=1000)
 root.tagFrame = TagFrame(
     tag_json=tags_json, bookframe=root.bookDisplayTabs, master=root)
-root.authorFrame = AuthorFrame(master=root)
+root.authorFrame = AuthorFrame(
+    authors_json=authors_json, bookframe=root.bookDisplayTabs, master=root)
 root.importFrame = ImportFrame(
     library_json=library_json, library_path=args.mangaloc, tag_json=tags_json,
     bookframe=root.bookDisplayTabs, master=root)
