@@ -1,3 +1,6 @@
+import json
+from os import path
+
 import customtkinter
 
 from Database import *
@@ -8,6 +11,69 @@ class AuthorFrame(customtkinter.CTkFrame):
 
     def author_append_call(self, authors_json):
         print("add")
+        authors = []
+        if path.isfile(authors_json) is False:
+            print("path dont exist")
+        else:
+            # create the dialogue box
+            authors_append_dialogue = customtkinter.CTkInputDialog(text="New Author: ", title="Append a new author")
+            authors_append_dialogue.geometry('0+0')
+
+            # load the json
+            with open(authors_json, 'r') as f:
+                load_authors = json.load(f)
+
+            # load the tag names from the json into an array
+            for i in load_authors['authors']:
+                authors.append(i['name'])
+
+            # get the input from the user
+            new_author = authors_append_dialogue.get_input()
+
+            # check if the input is valid
+            if new_author == '':
+                # user hit the cancel button
+                do_nothing = 0
+            elif check_exists(new_author, authors, False) is False:
+                error = customtkinter.CTkToplevel()
+                error.geometry("0+0")
+                label = customtkinter.CTkLabel(error,
+                                               text="this tag already exists\n(not case sensitive)",
+                                               font=("Roboto", 20))
+                label.grid(padx=10, pady=10)
+            else:
+                # append the new tag to the array
+                authors.append(new_author)
+                authors.sort()
+
+                # delete all the authors
+                del load_authors['authors']
+
+                # delete ['authors'] object from json
+                with open(authors_json, 'w') as f:
+                    json.dump(load_authors, f, indent=2)
+
+                # load the ['authors'] object back into json
+                with open(authors_json, 'w') as f:
+                    t = {
+                        "authors": [
+                        ]
+                    }
+                    json.dump(t, f, indent=2)
+
+                # load the json back in
+                with open(authors_json, 'r') as f:
+                    load_authors = json.load(f)
+
+                # load them all back into load_authors
+                for i in authors:
+                    load_authors["authors"].append({
+                        "name": i
+                    })
+
+                # finalize json
+                with open(authors_json, 'w') as f:
+                    json.dump(load_authors, f, indent=2)
 
     def author_delete_call(self, authors_json, window):
         print("delete")
