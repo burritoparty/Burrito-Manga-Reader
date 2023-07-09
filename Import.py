@@ -2,29 +2,31 @@ import json
 import os
 import shutil
 from tkinter.filedialog import askdirectory
-
 import customtkinter
 from PIL import Image
-
 from Book import Book
-from Database import *
+from Database import light_pink
+from Database import dark_pink
+from Database import black
+from Database import authors
 from Functions import *
 
 
 class ImportFrame(customtkinter.CTkFrame):
 
-    def open_import_window(self, library_frame):
+    def open_import_window(self, library_frame, tag_json):
 
         if self.import_window is None or not self.import_window.winfo_exists():
             # create window if its None or destroyed
             self.import_window = ImportWindow(
                 library_json=self.library_json,
                 library_path=self.library_path,
+                tag_json=tag_json,
                 book_frame=library_frame, master=self)
         else:
             self.import_window.focus()  # if window exists focus it
 
-    def __init__(self, library_path, library_json, bookframe, master, **kwargs):
+    def __init__(self, library_path, library_json, tag_json, bookframe, master, **kwargs):
         super().__init__(master, **kwargs)
         self.library_path = library_path
         self.library_json = library_json
@@ -38,7 +40,8 @@ class ImportFrame(customtkinter.CTkFrame):
                                                    fg_color=light_pink,
                                                    text_color=black,
                                                    hover_color=dark_pink,
-                                                   command=lambda x=bookframe: self.open_import_window(x))
+                                                   command=lambda
+                                                       x=bookframe, y=tag_json: self.open_import_window(x, y))
         self.import_window = None
 
         self.import_library = customtkinter.CTkButton(self,
@@ -147,7 +150,7 @@ class ImportWindow(customtkinter.CTkToplevel):
                 error_window, text="Missing either: \nLink, \nName, \nAuthor, \nPath")
             label.grid(row=0, column=0, padx=10, pady=10)
 
-    def __init__(self, library_path, library_json, book_frame, *args, **kwargs):
+    def __init__(self, library_path, library_json, tag_json, book_frame, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # this is keeping the window at the top
@@ -202,6 +205,17 @@ class ImportWindow(customtkinter.CTkToplevel):
         num_loops = 0
         r = 0
         c = 0
+
+        # grab from the json and append to array
+        # load the json
+        tags = []
+        with open(tag_json, 'r') as f:
+            load_tags = json.load(f)
+
+        # load the tag names from the json into an array
+        for i in load_tags['tags']:
+            tags.append(i['name'])
+
         for i in tags:
             self.checkbox = customtkinter.CTkCheckBox(self.tag_frame, text=i,
                                                       command=lambda x=i: self.tagged.append(
