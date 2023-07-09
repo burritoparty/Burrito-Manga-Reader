@@ -8,13 +8,12 @@ from Book import Book
 from Database import light_pink
 from Database import dark_pink
 from Database import black
-from Database import authors
 from Functions import *
 
 
 class ImportFrame(customtkinter.CTkFrame):
 
-    def open_import_window(self, library_frame, tag_json):
+    def open_import_window(self, library_frame, tag_json, authors_json):
 
         if self.import_window is None or not self.import_window.winfo_exists():
             # create window if its None or destroyed
@@ -22,11 +21,12 @@ class ImportFrame(customtkinter.CTkFrame):
                 library_json=self.library_json,
                 library_path=self.library_path,
                 tag_json=tag_json,
+                authors_json=authors_json,
                 book_frame=library_frame, master=self)
         else:
             self.import_window.focus()  # if window exists focus it
 
-    def __init__(self, library_path, library_json, tag_json, bookframe, master, **kwargs):
+    def __init__(self, library_path, library_json, tag_json, authors_json, bookframe, master, **kwargs):
         super().__init__(master, **kwargs)
         self.library_path = library_path
         self.library_json = library_json
@@ -41,7 +41,10 @@ class ImportFrame(customtkinter.CTkFrame):
                                                    text_color=black,
                                                    hover_color=dark_pink,
                                                    command=lambda
-                                                       x=bookframe, y=tag_json: self.open_import_window(x, y))
+                                                       x=bookframe,
+                                                       y=tag_json,
+                                                   z=authors_json:
+                                                   self.open_import_window(x, y, z))
         self.import_window = None
 
         self.import_library = customtkinter.CTkButton(self,
@@ -150,7 +153,7 @@ class ImportWindow(customtkinter.CTkToplevel):
                 error_window, text="Missing either: \nLink, \nName, \nAuthor, \nPath")
             label.grid(row=0, column=0, padx=10, pady=10)
 
-    def __init__(self, library_path, library_json, tag_json, book_frame, *args, **kwargs):
+    def __init__(self, library_path, library_json, tag_json, authors_json, book_frame, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # this is keeping the window at the top
@@ -186,7 +189,19 @@ class ImportWindow(customtkinter.CTkToplevel):
             self, placeholder_text="Enter Name", width=750)
         self.name_entry.grid(row=1, column=1, padx=20, pady=20)
 
-        # TODO add autocomplete, https://github.com/TomSchimansky/CustomTkinter/issues/255
+        # get from json
+        # grab from the json and append to array
+        # load the json
+        authors = []
+        with open(authors_json, 'r') as f:
+            load_authors = json.load(f)
+
+        # load the tag names from the json into an array
+        for i in load_authors['authors']:
+            authors.append(i['name'])
+
+        print(authors)
+
         self.author_cbox = customtkinter.CTkComboBox(self,
                                                      values=authors,
                                                      fg_color=light_pink,
@@ -222,7 +237,7 @@ class ImportWindow(customtkinter.CTkToplevel):
                                                           x),
                                                       hover_color=light_pink, fg_color=dark_pink,
                                                       text_color=light_pink)
-            self.checkbox.grid(row=r, column=c, pady=(20, 0), padx=20)
+            self.checkbox.grid(row=r, column=c, pady=15, padx=15)
 
             if c == 7:
                 c = 0

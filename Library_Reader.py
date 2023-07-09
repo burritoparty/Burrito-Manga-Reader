@@ -252,7 +252,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                           y=tag_json,
                                                           z=i:
                                                       self.append_new_tags(x, y, z))
-                check_box.grid(row=r, column=c, padx=20, pady=20)
+                check_box.grid(row=r, column=c, padx=10, pady=10)
                 if c == 2:
                     c = 0
                     r += 1
