@@ -5,6 +5,7 @@ import os
 from os import path
 
 import customtkinter
+import keyboard
 
 from Book import Book
 from Database import black, dark_pink, light_pink
@@ -16,11 +17,14 @@ from Functions import *
 class BookFrame(customtkinter.CTkScrollableFrame):
 
     def close_reader(self):
-        # lift description window back up
+        # clear windows hotkeys
+        keyboard.clear_all_hotkeys()
         if self.reader_window:
+            # yeet the reader window
             self.reader_window.destroy()
             self.reader_window = None
         if self.book_window:
+            # lift description window back up
             self.book_window.attributes('-topmost', 1)
 
     def next_page(self):
@@ -79,6 +83,15 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.reader_window.attributes('-fullscreen', True)
             self.reader_window.attributes('-topmost', 3)
 
+            # make windows hoykeys
+            keyboard.add_hotkey('a', self.prev_page)
+            keyboard.add_hotkey('left arrow', self.prev_page)
+            keyboard.add_hotkey('d', self.next_page)
+            keyboard.add_hotkey('right arrow', self.next_page)
+            # FIXME close reader with esc key throws error
+            # keyboard.on_press('esc', self.close_reader)
+
+            # make mac hoykeys
             self.reader_window.bind('a', lambda _: self.prev_page())
             self.reader_window.bind('<Left>', lambda _: self.next_page())
             self.reader_window.bind('d', lambda _: self.prev_page())
