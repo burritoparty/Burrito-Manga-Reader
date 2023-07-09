@@ -438,16 +438,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.excess_books = self.books_per_page - (math.ceil(len(book) / self.books_per_page)
                                                    * self.books_per_page - len(book))
 
-    # FIXME these throw an error and i can't figure out why
-    def make_hotkeys(self):
-        keyboard.add_hotkey('a', self.prev_tab)
-        keyboard.add_hotkey('left arrow', self.prev_page)
-        keyboard.add_hotkey('d', self.next_tab)
-        keyboard.add_hotkey('right arrow', self.next_tab)
-
-    def kill_hotkeys(self):
-        keyboard.clear_all_hotkeys()
-
     def get_current_tab(self):
         return self.current_tab
 
@@ -475,13 +465,13 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
 
 class TabNavigator(customtkinter.CTkFrame):
-    def __init__(self, bookframe, master, **kwargs):
+    def __init__(self, bookframe, tag_json, master, **kwargs):
         super().__init__(master, **kwargs)
-        next_tab = customtkinter.CTkButton(self, text="Next Page", command=bookframe.next_tab, width=400,
+        next_tab = customtkinter.CTkButton(self, text="Next Page", command=lambda x=tag_json: bookframe.next_tab(x), width=400,
                                            fg_color=light_pink,
                                            text_color=black,
                                            hover_color=dark_pink)
-        prev_tab = customtkinter.CTkButton(self, text="Last Page", command=bookframe.prev_tab, width=400,
+        prev_tab = customtkinter.CTkButton(self, text="Last Page", command=lambda x=tag_json: bookframe.next_tab(x), width=400,
                                            fg_color=light_pink,
                                            text_color=black,
                                            hover_color=dark_pink)

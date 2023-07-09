@@ -76,7 +76,7 @@ root.authorFrame = AuthorFrame(
 root.importFrame = ImportFrame(
     library_json=library_json, library_path=args.mangaloc, tag_json=tags_json, authors_json=authors_json,
     bookframe=root.bookDisplayTabs, master=root)
-root.tab_nav = TabNavigator(bookframe=root.bookDisplayTabs, master=root)
+root.tab_nav = TabNavigator(bookframe=root.bookDisplayTabs, tag_json=tags_json, master=root)
 
 # place frames
 root.tagFrame.grid(row=0, column=0, padx=20, pady=20, rowspan=2)
