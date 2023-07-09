@@ -78,6 +78,7 @@ class TagFrame(customtkinter.CTkFrame):
                     json.dump(load_tags, f, indent=2)
 
     def tag_delete_call(self, tags_json, window):
+        # TODO need to remove this tag from all entries in the library that have it
         tags = []
         buttons = []
         index = 0
@@ -169,6 +170,7 @@ class TagFrame(customtkinter.CTkFrame):
         window.destroy()
 
     def tag_rename_call(self, tags_json, window):
+        # TODO need to rename this tag in all entries in the library that have it
         tags = []
         buttons = []
         index = 0

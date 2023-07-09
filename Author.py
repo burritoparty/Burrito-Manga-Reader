@@ -101,13 +101,6 @@ class AuthorFrame(customtkinter.CTkFrame):
                                                      text_color=black,
                                                      hover_color=dark_pink,
                                                      command=lambda x=authors_json: self.author_append_call(x))
-        self.author_delete = customtkinter.CTkButton(self,
-                                                     text="Delete author",
-                                                     fg_color=light_pink,
-                                                     text_color=black,
-                                                     hover_color=dark_pink,
-                                                     command=lambda x=authors_json,
-                                                     y=authors_delete_window: self.author_delete_call(x, y))
         self.author_rename = customtkinter.CTkButton(self,
                                                      text="Rename author",
                                                      fg_color=light_pink,
@@ -118,5 +111,4 @@ class AuthorFrame(customtkinter.CTkFrame):
 
         self.author_sort.grid(row=0, column=0, padx=20, pady=20)
         self.author_append.grid(row=2, column=0, padx=20, pady=20)
-        self.author_delete.grid(row=3, column=0, padx=20, pady=20)
-        self.author_rename.grid(row=4, column=0, padx=20, pady=20)
+        self.author_rename.grid(row=3, column=0, padx=20, pady=20)
