@@ -8,11 +8,8 @@ import customtkinter
 import keyboard
 
 from Book import Book
-from Database import light_pink
-from Database import dark_pink
-from Database import black
+from Database import black, dark_pink, light_pink
 from Functions import *
-
 
 # test line
 
@@ -23,21 +20,27 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         # yeet dem hotkeys
         keyboard.clear_all_hotkeys()
         # lift description window back up
-        self.reader_window.destroy()
-        self.book_window.attributes('-topmost', 1)
+        if self.reader_window:
+            self.reader_window.destroy()
+            self.reader_window = None
+        if self.book_window:
+            self.book_window.attributes('-topmost', 1)
 
     def next_page(self):
         if self.current_page_num < len(self.page_list) - 1:
-            # destroy current items
-            self.page.destroy()
-            self.pagenum_label.destroy()
 
-            # update page nymber
+            if self.page:
+                # destroy current items
+                self.page.destroy()
+            if self.pagenum_label:
+                self.pagenum_label.destroy()
+
+            # update page number
             self.current_page_num += 1
 
             # change
             self.page = customtkinter.CTkLabel(self.reader_window,
-                                               image=self.page_list[self.current_page_num], text=None)
+                                               image=self.page_list[self.current_page_num], text="")
             self.page.grid(row=0, column=0, columnspan=3)
 
             # update the user's page counter
@@ -49,16 +52,19 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
     def prev_page(self):
         if self.current_page_num != 0:
+            assert self.page
+            assert self.pagenum_label
+
             # destroy current items
             self.page.destroy()
             self.pagenum_label.destroy()
 
-            # update page nymber
+            # update page number
             self.current_page_num -= 1
 
             # change the page
             self.page = customtkinter.CTkLabel(self.reader_window,
-                                               image=self.page_list[self.current_page_num], text=None)
+                                               image=self.page_list[self.current_page_num], text="")
             self.page.grid(row=0, column=0, columnspan=3)
 
             # update the user's page counter
@@ -68,8 +74,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 self.reader_window, text=self.pagenum_text, font=("Roboto", 20))
             self.pagenum_label.grid(row=1, column=1)
 
-    def open_reader(self, book):
+    def open_reader(self, book: Book):
         if self.reader_window is None or not self.reader_window.winfo_exists():
+            assert self.book_window
 
             # make hotkeys
             keyboard.add_hotkey('a', self.prev_page)
@@ -111,7 +118,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
             # page
             self.page = customtkinter.CTkLabel(
-                self.reader_window, text=None, image=self.page_list[0], compound="n")
+                self.reader_window, text="", image=self.page_list[0], compound="n")
 
             # place all the shit
             pad = 5
@@ -125,11 +132,13 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.reader_window.focus()
 
     def close_book_description(self):
+        assert self.book_window
+
         self.book_window.destroy()
         # yeet that memory into the stratosphere!
         gc.collect()
 
-    def append_new_tags(self, book, tag_json, checked_tag):
+    def append_new_tags(self, book: Book, tag_json: str, checked_tag: str):
         if os.path.isfile(self.library_json) is False:
             print("FILE NOT FOUND")
         else:
@@ -137,34 +146,33 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 # load the library
                 books_json = json.load(f)
 
-
                 if check_exists(checked_tag, book.get_tags(), False):
-                    # loops through books_json's elements
+                    # loops through book's JSON elements
                     for b in books_json['book']:
                         # if b's path matches our current book's path
                         if b['path'] == book.get_path():
-                            # append the tag to the json
+                            # append the tag to the JSON
                             b['tagged'].append(checked_tag)
                             # and update the current objects tags
                             book.get_tags().append(checked_tag)
                 else:
-                    # loops through books_json's elements
+                    # loops through book's_JSON elements
                     for b in books_json['book']:
                         # if b's path matches our current book's path
                         if b['path'] == book.get_path():
-                            # remove the tag from the json
+                            # remove the tag from the JSON
                             b['tagged'].remove(checked_tag)
                             # and update the current objects tags
                             book.get_tags().remove(checked_tag)
 
-                # write to the json
+                # write to the JSON
                 with open(self.library_json, 'w') as f:
                     json.dump(books_json, f, indent=2)
 
                 # updates the tab to refresh tags when clicked again
                 self.load_tab(tag_json)
 
-    def open_book_description(self, book, tag_json):
+    def open_book_description(self, book: Book, tag_json: str):
         if self.book_window is None or not self.book_window.winfo_exists():
             self.reader_window = None
             self.book_window = customtkinter.CTkToplevel()
@@ -185,7 +193,8 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # make widgets
             # read button, making new cover to resize
             read_button = customtkinter.CTkButton(self.book_window, compound="top", fg_color="transparent",
-                                                  hover_color=dark_pink, font=("Roboto", 16),
+                                                  hover_color=dark_pink, font=(
+                                                      "Roboto", 16),
                                                   image=book.get_full_cover(),
                                                   command=lambda x=book: self.open_reader(
                                                       x),
@@ -228,19 +237,19 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # get pages
             page_thumbs = book.get_pages(True)
 
-            tag_checks = []
+            tag_checks: list[customtkinter.CTkCheckBox] = []
 
             r = 0
             c = 0
 
-            # TODO pull from a json
+            # TODO pull from a JSON
 
-            # grab from the json and append to array
-            tags = []
+            # grab from the JSON and append to array
+            tags: list[str] = []
             with open(tag_json, 'r') as f:
                 load_tags = json.load(f)
 
-            # load the tag names from the json into an array
+            # load the tag names from the JSON into an array
             for i in load_tags['tags']:
                 tags.append(i['name'])
 
@@ -248,9 +257,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 check_box = customtkinter.CTkCheckBox(tag_scroller, text=i,
                                                       hover_color=light_pink, fg_color=dark_pink, text_color=light_pink,
                                                       command=lambda
-                                                          x=book,
-                                                          y=tag_json,
-                                                          z=i:
+                                                      x=book,
+                                                      y=tag_json,
+                                                      z=i:
                                                       self.append_new_tags(x, y, z))
                 check_box.grid(row=r, column=c, padx=10, pady=10)
                 if c == 2:
@@ -318,32 +327,34 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         else:
             self.book_window.focus()  # if window exists focus it
 
-    def next_tab(self, tag_json):
+    def next_tab(self, tag_json: str):
         # print(str(self.current_tab) + " < " + str(math.ceil((self.book_count - 1) / 10)))
         if self.current_tab < math.ceil(self.book_count / self.books_per_page) - 1:
             self.current_tab += 1
             self.load_tab(tag_json)
 
-    def prev_tab(self, tag_json):
+    def prev_tab(self, tag_json: str):
         if self.current_tab != 0:
             self.current_tab -= 1
             self.load_tab(tag_json)
 
-    def load_tab(self, tag_json):
+    def load_tab(self, tag_json: str):
 
         # if the library already has books, destroy them
         for i in self.book_buttons:
             i.destroy()
         self.book_buttons.clear()
 
-        # load the  json
+        books_json = {}
+
+        # load the JSON
         if path.isfile(self.library_json) is False:
             print("FILE NOT FOUND")
         else:
             with open(self.library_json) as f:
                 books_json = json.load(f)
 
-        books = []
+        books: list[Book] = []
         # load all the books (metadata) into memory
         for i in books_json['book']:
             books.append(Book(i['path'], i['name'],
@@ -369,7 +380,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         # print(str(tab_count) + " != " + str(self.current_tab+1))
         if self.book_count == 0:
             # TODO  works but, make the conditional be less shit
-            num = None
+            pass
 
         elif tab_count != self.current_tab + 1:
             # create the book objects
@@ -378,7 +389,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                  image=books[index_to_start_at].get_cover(
                                                  ),
                                                  command=lambda
-                                                     x=books[index_to_start_at], y=tag_json: self.open_book_description(
+                                                 x=books[index_to_start_at], y=tag_json: self.open_book_description(
                                                      x, y),
                                                  fg_color="transparent", hover_color=dark_pink,
                                                  text=indent_string(
@@ -395,7 +406,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                  image=books[index_to_start_at].get_cover(
                                                  ),
                                                  command=lambda
-                                                     x=books[index_to_start_at], y=tag_json: self.open_book_description(
+                                                 x=books[index_to_start_at], y=tag_json: self.open_book_description(
                                                      x, y),
                                                  fg_color="transparent", hover_color=dark_pink,
                                                  text=indent_string(
@@ -423,12 +434,13 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 c += 1
 
     def initialize_self(self):
+        book: list[Book] = []
+
         if path.isfile(self.library_json) is False:
             print("FILE NOT FOUND")
         else:
             with open(self.library_json) as f:
                 books_json = json.load(f)
-                book = []
                 # grab the metadata
                 for i in books_json['book']:
                     book.append(Book(i['path'], i['name'],
@@ -441,7 +453,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
     def get_current_tab(self):
         return self.current_tab
 
-    def __init__(self, library_json, tag_json, master, **kwargs):
+    def __init__(self, library_json: str, tag_json: str, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
 
         # keyboard.clear_all_hotkeys()
@@ -456,16 +468,20 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         # books_per_page should be divisible by 12
         self.books_per_page = 12
         self.book_window = None
-        self.book_buttons = []
+        self.book_buttons: list[customtkinter.CTkButton] = []
         self.current_tab = 0
         self.library_json = library_json
+        self.page: customtkinter.CTkLabel | None = None
+        self.pagenum_label: customtkinter.CTkLabel | None = None
+        self.reader_window: customtkinter.CTkToplevel | None = None
+        self.book_window: customtkinter.CTkToplevel | None = None
         self.initialize_self()
 
         self.load_tab(tag_json)
 
 
 class TabNavigator(customtkinter.CTkFrame):
-    def __init__(self, bookframe, tag_json, master, **kwargs):
+    def __init__(self, bookframe: BookFrame, tag_json: str, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
         next_tab = customtkinter.CTkButton(self, text="Next Page", command=lambda x=tag_json: bookframe.next_tab(x), width=400,
                                            fg_color=light_pink,
