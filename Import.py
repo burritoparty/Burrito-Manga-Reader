@@ -215,6 +215,14 @@ class ImportWindow(customtkinter.CTkToplevel):
         # TODO long tag names do not fit
         self.tag_frame = customtkinter.CTkScrollableFrame(self, label_text="Select Tags",
                                                           width=1100, label_text_color=light_pink)
+        # align checkbox columns
+        self.tag_frame.columnconfigure(0, weight=1)
+        self.tag_frame.columnconfigure(1, weight=1)
+        self.tag_frame.columnconfigure(2, weight=1)
+        self.tag_frame.columnconfigure(3, weight=1)
+        self.tag_frame.columnconfigure(4, weight=1)
+        self.tag_frame.columnconfigure(5, weight=1)
+        self.tag_frame.columnconfigure(6, weight=1)
         self.tag_frame.grid(row=4, column=0, columnspan=4, padx=20, pady=20)
 
         num_loops = 0

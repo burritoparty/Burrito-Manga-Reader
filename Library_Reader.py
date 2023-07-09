@@ -299,7 +299,10 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 row=2, column=2, sticky="ns", padx=pad, pady=pad)
             book_author_button.grid(
                 row=4, column=2, sticky="ns", padx=pad, pady=pad)
-
+            # align checkbox columns
+            tag_scroller.grid_columnconfigure(0, weight=1)
+            tag_scroller.grid_columnconfigure(1, weight=1)
+            tag_scroller.grid_columnconfigure(1, weight=1)
             tag_scroller.grid(row=0, column=3, rowspan=6, padx=pad, pady=pad)
             page_scroller.grid(
                 row=6, column=0, columnspan=4, padx=pad, pady=pad)
@@ -471,7 +474,7 @@ class TabNavigator(customtkinter.CTkFrame):
                                            fg_color=light_pink,
                                            text_color=black,
                                            hover_color=dark_pink)
-        prev_tab = customtkinter.CTkButton(self, text="Last Page", command=lambda x=tag_json: bookframe.next_tab(x), width=400,
+        prev_tab = customtkinter.CTkButton(self, text="Last Page", command=lambda x=tag_json: bookframe.prev_tab(x), width=400,
                                            fg_color=light_pink,
                                            text_color=black,
                                            hover_color=dark_pink)
