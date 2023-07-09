@@ -15,6 +15,10 @@ from Functions import *
 
 class BookFrame(customtkinter.CTkScrollableFrame):
 
+    def focus_reader(self):
+        assert self.reader_window
+        self.reader_window.focus()
+    
     def close_reader(self):
         # lift description window back up
         if self.reader_window:
@@ -80,8 +84,8 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.reader_window.attributes('-topmost', 3)
 
             self.reader_window.bind('a', lambda _: self.prev_page())
-            self.reader_window.bind('<Left>', lambda _: self.next_page())
-            self.reader_window.bind('d', lambda _: self.prev_page())
+            self.reader_window.bind('<Left>', lambda _: self.prev_page())
+            self.reader_window.bind('d', lambda _: self.next_page())
             self.reader_window.bind('<Right>', lambda _: self.next_page())
             self.reader_window.bind('<Escape>', lambda _: self.close_reader())
 
@@ -122,9 +126,12 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.pagenum_label.grid(row=1, column=1, padx=pad, pady=pad)
             next_page.grid(row=1, column=2, padx=pad, pady=pad)
             close.grid(row=2, column=1, padx=pad, pady=10)
-
-        else:
-            self.reader_window.focus()
+        
+        # Focus the reader window, but wait 1ms.
+        # On Windows machines, the window doesn't always get focus, so keyboard
+        # shortcuts won't work. But waiting a 1ms seems to ensure focus is
+        # obtained.
+        self.reader_window.after(1, self.focus_reader)
 
     def close_book_description(self):
         assert self.book_window
