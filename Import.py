@@ -87,7 +87,7 @@ class ImportWindow(customtkinter.CTkToplevel):
     def input_tag(self, tag):
         self.tagged.append(tag)
 
-    def finalize_book(self, book_frame):
+    def finalize_book(self, book_frame, tag_json):
         if self.path is not None and self.author_cbox.get() != "" and self.name_entry.get() != "" and self.link_entry.get() != "":
             self.author = self.author_cbox.get()
             self.name = self.name_entry.get()
@@ -133,9 +133,9 @@ class ImportWindow(customtkinter.CTkToplevel):
                     json.dump(books_json, f, indent=4)
 
                 # update the library count here
-                book_frame.load_tab()
+                book_frame.load_tab(tag_json)
                 book_frame.initialize_self()
-                book_frame.load_tab()
+                book_frame.load_tab(tag_json)
 
             self.destroy()
 
@@ -231,7 +231,8 @@ class ImportWindow(customtkinter.CTkToplevel):
                 c += 1
             num_loops += 1
 
-        self.submit_button = customtkinter.CTkButton(self, text="Submit", command=lambda x=book_frame: self.finalize_book(x),
+        self.submit_button = customtkinter.CTkButton(self, text="Submit",
+                                                     command=lambda x=book_frame, y=tag_json: self.finalize_book(x, y),
                                                      fg_color=light_pink, hover_color=dark_pink, text_color=black)
         self.submit_button.grid(row=1, column=3, padx=20, pady=20)
 

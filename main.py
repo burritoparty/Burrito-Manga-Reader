@@ -54,7 +54,7 @@ root.attributes('-topmost', 0)
 
 # make frames
 root.bookDisplayTabs = BookFrame(
-    library_json=library_json, master=root, width=1650, height=1000)
+    library_json=library_json, tag_json=tags_json, master=root, width=1650, height=1000)
 root.tagFrame = TagFrame(
     tag_json=tags_json, bookframe=root.bookDisplayTabs, master=root)
 root.authorFrame = AuthorFrame(master=root)
