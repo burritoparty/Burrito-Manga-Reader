@@ -5,7 +5,6 @@ import os
 from os import path
 
 import customtkinter
-import keyboard
 
 from Book import Book
 from Database import black, dark_pink, light_pink
@@ -17,8 +16,6 @@ from Functions import *
 class BookFrame(customtkinter.CTkScrollableFrame):
 
     def close_reader(self):
-        # yeet dem hotkeys
-        keyboard.clear_all_hotkeys()
         # lift description window back up
         if self.reader_window:
             self.reader_window.destroy()
@@ -78,17 +75,15 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         if self.reader_window is None or not self.reader_window.winfo_exists():
             assert self.book_window
 
-            # make hotkeys
-            keyboard.add_hotkey('a', self.prev_page)
-            keyboard.add_hotkey('left arrow', self.prev_page)
-            keyboard.add_hotkey('d', self.next_page)
-            keyboard.add_hotkey('right arrow', self.next_page)
-            # FIXME only the esc throws an error
-            keyboard.add_hotkey('esc', self.close_reader)
-
             self.reader_window = customtkinter.CTkToplevel()
             self.reader_window.attributes('-fullscreen', True)
             self.reader_window.attributes('-topmost', 3)
+
+            self.reader_window.bind('a', lambda _: self.prev_page())
+            self.reader_window.bind('<Left>', lambda _: self.next_page())
+            self.reader_window.bind('d', lambda _: self.prev_page())
+            self.reader_window.bind('<Right>', lambda _: self.next_page())
+            self.reader_window.bind('<Escape>', lambda _: self.close_reader())
 
             # push description window down
             self.book_window.attributes('-topmost', 0)
