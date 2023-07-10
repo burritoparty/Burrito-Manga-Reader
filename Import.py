@@ -76,86 +76,101 @@ class ImportWindow(customtkinter.CTkToplevel):
         valid_images = [".jpg", ".png"]
 
         # IDK how to get the first image in this path so.... this works... :shrug:
-        for f in os.listdir(self.path):
-            ext = os.path.splitext(f)[1]
-            if ext.lower() not in valid_images:
-                continue
-            images.append(Image.open(os.path.join(self.path, f)))
+        if self.path != '':
+            for f in os.listdir(self.path):
+                ext = os.path.splitext(f)[1]
+                if ext.lower() not in valid_images:
+                    continue
+                images.append(Image.open(os.path.join(self.path, f)))
 
-        cover = customtkinter.CTkImage(
-            dark_image=add_corners(images[0], 25), size=(200, 275))
-        cover = customtkinter.CTkLabel(self, image=cover, text=None)
-        cover.grid(row=0, column=0, rowspan=3, padx=20, pady=20)
+            cover = customtkinter.CTkImage(
+                dark_image=add_corners(images[0], 25), size=(200, 275))
+            cover = customtkinter.CTkLabel(self, image=cover, text=None)
+            cover.grid(row=0, column=0, rowspan=3, padx=20, pady=20)
 
-        if self.name_entry.get() == "":
-            self.name_entry.insert(0, os.path.basename(self.path))
+            if self.name_entry.get() == "":
+                self.name_entry.insert(0, os.path.basename(self.path))
 
     def input_tag(self, tag):
         self.tagged.append(tag)
 
     def finalize_book(self, book_frame, tag_json):
         if self.path is not None and self.author_cbox.get() != "" and self.name_entry.get() != "" and self.link_entry.get() != "":
-            self.author = self.author_cbox.get()
-            self.name = self.name_entry.get()
-            self.link = self.link_entry.get()
+            if self.path != '':
+                self.author = self.author_cbox.get()
+                self.name = self.name_entry.get()
+                self.link = self.link_entry.get()
 
-            # now create and store book?
-            # TODO get access to program files?
-            library_path = self.library_path
-            book = Book(self.path, self.name, self.author,
-                        self.link, self.tagged)
+                # now create and store book?
+                # TODO get access to program files?
+                library_path = self.library_path
+                book = Book(self.path, self.name, self.author,
+                            self.link, self.tagged)
 
-            # TODO need to restrict how long the name is for formatting reasons
-            # make new path based on name / .strip() to remove the whitespace from the end
-            self.name = self.name.strip()
-            # strip the path of all illegal characters
-            strip_name = self.name
-            strip_name = strip_name.replace('/', '')
-            strip_name = strip_name.replace('\\', '')
-            strip_name = strip_name.replace(':', '')
-            strip_name = strip_name.replace('*', '')
-            strip_name = strip_name.replace('?', '')
-            strip_name = strip_name.replace('"', '')
-            strip_name = strip_name.replace('<', '')
-            strip_name = strip_name.replace('>', '')
-            strip_name = strip_name.replace('|', '')
-            strip_name = strip_name.strip()
-            newpath = os.path.join(library_path, strip_name)
-            os.mkdir(os.path.join(library_path, newpath))
+                # TODO need to restrict how long the name is for formatting reasons
+                # make new path based on name / .strip() to remove the whitespace from the end
+                self.name = self.name.strip()
+                # strip the path of all illegal characters
+                strip_name = self.name
+                strip_name = strip_name.replace('/', '')
+                strip_name = strip_name.replace('\\', '')
+                strip_name = strip_name.replace(':', '')
+                strip_name = strip_name.replace('*', '')
+                strip_name = strip_name.replace('?', '')
+                strip_name = strip_name.replace('"', '')
+                strip_name = strip_name.replace('<', '')
+                strip_name = strip_name.replace('>', '')
+                strip_name = strip_name.replace('|', '')
+                strip_name = strip_name.strip()
+                newpath = os.path.join(library_path, strip_name)
+                os.mkdir(os.path.join(library_path, newpath))
 
             # copy from old path to new path
-            files = os.listdir(self.path)
-            for i in files:
-                shutil.copy(os.path.join(self.path, i),
-                            os.path.join(newpath, i))
 
-            # now update object's path
-            book.path = newpath
+                files = os.listdir(self.path)
+                for i in files:
+                    shutil.copy(os.path.join(self.path, i),
+                                os.path.join(newpath, i))
 
-            # import to JSON
-            if os.path.isfile(self.library_json) is False:
-                print("FILE NOT FOUND")
+                # now update object's path
+                book.path = newpath
+
+                # import to JSON
+                if os.path.isfile(self.library_json) is False:
+                    print("FILE NOT FOUND")
+                else:
+                    with open(self.library_json) as f:
+                        books_json = json.load(f)
+
+                    books_json['book'].append({
+                        "path": book.get_path(),
+                        "name": book.get_name(),
+                        "author": book.get_author(),
+                        "link": book.get_link(),
+                        "tagged": book.get_tags()
+                    })
+
+                    with open(self.library_json, 'w') as f:
+                        json.dump(books_json, f, indent=4)
+
+                    # update the library count here
+                    book_frame.load_tab(tag_json)
+                    book_frame.initialize_self()
+                    book_frame.load_tab(tag_json)
+
+                self.destroy()
+
             else:
-                with open(self.library_json) as f:
-                    books_json = json.load(f)
-
-                books_json['book'].append({
-                    "path": book.get_path(),
-                    "name": book.get_name(),
-                    "author": book.get_author(),
-                    "link": book.get_link(),
-                    "tagged": book.get_tags()
-                })
-
-                with open(self.library_json, 'w') as f:
-                    json.dump(books_json, f, indent=4)
-
-                # update the library count here
-                book_frame.load_tab(tag_json)
-                book_frame.initialize_self()
-                book_frame.load_tab(tag_json)
-
-            self.destroy()
+                # this is for if the user presses the cancel button in the path entry
+                self.lower()
+                error_window = customtkinter.CTkToplevel()
+                error_window.attributes('-topmost', 2)
+                error_window.geometry('150x100+1275+720')
+                error_window.grid_columnconfigure(0, weight=1)
+                error_window.columnconfigure(0, weight=1)
+                label = customtkinter.CTkLabel(
+                    error_window, text="Path invalid")
+                label.grid(row=0, column=0, padx=10, pady=10)
 
         else:
             self.lower()
@@ -165,8 +180,11 @@ class ImportWindow(customtkinter.CTkToplevel):
             error_window.grid_columnconfigure(0, weight=1)
             error_window.columnconfigure(0, weight=1)
             label = customtkinter.CTkLabel(
-                error_window, text="Missing either: \nLink, \nName, \nAuthor, \nPath")
+                error_window, text="Missing either: \nLink, \nName, \nAuthor")
             label.grid(row=0, column=0, padx=10, pady=10)
+
+
+
 
     def focus_import(self):
         assert self

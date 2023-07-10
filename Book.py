@@ -104,16 +104,17 @@ class Book:
         VALID_IMAGES = (".jpg", ".png")
 
         cover_im = None
-        for f in os.listdir(self.path):
-            ext = os.path.splitext(f)[1]
-            if ext.lower() not in VALID_IMAGES:
-                continue
-            cover_im = Image.open(os.path.join(path, f)).resize(COVER_SIZE)
-            break
+        if self.path != '':
+            for f in os.listdir(self.path):
+                ext = os.path.splitext(f)[1]
+                if ext.lower() not in VALID_IMAGES:
+                    continue
+                cover_im = Image.open(os.path.join(path, f)).resize(COVER_SIZE)
+                break
 
-        # There should have a cover image.
-        assert cover_im
+            # There should have a cover image.
+            assert cover_im
 
-        # set cover
-        self.cover = customtkinter.CTkImage(
-            dark_image=self.add_corners(cover_im, 10), size=COVER_SIZE)
+            # set cover
+            self.cover = customtkinter.CTkImage(
+                dark_image=self.add_corners(cover_im, 10), size=COVER_SIZE)
