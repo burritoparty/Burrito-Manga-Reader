@@ -161,6 +161,29 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         else:
             pass
 
+    def link_update(self, book: Book, tag_json: str):
+
+        # check if the name has actually been changed
+        if book.get_link() != self.book_link_entry.get():
+            with open(self.library_json) as f:
+                # load the library
+                books_json = json.load(f)
+                for b in books_json['book']:
+                    # if b's name matches our current book's name
+                    if b['link'] == book.get_link():
+                        b['link'] = self.book_link_entry.get()
+                        book.link = self.book_link_entry.get()
+
+                # write to the JSON
+                with open(self.library_json, 'w') as f:
+                    json.dump(books_json, f, indent=2)
+
+                # updates the tab to refresh tags when clicked again
+                self.load_tab(tag_json)
+
+        else:
+            pass
+
     def append_new_tags(self, book: Book, tag_json: str, checked_tag: str):
         if os.path.isfile(self.library_json) is False:
             print("FILE NOT FOUND")
@@ -220,11 +243,11 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # make widgets
             # read button, making new cover to resize
             self.read_button = customtkinter.CTkButton(self.book_window, compound="top", fg_color="transparent",
-                                                  hover_color=dark_pink, font=("Roboto", 16),
-                                                  image=book.get_full_cover(),
-                                                  command=lambda x=book: self.open_reader(
-                                                      x),
-                                                  text=indent_string(book.get_name()))
+                                                       hover_color=dark_pink, font=("Roboto", 16),
+                                                       image=book.get_full_cover(),
+                                                       command=lambda x=book: self.open_reader(
+                                                           x),
+                                                       text=indent_string(book.get_name()))
 
             # labels
             book_link_label = customtkinter.CTkLabel(self.book_window, text="Book Link", font=("Roboto", 20),
@@ -235,8 +258,10 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                        text_color=light_pink)
 
             # buttons
-            book_link_button = customtkinter.CTkButton(self.book_window, text="Update Link",
-                                                       fg_color=light_pink, hover_color=dark_pink, text_color=black)
+            self.book_link_button = customtkinter.CTkButton(self.book_window, text="Update Link",
+                                                            fg_color=light_pink, hover_color=dark_pink,
+                                                            text_color=black,
+                                                            command=lambda x=book, y=tag_json: self.link_update(x, y))
             self.book_name_button = customtkinter.CTkButton(self.book_window, text="Update Name",
                                                             fg_color=light_pink, hover_color=dark_pink,
                                                             text_color=black,
@@ -246,13 +271,13 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
             # entry
             w = 925
-            book_link_entry = customtkinter.CTkEntry(
+            self.book_link_entry = customtkinter.CTkEntry(
                 self.book_window, placeholder_text="LINK", width=w)
             self.book_name_entry = customtkinter.CTkEntry(
                 self.book_window, placeholder_text="NAME", width=w)
             book_author_entry = customtkinter.CTkEntry(
                 self.book_window, placeholder_text="AUTHOR", width=w)
-            book_link_entry.insert(0, book.get_link())
+            self.book_link_entry.insert(0, book.get_link())
             self.book_name_entry.insert(0, book.get_name())
             book_author_entry.insert(0, book.get_author())
 
@@ -323,14 +348,14 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             book_name_label.grid(row=2, column=1, padx=pad, pady=pad)
             book_author_label.grid(row=4, column=1, padx=pad, pady=pad)
 
-            book_link_entry.grid(
+            self.book_link_entry.grid(
                 row=1, column=1, columnspan=2, padx=pad, pady=pad)
             self.book_name_entry.grid(
                 row=3, column=1, columnspan=2, padx=pad, pady=pad)
             book_author_entry.grid(
                 row=5, column=1, columnspan=2, padx=pad, pady=pad)
 
-            book_link_button.grid(
+            self.book_link_button.grid(
                 row=0, column=2, sticky="ns", padx=pad, pady=pad)
             self.book_name_button.grid(
                 row=2, column=2, sticky="ns", padx=pad, pady=pad)
