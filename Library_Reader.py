@@ -138,7 +138,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
     def name_update(self, book: Book, tag_json: str):
 
         # check if the name has actually been changed
-        if book.get_name() != self.book_name_entry.get():
+        if book.get_name() != self.book_name_entry.get() and self.book_name_entry.get() != '':
             with open(self.library_json) as f:
                 # load the library
                 books_json = json.load(f)

@@ -95,7 +95,7 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.tagged.append(tag)
 
     def finalize_book(self, book_frame, tag_json):
-        if self.path is not None and self.author_cbox.get() != "" and self.name_entry.get() != "" and self.link_entry.get() != "":
+        if self.path is not None and self.author_cbox.get() != "" and self.name_entry.get() != "":
             if self.path != '':
                 self.author = self.author_cbox.get()
                 self.name = self.name_entry.get()
@@ -235,8 +235,6 @@ class ImportWindow(customtkinter.CTkToplevel):
         # load the tag names from the JSON into an array
         for i in load_authors['authors']:
             authors.append(i['name'])
-
-        print(authors)
 
         self.author_cbox = customtkinter.CTkComboBox(self,
                                                      values=authors,
