@@ -24,9 +24,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # yeet the reader window
             self.reader_window.destroy()
             self.reader_window = None
-        if self.book_window:
-            # lift description window back up
-            self.book_window.attributes('-topmost', 1)
 
     def next_page(self):
         if self.current_page_num < len(self.page_list) - 1:
@@ -82,16 +79,12 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
             self.reader_window = customtkinter.CTkToplevel()
             self.reader_window.attributes('-fullscreen', True)
-            self.reader_window.attributes('-topmost', 3)
 
             self.reader_window.bind('a', lambda _: self.prev_page())
             self.reader_window.bind('<Left>', lambda _: self.prev_page())
             self.reader_window.bind('d', lambda _: self.next_page())
             self.reader_window.bind('<Right>', lambda _: self.next_page())
             self.reader_window.bind('<Escape>', lambda _: self.close_reader())
-
-            # push description window down
-            self.book_window.attributes('-topmost', 0)
 
             self.reader_window.grid_rowconfigure(0, weight=1)
             self.reader_window.grid_columnconfigure(0, weight=1)
@@ -174,6 +167,10 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
                 # updates the tab to refresh tags when clicked again
                 self.load_tab(tag_json)
+
+    def focus_description(self):
+        assert self.book_window
+        self.book_window.focus()
 
     def open_book_description(self, book: Book, tag_json: str):
         if self.book_window is None or not self.book_window.winfo_exists():
@@ -326,9 +323,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             #  it crashes, seems like book's data gets fucked, it is also taking some memory
             self.load_tab(tag_json)
 
-            # the reason this is all the way down here is cause
-            # it keeps it on the bottom so the user doesn't see till done
-            self.book_window.attributes('-topmost', 1)
+            # focus the window
+            self.after(1, self.focus_description)
+
 
         else:
             self.book_window.focus()  # if window exists focus it

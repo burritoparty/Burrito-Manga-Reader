@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import time
 from tkinter.filedialog import askdirectory
 
 import customtkinter
@@ -41,9 +42,9 @@ class ImportFrame(customtkinter.CTkFrame):
                                                    text_color=black,
                                                    hover_color=dark_pink,
                                                    command=lambda
-                                                   x=bookframe,
-                                                   y=tag_json,
-                                                   z=authors_json:
+                                                       x=bookframe,
+                                                       y=tag_json,
+                                                       z=authors_json:
                                                    self.open_import_window(x, y, z))
         self.import_window = None
 
@@ -67,7 +68,9 @@ class ImportFrame(customtkinter.CTkFrame):
 class ImportWindow(customtkinter.CTkToplevel):
 
     def input_path(self):
+        # changed to pull the window back to the top after path is selected
         self.path = askdirectory()
+        self.after(1, self.focus_import)
 
         images = []
         valid_images = [".jpg", ".png"]
@@ -105,8 +108,20 @@ class ImportWindow(customtkinter.CTkToplevel):
             # TODO need to restrict how long the name is for formatting reasons
             # make new path based on name / .strip() to remove the whitespace from the end
             self.name = self.name.strip()
-            newpath = os.path.join(library_path, self.name)
-            os.mkdir(os.path.join(library_path, self.name))
+            # strip the path of all illegal characters
+            strip_name = self.name
+            strip_name = strip_name.replace('/', '')
+            strip_name = strip_name.replace('\\', '')
+            strip_name = strip_name.replace(':', '')
+            strip_name = strip_name.replace('*', '')
+            strip_name = strip_name.replace('?', '')
+            strip_name = strip_name.replace('"', '')
+            strip_name = strip_name.replace('<', '')
+            strip_name = strip_name.replace('>', '')
+            strip_name = strip_name.replace('|', '')
+            strip_name = strip_name.strip()
+            newpath = os.path.join(library_path, strip_name)
+            os.mkdir(os.path.join(library_path, newpath))
 
             # copy from old path to new path
             files = os.listdir(self.path)
@@ -153,11 +168,14 @@ class ImportWindow(customtkinter.CTkToplevel):
                 error_window, text="Missing either: \nLink, \nName, \nAuthor, \nPath")
             label.grid(row=0, column=0, padx=10, pady=10)
 
+    def focus_import(self):
+        assert self
+        self.focus()
+
     def __init__(self, library_path, library_json, tag_json, authors_json, book_frame, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # this is keeping the window at the top
-        self.attributes('-topmost', 1)
         self.title("Import Book")
         # TODO not very centered :/
         # print("width: " + str(self.winfo_width()) + " screenwidth: " + str(self.winfo_screenwidth()))
@@ -267,3 +285,6 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.get_path_button = customtkinter.CTkButton(self, text="Select Book", command=self.input_path,
                                                        fg_color=light_pink, hover_color=dark_pink, text_color=black)
         self.get_path_button.grid(row=0, column=3)
+
+        # pulls window to the front
+        self.after(1, self.focus_import)
