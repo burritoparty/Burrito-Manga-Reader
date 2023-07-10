@@ -62,7 +62,6 @@ root.geometry('%dx%d+%d+%d' % (1920, 1080,
                                get_x_coordinates(
                                    1920, root.winfo_screenwidth()),
                                get_y_coordinates(1080, root.winfo_screenheight())))
-root.attributes('-topmost', 0)
 
 # make frames
 root.bookDisplayTabs = BookFrame(
