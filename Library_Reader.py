@@ -5,7 +5,6 @@ import os
 from os import path
 
 import customtkinter
-import keyboard
 
 from Book import Book
 from Database import black, dark_pink, light_pink
@@ -16,9 +15,11 @@ from Functions import *
 
 class BookFrame(customtkinter.CTkScrollableFrame):
 
+    def focus_reader(self):
+        assert self.reader_window
+        self.reader_window.focus()
+
     def close_reader(self):
-        # clear windows hotkeys
-        keyboard.clear_all_hotkeys()
         if self.reader_window:
             # yeet the reader window
             self.reader_window.destroy()
@@ -83,18 +84,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.reader_window.attributes('-fullscreen', True)
             self.reader_window.attributes('-topmost', 3)
 
-            # make windows hoykeys
-            keyboard.add_hotkey('a', self.prev_page)
-            keyboard.add_hotkey('left arrow', self.prev_page)
-            keyboard.add_hotkey('d', self.next_page)
-            keyboard.add_hotkey('right arrow', self.next_page)
-            # FIXME close reader with esc key throws error
-            # keyboard.on_press('esc', self.close_reader)
-
-            # make mac hoykeys
             self.reader_window.bind('a', lambda _: self.prev_page())
-            self.reader_window.bind('<Left>', lambda _: self.next_page())
-            self.reader_window.bind('d', lambda _: self.prev_page())
+            self.reader_window.bind('<Left>', lambda _: self.prev_page())
+            self.reader_window.bind('d', lambda _: self.next_page())
             self.reader_window.bind('<Right>', lambda _: self.next_page())
             self.reader_window.bind('<Escape>', lambda _: self.close_reader())
 
@@ -136,8 +128,11 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             next_page.grid(row=1, column=2, padx=pad, pady=pad)
             close.grid(row=2, column=1, padx=pad, pady=10)
 
-        else:
-            self.reader_window.focus()
+        # Focus the reader window, but wait 1ms.
+        # On Windows machines, the window doesn't always get focus, so keyboard
+        # shortcuts won't work. But waiting a 1ms seems to ensure focus is
+        # obtained.
+        self.reader_window.after(1, self.focus_reader)
 
     def close_book_description(self):
         assert self.book_window
