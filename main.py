@@ -65,7 +65,7 @@ root.geometry('%dx%d+%d+%d' % (1920, 1080,
 
 # make frames
 root.bookDisplayTabs = BookFrame(
-    library_json=library_json, tag_json=tags_json, master=root, width=1650, height=1000)
+    library_json=library_json, tag_json=tags_json, authors_json=authors_json, master=root, width=1650, height=1000)
 root.tagFrame = TagFrame(
     tag_json=tags_json, bookframe=root.bookDisplayTabs, master=root)
 root.authorFrame = AuthorFrame(
@@ -74,7 +74,7 @@ root.importFrame = ImportFrame(
     library_json=library_json, library_path=args.mangaloc, tag_json=tags_json, authors_json=authors_json,
     bookframe=root.bookDisplayTabs, master=root)
 root.tab_nav = TabNavigator(
-    bookframe=root.bookDisplayTabs, tag_json=tags_json, master=root)
+    bookframe=root.bookDisplayTabs, tag_json=tags_json, authors_json=authors_json, master=root)
 
 # place frames
 root.tagFrame.grid(row=0, column=0, padx=20, pady=20, rowspan=2)
