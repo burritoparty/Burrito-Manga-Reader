@@ -8,6 +8,7 @@ import customtkinter
 from PIL import Image
 
 from Book import Book
+from CTkScrollableDropdown import *
 from Database import black, dark_pink, light_pink
 from Functions import *
 
@@ -125,7 +126,7 @@ class ImportWindow(customtkinter.CTkToplevel):
                 newpath = os.path.join(library_path, strip_name)
                 os.mkdir(os.path.join(library_path, newpath))
 
-            # copy from old path to new path
+                # copy from old path to new path
 
                 files = os.listdir(self.path)
                 for i in files:
@@ -185,7 +186,6 @@ class ImportWindow(customtkinter.CTkToplevel):
 
 
 
-
     def focus_import(self):
         assert self
         self.focus()
@@ -236,15 +236,16 @@ class ImportWindow(customtkinter.CTkToplevel):
         for i in load_authors['authors']:
             authors.append(i['name'])
 
-        self.author_cbox = customtkinter.CTkComboBox(self,
-                                                     values=authors,
-                                                     fg_color=light_pink,
-                                                     text_color=black,
-                                                     dropdown_fg_color=light_pink,
-                                                     dropdown_hover_color=dark_pink,
-                                                     dropdown_text_color=black,
-                                                     state="readonly")
-        self.author_cbox.grid(row=2, column=1, padx=20, pady=20)
+        self.author_cbox = customtkinter.CTkComboBox(self, width=750)
+
+        self.author_cbox.grid(row=2, column=1)
+
+        CTkScrollableDropdown(self.author_cbox, values=authors, justify="left", button_color="transparent",
+                              resize=False, autocomplete=True,
+                              frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
+
+        self.author_cbox.set("")
+
 
         # TODO long tag names do not fit
         self.tag_frame = customtkinter.CTkScrollableFrame(self, label_text="Select Tags",
@@ -303,4 +304,4 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.get_path_button.grid(row=0, column=3)
 
         # pulls window to the front
-        self.after(1, self.focus_import)
+        self.after(250, self.focus_import)

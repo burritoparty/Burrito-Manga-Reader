@@ -270,7 +270,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                          fg_color=light_pink, hover_color=dark_pink, text_color=black)
 
             # entry
-            w = 925
+            w = 800
             self.book_link_entry = customtkinter.CTkEntry(
                 self.book_window, placeholder_text="LINK", width=w)
             self.book_name_entry = customtkinter.CTkEntry(
@@ -283,7 +283,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
             # scrollable frame
             tag_scroller = customtkinter.CTkScrollableFrame(
-                self.book_window, width=400, height=300)
+                self.book_window, label_text="Tags", label_text_color=light_pink, width=500, height=300)
             page_scroller = customtkinter.CTkScrollableFrame(
                 self.book_window, width=1850, height=440)
 
