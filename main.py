@@ -67,7 +67,7 @@ root.geometry('%dx%d+%d+%d' % (1920, 1080,
 root.bookDisplayTabs = BookFrame(
     library_json=library_json, tag_json=tags_json, authors_json=authors_json, master=root, width=1650, height=1000)
 root.tagFrame = TagFrame(
-    library_json=library_json, tag_json=tags_json, bookframe=root.bookDisplayTabs, master=root)
+    library_json=library_json, authors_json=authors_json, tag_json=tags_json, bookframe=root.bookDisplayTabs, master=root)
 root.authorFrame = AuthorFrame(
     authors_json=authors_json, bookframe=root.bookDisplayTabs, master=root)
 root.importFrame = ImportFrame(
