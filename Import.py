@@ -269,11 +269,13 @@ class ImportWindow(customtkinter.CTkToplevel):
 
         self.author_cbox.grid(row=2, column=1)
 
-        CTkScrollableDropdown(self.author_cbox, values=authors, justify="left", button_color="transparent",
-                              resize=False, autocomplete=True,
-                              frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
+        if len(authors) != 0:
 
-        self.author_cbox.set("")
+            CTkScrollableDropdown(self.author_cbox, values=authors, justify="left", button_color="transparent",
+                                  resize=False, autocomplete=True,
+                                  frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
+
+            self.author_cbox.set("")
 
 
         # TODO long tag names do not fit
