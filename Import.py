@@ -184,9 +184,9 @@ class ImportWindow(customtkinter.CTkToplevel):
                             json.dump(books_json, f, indent=4)
 
                         # update the library count here
-                        book_frame.load_tab(tag_json)
+                        book_frame.load_tab(tag_json, authors_json)
                         book_frame.initialize_self()
-                        book_frame.load_tab(tag_json)
+                        book_frame.load_tab(tag_json, authors_json)
 
                     self.destroy()
 

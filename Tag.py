@@ -77,7 +77,7 @@ class TagFrame(customtkinter.CTkFrame):
                 with open(tags_json, 'w') as f:
                     json.dump(load_tags, f, indent=2)
 
-    def tag_delete_call(self, tags_json: str, window: customtkinter.CTkToplevel | None):
+    def tag_delete_call(self, library_json: str, tags_json: str, window: customtkinter.CTkToplevel | None):
         # TODO need to remove this tag from all entries in the library that have it
         tags: list[str] = []
         buttons: list[customtkinter.CTkButton] = []
@@ -114,7 +114,8 @@ class TagFrame(customtkinter.CTkFrame):
                                                          x=tags_json,
                                                          y=i,
                                                          z=tags,
-                                                         a=load_tags: self.tag_deleter(w, x, y, z, a))
+                                                         a=load_tags,
+                                                         b=library_json: self.tag_deleter(w, x, y, z, a, b))
                         buttons.append(button)
                         buttons[index].grid(row=r, column=c, padx=20, pady=20)
 
@@ -135,7 +136,20 @@ class TagFrame(customtkinter.CTkFrame):
 
     def tag_deleter(
             self, window: customtkinter.CTkToplevel, tags_json: str,
-            tag_to_delete: str, tag_array: list[str], tag_loader: dict):
+            tag_to_delete: str, tag_array: list[str], tag_loader: dict,
+            library_json: str):
+
+        # remove the tags from the library
+        with open(library_json) as f:
+            # load the library
+            books_json = json.load(f)
+            for b in books_json['book']:
+                b['tagged'].remove(tag_to_delete)
+
+        # now dump the library
+        with open(library_json, 'w') as f:
+            json.dump(books_json, f, indent=2)
+
         # remove tag
         tag_array.remove(tag_to_delete)
         tag_array.sort()
@@ -291,7 +305,7 @@ class TagFrame(customtkinter.CTkFrame):
 
             window.destroy()
 
-    def __init__(self, tag_json: str, bookframe: BookFrame, master: customtkinter.CTk, **kwargs):
+    def __init__(self, library_json, tag_json: str, bookframe: BookFrame, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
 
         # make windows
@@ -318,8 +332,8 @@ class TagFrame(customtkinter.CTkFrame):
                                                   fg_color=light_pink,
                                                   text_color=black,
                                                   hover_color=dark_pink,
-                                                  command=lambda x=tag_json, y=tags_delete_window:
-                                                  self.tag_delete_call(x, y))
+                                                  command=lambda w=library_json, x=tag_json, y=tags_delete_window:
+                                                  self.tag_delete_call(w, x, y))
         self.tag_rename = customtkinter.CTkButton(self,
                                                   text="Rename tag",
                                                   fg_color=light_pink,
