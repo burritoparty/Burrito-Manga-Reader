@@ -513,8 +513,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
         self.print_page()
 
-        gc.collect()
-
     def print_page(self):
         r = 1
         c = 0
@@ -548,7 +546,49 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         assert self.sort_by_tag_window
         self.sort_by_tag_window.focus()
 
-    def sort_by_tag_call(self, tag_json: str):
+    def load_tab_tag(self, tag_cbox, tag_json, authors_json):
+        # if the library already has books, destroy them
+        for i in self.book_buttons:
+            i.destroy()
+        self.book_buttons.clear()
+
+        books_json = {}
+
+        # load the JSON
+        if path.isfile(self.library_json) is False:
+            print("FILE NOT FOUND")
+        else:
+            with open(self.library_json) as f:
+                books_json = json.load(f)
+
+        books: list[Book] = []
+        # create all the book objects
+        for i in books_json['book']:
+            books.append(Book(i['path'], i['name'],
+                              i['author'], i['link'], i['tagged']))
+
+        # loop through each of these book objects
+        #      if the book has a matching tag append it to self.book_buttons
+
+        for b in books:
+            # load the current book's tags
+            current_books_tags = b.get_tags()
+            # if the tag is found append to self.book_buttons
+            for i in current_books_tags:
+                if i == tag_cbox.get():
+                    button = customtkinter.CTkButton(self, compound="top", image=b.get_cover(),
+                                                     command=lambda
+                                                         x=b, y=tag_json, z=authors_json:
+                                                     self.open_book_description(x, y, z),
+                                                     text=indent_string(b.get_name()),
+                                                     fg_color="transparent", hover_color=dark_pink,
+                                                     font=("Roboto", 18))
+                    self.book_buttons.append(button)
+
+        self.print_page()
+        gc.collect()
+
+    def sort_by_tag_call(self, tag_json: str, authors_json: str):
         if self.sort_by_tag_window is None or not self.sort_by_tag_window.winfo_exists():
             self.sort_by_tag_window = customtkinter.CTkToplevel()
             self.sort_by_tag_window.geometry('1275+720')
@@ -562,11 +602,19 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
             tag_cbox = customtkinter.CTkComboBox(self.sort_by_tag_window, values=tags, width=300)
             tag_cbox.grid(padx=10, pady=10)
-
             if len(tags) != 0:
                 CTkScrollableDropdown(tag_cbox, values=tags, justify="left", button_color="transparent",
                                       resize=False, autocomplete=True,
                                       frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
+
+            # button to submit
+            tag_button = customtkinter.CTkButton(self.sort_by_tag_window, text="Filter",
+                                                 fg_color=light_pink,
+                                                 text_color=black,
+                                                 hover_color=dark_pink,
+                                                 command=lambda x=tag_cbox,
+                                                                y=tag_json, z=authors_json: self.load_tab_tag(x, y, z))
+            tag_button.grid(padx=10, pady=10)
 
             # focus it
             self.after(100, self.focus_sort_by_tag_call)
@@ -596,7 +644,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                      text_color=black,
                                                      hover_color=dark_pink,
                                                      command=lambda
-                                                         y=tag_json: self.sort_by_tag_call(y))
+                                                         y=tag_json, z=authors_json: self.sort_by_tag_call(y, z))
         sort_by_tag_button.grid(row=0, column=0, columnspan=3, sticky="ew", padx=10, pady=10)
 
         sort_by_author_button = customtkinter.CTkButton(self, text="Filter by author",
