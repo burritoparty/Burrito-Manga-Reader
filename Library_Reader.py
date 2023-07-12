@@ -706,7 +706,11 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
     def search_by_name_call(self, tag_json: str, authors_json: str):
         if self.search_by_name_dialogue is None or not self.search_by_name_dialogue.winfo_exists():
-            self.search_by_name_dialogue = customtkinter.CTkInputDialog()
+            self.search_by_name_dialogue = customtkinter.CTkInputDialog(button_fg_color=light_pink,
+                                                                        button_hover_color=dark_pink,
+                                                                        button_text_color=black,
+                                                                        text="Search by book name")
+            self.search_by_name_dialogue.title("Search by book name")
             # get the string to search for
             search_for = self.search_by_name_dialogue.get_input()
 
