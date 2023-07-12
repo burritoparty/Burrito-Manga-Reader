@@ -271,7 +271,8 @@ class TagFrame(customtkinter.CTkFrame):
         # create dialogue entry
         text = "Rename tag: " + tag_to_rename
         tags_rename_dialogue = customtkinter.CTkInputDialog(
-            text=text, title="Rename a tag")
+            text=text, title="Rename a tag",
+        button_text_color=black, button_fg_color=light_pink, button_hover_color=dark_pink)
         tags_rename_dialogue.geometry('0+0')
 
         # get the tag's new name

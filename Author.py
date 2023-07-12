@@ -148,7 +148,8 @@ class AuthorFrame(customtkinter.CTkFrame):
         # create dialogue entry
         text = "Rename author: " + author_to_rename
         author_rename_dialogue = customtkinter.CTkInputDialog(
-            text=text, title="Rename an author")
+            text=text, title="Rename an author",
+        button_text_color=black, button_fg_color=light_pink, button_hover_color=dark_pink)
         author_rename_dialogue.geometry('0+0')
 
         # get the author's new name
