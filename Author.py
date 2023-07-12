@@ -217,11 +217,6 @@ class AuthorFrame(customtkinter.CTkFrame):
         authors_rename_window = None
 
         # make the buttons
-        self.author_sort = customtkinter.CTkButton(self,
-                                                   text="Sort by author",
-                                                   fg_color=light_pink,
-                                                   text_color=black,
-                                                   hover_color=dark_pink)
         self.author_append = customtkinter.CTkButton(self,
                                                      text="Add author",
                                                      fg_color=light_pink,
@@ -239,7 +234,5 @@ class AuthorFrame(customtkinter.CTkFrame):
                                                      z=tag_json,
                                                      a=library_json,
                                                      b=bookframe: self.author_rename_call(x, y, z, a, b))
-
-        self.author_sort.grid(row=0, column=0, padx=20, pady=20)
-        self.author_append.grid(row=1, column=0, padx=20, pady=20)
-        self.author_rename.grid(row=2, column=0, padx=20, pady=20)
+        self.author_append.grid(row=0, column=0, padx=20, pady=20)
+        self.author_rename.grid(row=1, column=0, padx=20, pady=20)
