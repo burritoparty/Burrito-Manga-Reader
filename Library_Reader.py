@@ -800,7 +800,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         button_frame.grid(row=0, column=0, columnspan=6, padx=10, pady=10)
 
         # books_per_page should be divisible by 12
-        self.books_per_page = 24
+        self.books_per_page = 12
         self.book_window = None
         self.book_buttons: list[customtkinter.CTkButton] = []
         self.current_tab = 0
