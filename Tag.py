@@ -17,7 +17,10 @@ class TagFrame(customtkinter.CTkFrame):
         else:
             # create the dialogue box
             tags_append_dialogue = customtkinter.CTkInputDialog(
-                text="New tag: ", title="Append a new tag")
+                text="New tag: ", title="Append a new tag",
+                button_fg_color=light_pink,
+                button_text_color=black,
+                button_hover_color=dark_pink)
             tags_append_dialogue.geometry('0+0')
 
             # load the JSON
@@ -111,6 +114,9 @@ class TagFrame(customtkinter.CTkFrame):
                     # make the buttons
                     for i in tags:
                         button = customtkinter.CTkButton(window, text=i,
+                                                         fg_color=light_pink,
+                                                         text_color=black,
+                                                         hover_color=dark_pink,
                                                          command=lambda
                                                          w=window,
                                                          x=tags_json,
@@ -226,6 +232,9 @@ class TagFrame(customtkinter.CTkFrame):
                     # make the buttons
                     for i in tags:
                         button = customtkinter.CTkButton(window, text=i,
+                                                         fg_color=light_pink,
+                                                         text_color=black,
+                                                         hover_color=dark_pink,
                                                          command=lambda
                                                          w=window,
                                                          x=tags_json,

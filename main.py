@@ -49,11 +49,6 @@ if os.path.exists(authors_json) is False:
         json.dump(books_json, f, indent=2)
         file.close()
 
-
-# sorting database
-tags.sort()
-authors.sort()
-
 customtkinter.set_appearance_mode("dark")
 root = customtkinter.CTk()  # main window
 root.title("Burrito Manga Reader")  # name of program

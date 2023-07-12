@@ -592,6 +592,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         if self.sort_by_tag_window is None or not self.sort_by_tag_window.winfo_exists():
             self.sort_by_tag_window = customtkinter.CTkToplevel()
             self.sort_by_tag_window.geometry('1275+720')
+            self.sort_by_tag_window.title("Filter by tag")
             tags = []
             with open(tag_json, 'r') as f:
                 load_tags = json.load(f)
@@ -669,6 +670,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         if self.sort_by_author_window is None or not self.sort_by_author_window.winfo_exists():
             self.sort_by_author_window = customtkinter.CTkToplevel()
             self.sort_by_author_window.geometry('1275+720')
+            self.sort_by_author_window.title("Filter by author")
             authors = []
             with open(authors_json, 'r') as f:
                 load_authors = json.load(f)
@@ -716,21 +718,32 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.sort_by_tag_window = None
         self.sort_by_author_window = None
 
-        sort_by_tag_button = customtkinter.CTkButton(self, text="Filter by tag",
+        button_frame = customtkinter.CTkFrame(self)
+
+        sort_by_tag_button = customtkinter.CTkButton(button_frame, text="Filter by tag", width=520,
                                                      fg_color=light_pink,
                                                      text_color=black,
                                                      hover_color=dark_pink,
                                                      command=lambda
                                                          y=tag_json, z=authors_json: self.sort_by_tag_call(y, z))
-        sort_by_tag_button.grid(row=0, column=0, columnspan=3, sticky="ew", padx=10, pady=10)
 
-        sort_by_author_button = customtkinter.CTkButton(self, text="Filter by author",
+        search_button = customtkinter.CTkButton(button_frame, text="Search by name", width=520,
+                                                fg_color=light_pink,
+                                                text_color=black,
+                                                hover_color=dark_pink)
+
+        sort_by_author_button = customtkinter.CTkButton(button_frame, text="Filter by author", width=520,
                                                         fg_color=light_pink,
                                                         text_color=black,
                                                         hover_color=dark_pink,
                                                         command=lambda
                                                             y=tag_json, z=authors_json: self.sort_by_author_call(y, z))
-        sort_by_author_button.grid(row=0, column=3, columnspan=3, sticky="ew", padx=10, pady=10)
+
+        sort_by_tag_button.grid(row=0, column=0, sticky="ew", padx=10)
+        search_button.grid(row=0, column=1, sticky="ew", padx=10)
+        sort_by_author_button.grid(row=0, column=2, sticky="ew", padx=10)
+
+        button_frame.grid(row=0, column=0, columnspan=6, padx=10, pady=10)
 
         # books_per_page should be divisible by 12
         self.books_per_page = 12

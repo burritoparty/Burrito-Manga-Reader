@@ -17,7 +17,10 @@ class AuthorFrame(customtkinter.CTkFrame):
         else:
             # create the dialog box
             authors_append_dialogue = customtkinter.CTkInputDialog(
-                text="New Author: ", title="Append a new author")
+                text="New Author: ", title="Append a new author",
+                button_fg_color=light_pink,
+                button_text_color=black,
+                button_hover_color=dark_pink)
             authors_append_dialogue.geometry('0+0')
 
             # load the JSON
@@ -108,6 +111,9 @@ class AuthorFrame(customtkinter.CTkFrame):
                     # make the buttons
                     for i in authors:
                         button = customtkinter.CTkButton(window, text=i,
+                                                         fg_color=light_pink,
+                                                         text_color=black,
+                                                         hover_color=dark_pink,
                                                          command=lambda
                                                          w=window,
                                                          x=tag_json,
