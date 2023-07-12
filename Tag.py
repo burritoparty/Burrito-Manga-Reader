@@ -10,7 +10,7 @@ from Library_Reader import BookFrame
 
 class TagFrame(customtkinter.CTkFrame):
 
-    def tag_append_call(self, tags_json: str):
+    def tag_append_call(self, tags_json: str, authors_json: str, bookframe):
         tags: list[str] = []
         if path.isfile(tags_json) is False:
             print("path dont exist")
@@ -76,6 +76,7 @@ class TagFrame(customtkinter.CTkFrame):
                 # finalize JSON
                 with open(tags_json, 'w') as f:
                     json.dump(load_tags, f, indent=2)
+
 
     def tag_delete_call(self, library_json: str, tags_json: str, window: customtkinter.CTkToplevel | None,
                         authors_json: str, bookframe):
@@ -326,7 +327,6 @@ class TagFrame(customtkinter.CTkFrame):
                 json.dump(books_json, f, indent=2)
 
             # reload the library
-
             bookframe.load_tab(tags_json, authors_json)
 
             window.destroy()
@@ -344,7 +344,8 @@ class TagFrame(customtkinter.CTkFrame):
                                                   fg_color=light_pink,
                                                   text_color=black,
                                                   hover_color=dark_pink,
-                                                  command=lambda x=tag_json: self.tag_append_call(x))
+                                                  command=lambda x=tag_json, y=authors_json, z=bookframe:
+                                                  self.tag_append_call(x, y, z))
         self.tag_delete = customtkinter.CTkButton(self,
                                                   text="Delete tag",
                                                   fg_color=light_pink,

@@ -6,6 +6,7 @@ from os import path
 import customtkinter
 
 from Book import Book
+from CTkScrollableDropdown import CTkScrollableDropdown
 from Database import black, dark_pink, light_pink
 from Functions import *
 
@@ -274,7 +275,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # read button, making new cover to resize
             self.read_button = customtkinter.CTkButton(self.book_window, compound="top", fg_color="transparent",
                                                        hover_color=dark_pink, font=(
-                                                           "Roboto", 16),
+                    "Roboto", 16),
                                                        image=book.get_full_cover(),
                                                        command=lambda x=book: self.open_reader(
                                                            x),
@@ -345,10 +346,10 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 check_box = customtkinter.CTkCheckBox(tag_scroller, text=i,
                                                       hover_color=light_pink, fg_color=dark_pink, text_color=light_pink,
                                                       command=lambda
-                                                      x=book,
-                                                      y=tag_json,
-                                                      a=authors_json,
-                                                      z=i:
+                                                          x=book,
+                                                          y=tag_json,
+                                                          a=authors_json,
+                                                          z=i:
                                                       self.append_new_tags(x, y, a, z))
                 check_box.grid(row=r, column=c, padx=10, pady=10)
                 if c == 2:
@@ -480,7 +481,8 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                  image=books[index_to_start_at].get_cover(
                                                  ),
                                                  command=lambda
-                                                 x=books[index_to_start_at], y=tag_json, z=authors_json: self.open_book_description(
+                                                     x=books[index_to_start_at], y=tag_json,
+                                                     z=authors_json: self.open_book_description(
                                                      x, y, z),
                                                  fg_color="transparent", hover_color=dark_pink,
                                                  text=indent_string(
@@ -497,7 +499,8 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                  image=books[index_to_start_at].get_cover(
                                                  ),
                                                  command=lambda
-                                                 x=books[index_to_start_at], y=tag_json, z=authors_json: self.open_book_description(
+                                                     x=books[index_to_start_at], y=tag_json,
+                                                     z=authors_json: self.open_book_description(
                                                      x, y, z),
                                                  fg_color="transparent", hover_color=dark_pink,
                                                  text=indent_string(
@@ -513,7 +516,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         gc.collect()
 
     def print_page(self):
-        r = 0
+        r = 1
         c = 0
         # print(str(len(self.book_buttons)))
         for i in self.book_buttons:
@@ -541,6 +544,36 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.excess_books = self.books_per_page - (math.ceil(len(book) / self.books_per_page)
                                                    * self.books_per_page - len(book))
 
+    def focus_sort_by_tag_call(self):
+        assert self.sort_by_tag_window
+        self.sort_by_tag_window.focus()
+
+    def sort_by_tag_call(self, tag_json: str):
+        if self.sort_by_tag_window is None or not self.sort_by_tag_window.winfo_exists():
+            self.sort_by_tag_window = customtkinter.CTkToplevel()
+            self.sort_by_tag_window.geometry('1275+720')
+            tags = []
+            with open(tag_json, 'r') as f:
+                load_tags = json.load(f)
+
+            # load the tag names from the JSON into an array
+            for i in load_tags['tags']:
+                tags.append(i['name'])
+
+            tag_cbox = customtkinter.CTkComboBox(self.sort_by_tag_window, values=tags, width=300)
+            tag_cbox.grid(padx=10, pady=10)
+
+            if len(tags) != 0:
+                CTkScrollableDropdown(tag_cbox, values=tags, justify="left", button_color="transparent",
+                                      resize=False, autocomplete=True,
+                                      frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
+
+            # focus it
+            self.after(100, self.focus_sort_by_tag_call)
+
+        else:
+            self.sort_by_tag_window.focus()
+
     def get_current_tab(self):
         return self.current_tab
 
@@ -555,6 +588,22 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.grid_columnconfigure(3, weight=1)
         self.grid_columnconfigure(4, weight=1)
         self.grid_columnconfigure(5, weight=1)
+
+        self.sort_by_tag_window = None
+
+        sort_by_tag_button = customtkinter.CTkButton(self, text="Filter by tag",
+                                                     fg_color=light_pink,
+                                                     text_color=black,
+                                                     hover_color=dark_pink,
+                                                     command=lambda
+                                                         y=tag_json: self.sort_by_tag_call(y))
+        sort_by_tag_button.grid(row=0, column=0, columnspan=3, sticky="ew", padx=10, pady=10)
+
+        sort_by_author_button = customtkinter.CTkButton(self, text="Filter by author",
+                                                        fg_color=light_pink,
+                                                        text_color=black,
+                                                        hover_color=dark_pink)
+        sort_by_author_button.grid(row=0, column=3, columnspan=3, sticky="ew", padx=10, pady=10)
 
         # books_per_page should be divisible by 12
         self.books_per_page = 12
@@ -575,13 +624,13 @@ class TabNavigator(customtkinter.CTkFrame):
     def __init__(self, bookframe: BookFrame, tag_json: str, authors_json: str, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
         next_tab = customtkinter.CTkButton(self, text="Next Page", command=lambda x=tag_json, z=authors_json:
-                                           bookframe.next_tab(x, z),
+        bookframe.next_tab(x, z),
                                            width=400,
                                            fg_color=light_pink,
                                            text_color=black,
                                            hover_color=dark_pink)
         prev_tab = customtkinter.CTkButton(self, text="Last Page", command=lambda x=tag_json, z=authors_json:
-                                           bookframe.prev_tab(x, z),
+        bookframe.prev_tab(x, z),
                                            width=400,
                                            fg_color=light_pink,
                                            text_color=black,
