@@ -280,8 +280,6 @@ class TagFrame(customtkinter.CTkFrame):
             label.grid(padx=10, pady=10)
         else:
             # remove the old tag and append the new tag to the array
-            print(tag_to_rename)
-            print(tag_array)
             tag_array.remove(tag_to_rename)
             tag_array.append(new_name)
             tag_array.sort()
