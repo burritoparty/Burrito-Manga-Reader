@@ -70,7 +70,7 @@ class ImportWindow(customtkinter.CTkToplevel):
             cover = customtkinter.CTkImage(
                 dark_image=add_corners(images[0], 25), size=(200, 275))
             cover = customtkinter.CTkLabel(self, image=cover, text="")
-            cover.grid(row=0, column=0, rowspan=3, padx=20, pady=20)
+            cover.grid(row=0, column=2, rowspan=3, padx=20, pady=20)
 
             if self.name_entry.get() == "":
                 self.name_entry.insert(0, os.path.basename(self.path))
@@ -196,7 +196,84 @@ class ImportWindow(customtkinter.CTkToplevel):
                     error_window, text="Missing either: \nLink, \nName, \nAuthor")
                 label.grid(row=0, column=0, padx=10, pady=10)
 
+    def make_new_author(self, authors_json: str):
+        authors = []
+        authors_append_dialogue = customtkinter.CTkInputDialog(
+            text="New Author: ", title="Append a new author",
+            button_fg_color=light_pink,
+            button_text_color=black,
+            button_hover_color=dark_pink)
+        authors_append_dialogue.geometry('0+0')
 
+        # load the JSON
+        with open(authors_json, 'r') as f:
+            load_authors = json.load(f)
+
+        # load the tag names from the JSON into an array
+        for i in load_authors['authors']:
+            authors.append(i['name'])
+
+        # get the input from the user
+        new_author = authors_append_dialogue.get_input()
+
+        # check if the input is valid
+        if new_author == '' or new_author is None:
+            # user hit the cancel button
+            pass
+        elif check_exists(new_author, authors, False) is False:
+            error = customtkinter.CTkToplevel()
+            error.geometry("0+0")
+            label = customtkinter.CTkLabel(error,
+                                           text="this tag already exists\n(not case sensitive)",
+                                           font=("Roboto", 20))
+            label.grid(padx=10, pady=10)
+        else:
+            # append the new tag to the array
+            authors.append(new_author)
+            authors.sort()
+
+            # delete all the authors
+            del load_authors['authors']
+
+            # delete ['authors'] object from JSON
+            with open(authors_json, 'w') as f:
+                json.dump(load_authors, f, indent=2)
+
+            # load the ['authors'] object back into JSON
+            with open(authors_json, 'w') as f:
+                t = {
+                    "authors": [
+                    ]
+                }
+                json.dump(t, f, indent=2)
+
+            # load the JSON back in
+            with open(authors_json, 'r') as f:
+                load_authors = json.load(f)
+
+            # load them all back into load_authors
+            for i in authors:
+                load_authors["authors"].append({
+                    "name": i
+                })
+
+            # finalize JSON
+            with open(authors_json, 'w') as f:
+                json.dump(load_authors, f, indent=2)
+
+        # reload the cbox
+        self.author_cbox = customtkinter.CTkComboBox(self, width=750)
+        self.author_cbox.grid(row=2, column=0)
+        if len(authors) != 0:
+
+            CTkScrollableDropdown(self.author_cbox, values=authors, justify="left", button_color="transparent",
+                                  resize=False, autocomplete=True,
+                                  frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
+
+            self.author_cbox.set("")
+
+        # focus the import window
+        self.after(250, self.focus_import)
 
     def focus_import(self):
         assert self
@@ -230,12 +307,12 @@ class ImportWindow(customtkinter.CTkToplevel):
 
         self.link_entry = customtkinter.CTkEntry(
             self, placeholder_text="Enter Link", width=750)
-        self.link_entry.grid(row=0, column=1, padx=20, pady=20)
+        self.link_entry.grid(row=0, column=0, padx=20, pady=20)
 
         # TODO set string limit to 65 chars
         self.name_entry = customtkinter.CTkEntry(
             self, placeholder_text="Enter Name", width=750)
-        self.name_entry.grid(row=1, column=1, padx=20, pady=20)
+        self.name_entry.grid(row=1, column=0, padx=20, pady=20)
 
         # get from JSON
         # grab from the JSON and append to array
@@ -250,7 +327,7 @@ class ImportWindow(customtkinter.CTkToplevel):
 
         self.author_cbox = customtkinter.CTkComboBox(self, width=750)
 
-        self.author_cbox.grid(row=2, column=1)
+        self.author_cbox.grid(row=2, column=0)
 
         if len(authors) != 0:
 
@@ -303,19 +380,20 @@ class ImportWindow(customtkinter.CTkToplevel):
                 c += 1
             num_loops += 1
 
-        self.submit_button = customtkinter.CTkButton(self, text="Submit",
+        self.submit_button = customtkinter.CTkButton(self, text="Submit Book",
                                                      command=lambda x=book_frame, y=tag_json, z=authors_json:
                                                      self.finalize_book(x, y, z),
                                                      fg_color=light_pink, hover_color=dark_pink, text_color=black)
-        self.submit_button.grid(row=1, column=3, padx=20, pady=20)
+        self.submit_button.grid(row=1, column=1, padx=20, pady=20)
 
-        self.cancel_button = customtkinter.CTkButton(self, text="Cancel", command=self.destroy,
+        self.cancel_button = customtkinter.CTkButton(self, text="Add an author",
+                                                     command=lambda x=authors_json:self.make_new_author(x),
                                                      fg_color=light_pink, hover_color=dark_pink, text_color=black)
-        self.cancel_button.grid(row=2, column=3, padx=20, pady=20)
+        self.cancel_button.grid(row=2, column=1, padx=20, pady=20)
 
         self.get_path_button = customtkinter.CTkButton(self, text="Select Book", command=self.input_path,
                                                        fg_color=light_pink, hover_color=dark_pink, text_color=black)
-        self.get_path_button.grid(row=0, column=3)
+        self.get_path_button.grid(row=0, column=1)
 
         # pulls window to the front
         self.after(250, self.focus_import)

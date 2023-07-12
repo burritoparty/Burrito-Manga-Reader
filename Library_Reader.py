@@ -319,7 +319,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
             # scrollable frame
             tag_scroller = customtkinter.CTkScrollableFrame(
-                self.book_window, label_text="Tags", label_text_color=light_pink, width=500, height=300)
+                self.book_window, label_text="Tags", label_text_color=light_pink, width=500, height=500)
             page_scroller = customtkinter.CTkScrollableFrame(
                 self.book_window, width=1850, height=440)
 
