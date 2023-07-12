@@ -87,7 +87,7 @@ class AuthorFrame(customtkinter.CTkFrame):
         if path.isfile(authors_json) is False:
             print("path dont exist")
         else:
-            if window is None or not window.toplevel_window.winfo_exists():
+            if window is None or not window.winfo_exists():
 
                 # make the window
                 window = customtkinter.CTkToplevel()

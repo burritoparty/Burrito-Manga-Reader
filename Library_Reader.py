@@ -183,7 +183,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         else:
             pass
 
-    def author_update(self, book: Book, tag_json: str, authors_json: str, authors: []):
+    def author_update(self, book: Book, tag_json: str, authors_json: str, authors: list[str]):
         # making sure the author input is valid
         author_exists = False
         for i in authors:
@@ -273,7 +273,8 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # make widgets
             # read button, making new cover to resize
             self.read_button = customtkinter.CTkButton(self.book_window, compound="top", fg_color="transparent",
-                                                       hover_color=dark_pink, font=("Roboto", 16),
+                                                       hover_color=dark_pink, font=(
+                                                           "Roboto", 16),
                                                        image=book.get_full_cover(),
                                                        command=lambda x=book: self.open_reader(
                                                            x),
@@ -303,17 +304,14 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                          command=lambda x=book, y=tag_json, z=authors_json, a=authors:
                                                          self.author_update(x, y, z, a))
 
-
-
-
-
             # entry
             w = 800
             self.book_link_entry = customtkinter.CTkEntry(
                 self.book_window, placeholder_text="LINK", width=w)
             self.book_name_entry = customtkinter.CTkEntry(
                 self.book_window, placeholder_text="NAME", width=w)
-            self.book_author_cbox = customtkinter.CTkComboBox(self.book_window, width=w, values=authors)
+            self.book_author_cbox = customtkinter.CTkComboBox(
+                self.book_window, width=w, values=authors)
             self.book_link_entry.insert(0, book.get_link())
             self.book_name_entry.insert(0, book.get_name())
             self.book_author_cbox.set(book.get_author())
@@ -347,10 +345,10 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 check_box = customtkinter.CTkCheckBox(tag_scroller, text=i,
                                                       hover_color=light_pink, fg_color=dark_pink, text_color=light_pink,
                                                       command=lambda
-                                                          x=book,
-                                                          y=tag_json,
-                                                          a=authors_json,
-                                                          z=i:
+                                                      x=book,
+                                                      y=tag_json,
+                                                      a=authors_json,
+                                                      z=i:
                                                       self.append_new_tags(x, y, a, z))
                 check_box.grid(row=r, column=c, padx=10, pady=10)
                 if c == 2:
@@ -417,7 +415,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # focus the window
             self.after(1, self.focus_description)
 
-
         else:
             self.book_window.focus()  # if window exists focus it
 
@@ -483,7 +480,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                  image=books[index_to_start_at].get_cover(
                                                  ),
                                                  command=lambda
-                                                     x=books[index_to_start_at], y=tag_json, z=authors_json: self.open_book_description(
+                                                 x=books[index_to_start_at], y=tag_json, z=authors_json: self.open_book_description(
                                                      x, y, z),
                                                  fg_color="transparent", hover_color=dark_pink,
                                                  text=indent_string(
@@ -500,7 +497,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                  image=books[index_to_start_at].get_cover(
                                                  ),
                                                  command=lambda
-                                                     x=books[index_to_start_at], y=tag_json, z=authors_json: self.open_book_description(
+                                                 x=books[index_to_start_at], y=tag_json, z=authors_json: self.open_book_description(
                                                      x, y, z),
                                                  fg_color="transparent", hover_color=dark_pink,
                                                  text=indent_string(
@@ -578,7 +575,7 @@ class TabNavigator(customtkinter.CTkFrame):
     def __init__(self, bookframe: BookFrame, tag_json: str, authors_json: str, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
         next_tab = customtkinter.CTkButton(self, text="Next Page", command=lambda x=tag_json, z=authors_json:
-                                            bookframe.next_tab(x, z),
+                                           bookframe.next_tab(x, z),
                                            width=400,
                                            fg_color=light_pink,
                                            text_color=black,
