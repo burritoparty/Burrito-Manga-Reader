@@ -338,18 +338,8 @@ class TagFrame(customtkinter.CTkFrame):
         super().__init__(master, **kwargs)
 
         # make windows
-        tag_sort_window = None
         tags_rename_window = None
         tags_delete_window = None
-
-
-
-        # make the label
-        self.tag_sort = customtkinter.CTkButton(self,
-                                                text="Sort by tag",
-                                                fg_color=light_pink,
-                                                text_color=black,
-                                                hover_color=dark_pink)
 
         # make the buttons
         self.tag_append = customtkinter.CTkButton(self,
@@ -375,7 +365,6 @@ class TagFrame(customtkinter.CTkFrame):
                                                   a=authors_json, b=bookframe:
                                                   self.tag_rename_call(w, x, y, a, b))
 
-        self.tag_sort.grid(row=0, column=0, padx=20, pady=20)
-        self.tag_append.grid(row=2, column=0, padx=20, pady=20)
-        self.tag_delete.grid(row=3, column=0, padx=20, pady=20)
-        self.tag_rename.grid(row=4, column=0, padx=20, pady=20)
+        self.tag_append.grid(row=0, column=0, padx=20, pady=20)
+        self.tag_delete.grid(row=1, column=0, padx=20, pady=20)
+        self.tag_rename.grid(row=2, column=0, padx=20, pady=20)

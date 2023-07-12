@@ -33,9 +33,6 @@ class ImportFrame(customtkinter.CTkFrame):
         self.library_path = library_path
         self.library_json = library_json
 
-        self.label = customtkinter.CTkLabel(
-            self, text="Library", text_color=light_pink)
-
         # add new book button
         self.import_book = customtkinter.CTkButton(self,
                                                    text="Import Book",
@@ -49,21 +46,7 @@ class ImportFrame(customtkinter.CTkFrame):
                                                    self.open_import_window(x, y, z))
         self.import_window = None
 
-        self.import_library = customtkinter.CTkButton(self,
-                                                      text="Import Library",
-                                                      fg_color=light_pink,
-                                                      text_color=black,
-                                                      hover_color=dark_pink)
-
-        self.export_library = customtkinter.CTkButton(self,
-                                                      text="Export Library",
-                                                      fg_color=light_pink,
-                                                      text_color=black,
-                                                      hover_color=dark_pink)
-        self.label.grid(row=0, column=0)
-        self.import_book.grid(row=1, column=0, padx=20, pady=20)
-        self.import_library.grid(row=2, column=0, padx=20, pady=20)
-        self.export_library.grid(row=3, column=0, padx=20, pady=20)
+        self.import_book.grid(row=0, column=0, padx=20, pady=20)
 
 
 class ImportWindow(customtkinter.CTkToplevel):
