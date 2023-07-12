@@ -89,7 +89,7 @@ class TagFrame(customtkinter.CTkFrame):
         if path.isfile(tags_json) is False:
             print("path dont exist")
         else:
-            if window is None or not window.toplevel_window.winfo_exists():
+            if window is None or not window.winfo_exists():
 
                 # make the window
                 window = customtkinter.CTkToplevel()
@@ -204,7 +204,7 @@ class TagFrame(customtkinter.CTkFrame):
         if path.isfile(tags_json) is False:
             print("path dont exist")
         else:
-            if window is None or not window.toplevel_window.winfo_exists():
+            if window is None or not window.winfo_exists():
 
                 # make the window
                 window = customtkinter.CTkToplevel()
@@ -257,8 +257,6 @@ class TagFrame(customtkinter.CTkFrame):
             self, window: customtkinter.CTkToplevel, tags_json: str,
             tag_to_rename: str, tag_array: list[str], tag_loader: dict,
             library_json: str, authors_json: str, bookframe):
-
-
 
         # create dialogue entry
         text = "Rename tag: " + tag_to_rename
@@ -330,7 +328,6 @@ class TagFrame(customtkinter.CTkFrame):
             # reload the library
 
             bookframe.load_tab(tags_json, authors_json)
-
 
             window.destroy()
 

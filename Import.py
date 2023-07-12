@@ -69,7 +69,7 @@ class ImportWindow(customtkinter.CTkToplevel):
 
             cover = customtkinter.CTkImage(
                 dark_image=add_corners(images[0], 25), size=(200, 275))
-            cover = customtkinter.CTkLabel(self, image=cover, text=None)
+            cover = customtkinter.CTkLabel(self, image=cover, text="")
             cover.grid(row=0, column=0, rowspan=3, padx=20, pady=20)
 
             if self.name_entry.get() == "":
