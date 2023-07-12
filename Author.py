@@ -11,7 +11,6 @@ from Library_Reader import BookFrame
 class AuthorFrame(customtkinter.CTkFrame):
 
     def author_append_call(self, authors_json: str):
-        print("add")
         authors: list[str] = []
         if path.isfile(authors_json) is False:
             print("path dont exist")
@@ -77,19 +76,145 @@ class AuthorFrame(customtkinter.CTkFrame):
                 with open(authors_json, 'w') as f:
                     json.dump(load_authors, f, indent=2)
 
-    def author_delete_call(self, authors_json: str, window):
-        print("delete")
+    def author_rename_call(self, authors_json: str, window: customtkinter.CTkToplevel | None,
+                           tag_json: str, library_json: str, bookframe):
+        authors: list[str] = []
+        buttons: list[customtkinter.CTkButton] = []
+        index = 0
+        num_loops = 0
+        r = 0
+        c = 0
+        if path.isfile(authors_json) is False:
+            print("path dont exist")
+        else:
+            if window is None or not window.toplevel_window.winfo_exists():
 
-    def author_rename_call(self, authors_json: str, window):
-        print("rename")
+                # make the window
+                window = customtkinter.CTkToplevel()
+                window.attributes('-topmost', 1)
+                window.title("Rename author")
+                window.geometry("0+0")
 
-    def __init__(self, authors_json: str, bookframe: BookFrame, master: customtkinter.CTk, **kwargs):
+                # load the JSON
+                with open(authors_json, 'r') as f:
+                    load_authors = json.load(f)
+
+                # load the author names from the JSON into an array
+                for i in load_authors['authors']:
+                    authors.append(i['name'])
+
+                # make button objects and place them in the window
+                if len(authors) != 0:
+                    # make the buttons
+                    for i in authors:
+                        button = customtkinter.CTkButton(window, text=i,
+                                                         command=lambda
+                                                         w=window,
+                                                         x=tag_json,
+                                                         y=i,
+                                                         z=authors,
+                                                         a=load_authors,
+                                                         b=library_json,
+                                                         c=authors_json,
+                                                         d=bookframe:
+                                                         self.author_rename_dialogue(w, x, y, z, a, b, c, d))
+                        buttons.append(button)
+                        buttons[index].grid(row=r, column=c, padx=20, pady=20)
+
+                        if c == 2:
+                            c = 0
+                            r += 1
+                        else:
+                            c += 1
+                        num_loops += 1
+                        index += 1
+                else:
+                    label = customtkinter.CTkLabel(
+                        window, text="There are no authors to rename")
+                    label.grid(padx=10, pady=10)
+
+            else:
+                window.focus()
+
+    def author_rename_dialogue(self, window: customtkinter.CTkToplevel, tags_json: str,
+            author_to_rename: str, author_array: list[str], author_loader: dict,
+            library_json: str, authors_json: str, bookframe):
+        # create dialogue entry
+        text = "Rename author: " + author_to_rename
+        author_rename_dialogue = customtkinter.CTkInputDialog(
+            text=text, title="Rename an author")
+        author_rename_dialogue.geometry('0+0')
+
+        # get the author's new name
+        new_name = author_rename_dialogue.get_input() or ""
+
+        # check if the input is valid
+        if not check_exists(new_name, author_array, True):
+            error = customtkinter.CTkToplevel()
+            error.attributes('-topmost', 2)
+            error.geometry("0+0")
+            label = customtkinter.CTkLabel(error,
+                                           text="Please enter a new name for the author",
+                                           font=("Roboto", 20))
+            label.grid(padx=10, pady=10)
+        else:
+            # remove the old author and append the new author to the array
+            author_array.remove(author_to_rename)
+            author_array.append(new_name)
+            author_array.sort()
+
+            # delete all the authors
+            del author_loader['authors']
+
+            # delete ['authors'] object from JSON
+            with open(authors_json, 'w') as f:
+                json.dump(author_loader, f, indent=2)
+
+            # load the ['authors'] object back into JSON
+            with open(authors_json, 'w') as f:
+                t = {
+                    "authors": [
+
+                    ]
+                }
+                json.dump(t, f, indent=2)
+
+            # load the JSON back in
+            with open(authors_json, 'r') as f:
+                load_authors = json.load(f)
+
+            # load them all back into load_authors
+            for i in author_array:
+                load_authors["authors"].append({
+                    "name": i
+                })
+
+            # finalize JSON
+            with open(authors_json, 'w') as f:
+                json.dump(load_authors, f, indent=2)
+
+            # rename the authors in the library
+            with open(library_json) as f:
+                # load the library
+                books_json = json.load(f)
+                for b in books_json['book']:
+                    if author_to_rename in b['author']:
+                        b['author'] = new_name
+
+            # now dump the library
+            with open(library_json, 'w') as f:
+                json.dump(books_json, f, indent=2)
+
+            # reload the library
+            bookframe.load_tab(tags_json, authors_json)
+
+            window.destroy()
+
+    def __init__(self, library_json: str, authors_json: str, tag_json: str, bookframe: BookFrame, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
 
         # make windows
-        authors_sort_window = None
         authors_rename_window = None
-        authors_delete_window = None
 
         # make the buttons
         self.author_sort = customtkinter.CTkButton(self,
@@ -108,9 +233,13 @@ class AuthorFrame(customtkinter.CTkFrame):
                                                      fg_color=light_pink,
                                                      text_color=black,
                                                      hover_color=dark_pink,
-                                                     command=lambda x=authors_json,
-                                                     y=authors_rename_window: self.author_rename_call(x, y))
+                                                     command=lambda
+                                                     x=authors_json,
+                                                     y=authors_rename_window,
+                                                     z=tag_json,
+                                                     a=library_json,
+                                                     b=bookframe: self.author_rename_call(x, y, z, a, b))
 
         self.author_sort.grid(row=0, column=0, padx=20, pady=20)
-        self.author_append.grid(row=2, column=0, padx=20, pady=20)
-        self.author_rename.grid(row=3, column=0, padx=20, pady=20)
+        self.author_append.grid(row=1, column=0, padx=20, pady=20)
+        self.author_rename.grid(row=2, column=0, padx=20, pady=20)

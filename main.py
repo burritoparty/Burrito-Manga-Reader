@@ -69,7 +69,7 @@ root.bookDisplayTabs = BookFrame(
 root.tagFrame = TagFrame(
     library_json=library_json, authors_json=authors_json, tag_json=tags_json, bookframe=root.bookDisplayTabs, master=root)
 root.authorFrame = AuthorFrame(
-    authors_json=authors_json, bookframe=root.bookDisplayTabs, master=root)
+    library_json=library_json, authors_json=authors_json, tag_json=tags_json, bookframe=root.bookDisplayTabs, master=root)
 root.importFrame = ImportFrame(
     library_json=library_json, library_path=args.mangaloc, tag_json=tags_json, authors_json=authors_json,
     bookframe=root.bookDisplayTabs, master=root)
