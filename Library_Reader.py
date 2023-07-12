@@ -250,6 +250,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.reader_window = None
             self.book_window = customtkinter.CTkToplevel()
             self.book_window.geometry(f"{1920}x{1080}")
+            self.book_window.title(book.get_name())
             #  sets to the center of the screen
             # print("width: " + str(self.winfo_width()) + " screenwidth: " + str(self.winfo_screenwidth()))
             # print("height: " + str(self.winfo_height()) + " screenheight: " + str(self.winfo_screenheight()))
@@ -703,6 +704,52 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         else:
             self.sort_by_author_window.focus()
 
+    def search_by_name_call(self, tag_json: str, authors_json: str):
+        if self.search_by_name_dialogue is None or not self.search_by_name_dialogue.winfo_exists():
+            self.search_by_name_dialogue = customtkinter.CTkInputDialog()
+            # get the string to search for
+            search_for = self.search_by_name_dialogue.get_input()
+
+            # make sure input is not empty and they didn't press the close button
+            if search_for != '' and search_for is not None:
+
+                # if the library already has books, destroy them
+                for i in self.book_buttons:
+                    i.destroy()
+                self.book_buttons.clear()
+
+                books_json = {}
+
+                # load the JSON
+                if path.isfile(self.library_json) is False:
+                    print("FILE NOT FOUND")
+                else:
+                    with open(self.library_json) as f:
+                        books_json = json.load(f)
+
+                books: list[Book] = []
+                # create all the book objects
+                for i in books_json['book']:
+                    books.append(Book(i['path'], i['name'],
+                                      i['author'], i['link'], i['tagged']))
+
+                for b in books:
+                    if search_for.lower() in b.get_name().lower():
+                        button = customtkinter.CTkButton(self, compound="top", image=b.get_cover(),
+                                                         command=lambda
+                                                             x=b, y=tag_json, z=authors_json:
+                                                         self.open_book_description(x, y, z),
+                                                         text=indent_string(b.get_name()),
+                                                         fg_color="transparent", hover_color=dark_pink,
+                                                         font=("Roboto", 18))
+                        self.book_buttons.append(button)
+
+                self.print_page()
+
+
+        else:
+            self.search_by_name_dialogue.focus()
+
     def __init__(self, library_json: str, tag_json: str, authors_json: str, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
 
@@ -717,6 +764,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
         self.sort_by_tag_window = None
         self.sort_by_author_window = None
+        self.search_by_name_dialogue = None
 
         button_frame = customtkinter.CTkFrame(self)
 
@@ -730,7 +778,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         search_button = customtkinter.CTkButton(button_frame, text="Search by name", width=520,
                                                 fg_color=light_pink,
                                                 text_color=black,
-                                                hover_color=dark_pink)
+                                                hover_color=dark_pink,
+                                                command=lambda
+                                                    y=tag_json, z=authors_json: self.search_by_name_call(y, z))
 
         sort_by_author_button = customtkinter.CTkButton(button_frame, text="Filter by author", width=520,
                                                         fg_color=light_pink,
@@ -746,7 +796,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         button_frame.grid(row=0, column=0, columnspan=6, padx=10, pady=10)
 
         # books_per_page should be divisible by 12
-        self.books_per_page = 12
+        self.books_per_page = 24
         self.book_window = None
         self.book_buttons: list[customtkinter.CTkButton] = []
         self.current_tab = 0
