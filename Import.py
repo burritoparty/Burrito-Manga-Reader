@@ -33,8 +33,14 @@ class ImportFrame(customtkinter.CTkFrame):
         self.library_path = library_path
         self.library_json = library_json
 
+        import_icon = Image.open(resource(os.path.join('button_icons', 'import_icon.png')))
+        ctk_import = customtkinter.CTkImage(dark_image=import_icon)
+
         # add new book button
         self.import_book = customtkinter.CTkButton(self,
+                                                   image=ctk_import,
+                                                   compound="left",
+                                                   anchor="center",
                                                    text="Import Book",
                                                    fg_color=light_pink,
                                                    text_color=black,
@@ -302,9 +308,6 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.library_path = library_path
         self.library_json = library_json
 
-        label = customtkinter.CTkLabel(self, text="placeholder image")
-        label.grid(row=0, column=0, padx=20, pady=20, rowspan=3)
-
         self.link_entry = customtkinter.CTkEntry(
             self, placeholder_text="Enter Link", width=750)
         self.link_entry.grid(row=0, column=0, padx=20, pady=20)
@@ -396,4 +399,4 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.get_path_button.grid(row=0, column=1)
 
         # pulls window to the front
-        self.after(300, self.focus_import)
+        self.after(350, self.focus_import)

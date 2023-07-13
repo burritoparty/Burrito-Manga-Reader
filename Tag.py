@@ -1,4 +1,6 @@
 import json
+import os
+import sys
 from os import path
 
 import customtkinter
@@ -341,6 +343,8 @@ class TagFrame(customtkinter.CTkFrame):
 
             window.destroy()
 
+
+
     def __init__(self, library_json, authors_json, tag_json: str, bookframe: BookFrame, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
 
@@ -348,15 +352,29 @@ class TagFrame(customtkinter.CTkFrame):
         tags_rename_window = None
         tags_delete_window = None
 
+        add = Image.open(resource(os.path.join('button_icons', 'add_icon.png')))
+        ctk_add = customtkinter.CTkImage(dark_image=add)
+        delete = Image.open(resource(os.path.join('button_icons', 'remove.png')))
+        ctk_delete = customtkinter.CTkImage(dark_image=delete)
+        rename = Image.open(resource(os.path.join('button_icons', 'rename_icon.png')))
+        ctk_rename = customtkinter.CTkImage(dark_image=rename)
+
+
         # make the buttons
         self.tag_append = customtkinter.CTkButton(self,
-                                                  text="Add tag",
+                                                  image=ctk_add,
+                                                  compound="left",
+                                                  anchor="center",
+                                                  text="Add Tag",
                                                   fg_color=light_pink,
                                                   text_color=black,
                                                   hover_color=dark_pink,
                                                   command=lambda x=tag_json, y=authors_json, z=bookframe:
                                                   self.tag_append_call(x, y, z))
         self.tag_delete = customtkinter.CTkButton(self,
+                                                  image=ctk_delete,
+                                                  compound="left",
+                                                  anchor="center",
                                                   text="Delete tag",
                                                   fg_color=light_pink,
                                                   text_color=black,
@@ -365,6 +383,9 @@ class TagFrame(customtkinter.CTkFrame):
                                                   a=authors_json, b=bookframe:
                                                   self.tag_delete_call(w, x, y, a, b))
         self.tag_rename = customtkinter.CTkButton(self,
+                                                  image=ctk_rename,
+                                                  compound="left",
+                                                  anchor="center",
                                                   text="Rename tag",
                                                   fg_color=light_pink,
                                                   text_color=black,

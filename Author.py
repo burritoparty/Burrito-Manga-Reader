@@ -223,14 +223,25 @@ class AuthorFrame(customtkinter.CTkFrame):
         # make windows
         authors_rename_window = None
 
+        add = Image.open(resource(os.path.join('button_icons', 'add_icon.png')))
+        ctk_add = customtkinter.CTkImage(dark_image=add)
+        rename = Image.open(resource(os.path.join('button_icons', 'rename_icon.png')))
+        ctk_rename = customtkinter.CTkImage(dark_image=rename)
+
         # make the buttons
         self.author_append = customtkinter.CTkButton(self,
+                                                     image=ctk_add,
+                                                     compound="left",
+                                                     anchor="center",
                                                      text="Add author",
                                                      fg_color=light_pink,
                                                      text_color=black,
                                                      hover_color=dark_pink,
                                                      command=lambda x=authors_json: self.author_append_call(x))
         self.author_rename = customtkinter.CTkButton(self,
+                                                     image=ctk_rename,
+                                                     compound="left",
+                                                     anchor="center",
                                                      text="Rename author",
                                                      fg_color=light_pink,
                                                      text_color=black,
