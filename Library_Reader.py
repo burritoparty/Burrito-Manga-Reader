@@ -2,6 +2,7 @@ import gc
 import json
 import math
 import os
+import time
 from os import path
 import customtkinter
 
@@ -453,10 +454,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             books.append(Book(i['path'], i['name'],
                               i['author'], i['link'], i['tagged']))
 
-        # TODO
-        #  call sorting tags or authors functions here maybe?
-        #  maybe i'll need to make a library loading function inside the tab or author class to do this
-
         # multiply number of books per page by the current page number
         # to find the starting index to grab the books
         # print("index to start at: " + str(self.current_tab * self.books_per_page))
@@ -527,8 +524,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 c += 1
 
     def initialize_self(self):
-        book: list[Book] = []
+        start_time = time.time()
 
+        count = 0
         if path.isfile(self.library_json) is False:
             print("FILE NOT FOUND")
         else:
@@ -536,12 +534,13 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 books_json = json.load(f)
                 # grab the metadata
                 for i in books_json['book']:
-                    book.append(Book(i['path'], i['name'],
-                                     i['author'], i['link'], i['tagged']))
+                    count += 1
 
-        self.book_count = len(book)
-        self.excess_books = self.books_per_page - (math.ceil(len(book) / self.books_per_page)
-                                                   * self.books_per_page - len(book))
+        self.book_count = count
+        self.excess_books = self.books_per_page - (math.ceil(self.book_count / self.books_per_page)
+                                                   * self.books_per_page - self.book_count)
+        # start_time = time.time()
+        # print("--- %s seconds ---" % (time.time() - start_time))
 
     def focus_sort_by_tag_call(self):
         assert self.sort_by_tag_window
@@ -753,6 +752,12 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
         else:
             self.search_by_name_dialogue.focus()
+
+    def get_tab_count(self):
+        # take the book count
+        # divide by books per page
+        # round up
+        return math.ceil(self.book_count / self.books_per_page)
 
     def __init__(self, library_json: str, tag_json: str, authors_json: str, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)

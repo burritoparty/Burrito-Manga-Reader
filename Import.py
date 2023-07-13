@@ -86,6 +86,8 @@ class ImportWindow(customtkinter.CTkToplevel):
 
     def finalize_book(self, book_frame, tag_json, authors_json):
 
+        full_time = time.time()
+
         # making sure the author input is valid
         authors = []
         # load an array with current authors
@@ -154,6 +156,8 @@ class ImportWindow(customtkinter.CTkToplevel):
                     # now update object's path
                     book.path = newpath
 
+
+
                     # import to JSON
                     if os.path.isfile(self.library_json) is False:
                         print("FILE NOT FOUND")
@@ -172,10 +176,14 @@ class ImportWindow(customtkinter.CTkToplevel):
                         with open(self.library_json, 'w') as f:
                             json.dump(books_json, f, indent=4)
 
+                        start_time = time.time()
                         # update the library count here
-                        book_frame.load_tab(tag_json, authors_json)
                         book_frame.initialize_self()
-                        book_frame.load_tab(tag_json, authors_json)
+                        if book_frame.get_tab_count() - 1 == book_frame.current_tab:
+                            book_frame.load_tab(tag_json, authors_json)
+
+
+
 
                     self.destroy()
 
