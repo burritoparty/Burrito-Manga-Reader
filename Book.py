@@ -43,8 +43,8 @@ class Book:
             ext = os.path.splitext(f)[1]
             if ext.lower() not in valid_images:
                 continue
-            w, _ = (Image.open(os.path.join(self.path, f))).size
-            if w < 1600:
+            w, h = (Image.open(os.path.join(self.path, f))).size
+            if w < h:
                 images.append(Image.open(os.path.join(
                     self.path, f)).resize(single_page_size))
             else:
@@ -52,8 +52,8 @@ class Book:
                     self.path, f)).resize(double_page_size))
 
         for i in images:
-            w, _ = i.size
-            if w < 1600:
+            w, h = i.size
+            if w < h:
                 pages.append((customtkinter.CTkImage(
                     dark_image=i, size=single_page_size)))
             else:
