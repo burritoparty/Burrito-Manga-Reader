@@ -461,27 +461,28 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         index_to_start_at = self.current_tab * self.books_per_page
         tab_count = math.ceil(self.book_count / self.books_per_page)
 
-        # put the current books into the array
-        if self.current_tab != self.get_tab_count() - 1:
-            while loopy < self.books_per_page:
-                books.append(
-                    Book(books_json['book'][index_to_start_at]['path'],
-                         books_json['book'][index_to_start_at]['name'],
-                         books_json['book'][index_to_start_at]['author'],
-                         books_json['book'][index_to_start_at]['link'],
-                         books_json['book'][index_to_start_at]['tagged']))
-                loopy += 1
-                index_to_start_at += 1
-        else:
-            while loopy < self.excess_books:
-                books.append(
-                    Book(books_json['book'][index_to_start_at]['path'],
-                         books_json['book'][index_to_start_at]['name'],
-                         books_json['book'][index_to_start_at]['author'],
-                         books_json['book'][index_to_start_at]['link'],
-                         books_json['book'][index_to_start_at]['tagged']))
-                loopy += 1
-                index_to_start_at += 1
+        if self.book_count != 0:
+            # put the current books into the array
+            if self.current_tab != self.get_tab_count() - 1:
+                while loopy < self.books_per_page:
+                    books.append(
+                        Book(books_json['book'][index_to_start_at]['path'],
+                             books_json['book'][index_to_start_at]['name'],
+                             books_json['book'][index_to_start_at]['author'],
+                             books_json['book'][index_to_start_at]['link'],
+                             books_json['book'][index_to_start_at]['tagged']))
+                    loopy += 1
+                    index_to_start_at += 1
+            else:
+                while loopy < self.excess_books:
+                    books.append(
+                        Book(books_json['book'][index_to_start_at]['path'],
+                             books_json['book'][index_to_start_at]['name'],
+                             books_json['book'][index_to_start_at]['author'],
+                             books_json['book'][index_to_start_at]['link'],
+                             books_json['book'][index_to_start_at]['tagged']))
+                    loopy += 1
+                    index_to_start_at += 1
 
         # create the buttons
         counter = 0
@@ -853,19 +854,19 @@ class TabNavigator(customtkinter.CTkFrame):
         book_frame.next_tab(tag_json, authors_json)
         if book_frame.current_tab + 1 < 10:
             self.tab_tracker.configure(
-                text=("0" + str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
+                text=("0" + str(book_frame.current_tab + 1) + " / 0" + str(book_frame.get_tab_count())))
         else:
             self.tab_tracker.configure(
-                text=(str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
+                text=(str(book_frame.current_tab + 1) + " / 0" + str(book_frame.get_tab_count())))
 
     def nav_prev_tab(self, book_frame: BookFrame, tag_json, authors_json):
         book_frame.prev_tab(tag_json, authors_json)
         if book_frame.current_tab + 1 < 10:
             self.tab_tracker.configure(
-                text=("0" + str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
+                text=("0" + str(book_frame.current_tab + 1) + " / 0" + str(book_frame.get_tab_count())))
         else:
             self.tab_tracker.configure(
-                text=(str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
+                text=(str(book_frame.current_tab + 1) + " / 0" + str(book_frame.get_tab_count())))
 
 
     def __init__(self, bookframe: BookFrame, tag_json: str, authors_json: str, master: customtkinter.CTk, **kwargs):
@@ -878,7 +879,7 @@ class TabNavigator(customtkinter.CTkFrame):
         ctk_prev = customtkinter.CTkImage(dark_image=prev)
 
         self.tab_tracker = customtkinter.CTkLabel(self,
-                                                  text=("01 / " + str(bookframe.get_tab_count())),
+                                                  text=("01 / 0" + str(bookframe.get_tab_count())),
                                                   font=("Roboto", 20))
 
         next_tab = customtkinter.CTkButton(self, text="Next Tab",
