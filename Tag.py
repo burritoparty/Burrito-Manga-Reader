@@ -354,7 +354,7 @@ class TagFrame(customtkinter.CTkFrame):
 
         add = Image.open(resource(os.path.join('button_icons', 'add_icon.png')))
         ctk_add = customtkinter.CTkImage(dark_image=add)
-        delete = Image.open(resource(os.path.join('button_icons', 'remove.png')))
+        delete = Image.open(resource(os.path.join('button_icons', 'remove_icon.png')))
         ctk_delete = customtkinter.CTkImage(dark_image=delete)
         rename = Image.open(resource(os.path.join('button_icons', 'rename_icon.png')))
         ctk_rename = customtkinter.CTkImage(dark_image=rename)

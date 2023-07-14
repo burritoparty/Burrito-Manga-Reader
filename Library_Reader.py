@@ -103,12 +103,19 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.pagenum_label = customtkinter.CTkLabel(
                 self.reader_window, text=self.pagenum_text, font=("Roboto", 20))
 
+            next = Image.open(resource(os.path.join('button_icons', 'next_icon.png')))
+            ctk_next = customtkinter.CTkImage(dark_image=next)
+            prev = Image.open(resource(os.path.join('button_icons', 'prev_icon.png')))
+            ctk_prev = customtkinter.CTkImage(dark_image=prev)
+            exit = Image.open(resource(os.path.join('button_icons', 'remove_icon.png')))
+            ctk_exit = customtkinter.CTkImage(dark_image=exit)
+
             # buttons
-            next_page = customtkinter.CTkButton(self.reader_window, text="->", command=self.next_page,
+            next_page = customtkinter.CTkButton(self.reader_window, command=self.next_page, image=ctk_next, text=None,
                                                 hover_color=dark_pink, fg_color=light_pink, text_color=black)
-            prev_page = customtkinter.CTkButton(self.reader_window, text="<-", command=self.prev_page,
+            prev_page = customtkinter.CTkButton(self.reader_window, command=self.prev_page, image=ctk_prev, text=None,
                                                 hover_color=dark_pink, fg_color=light_pink, text_color=black)
-            close = customtkinter.CTkButton(self.reader_window, text="EXIT", command=self.close_reader,
+            close = customtkinter.CTkButton(self.reader_window, command=self.close_reader, image=ctk_exit, text=None,
                                             hover_color=dark_pink, fg_color=light_pink, text_color=black)
 
             # page
@@ -284,25 +291,31 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                        text=indent_string(book.get_name()))
 
             # labels
-            book_link_label = customtkinter.CTkLabel(self.book_window, text="Book Link", font=("Roboto", 20),
+            book_link_label = customtkinter.CTkLabel(self.book_window, text="Link", font=("Roboto", 20),
                                                      text_color=light_pink)
-            book_name_label = customtkinter.CTkLabel(self.book_window, text="Book Name", font=("Roboto", 20),
+            book_name_label = customtkinter.CTkLabel(self.book_window, text="Name", font=("Roboto", 20),
                                                      text_color=light_pink)
-            book_author_label = customtkinter.CTkLabel(self.book_window, text="Book Author", font=("Roboto", 20),
+            book_author_label = customtkinter.CTkLabel(self.book_window, text="Author", font=("Roboto", 20),
                                                        text_color=light_pink)
+
+            update = Image.open(resource(os.path.join('button_icons', 'update_icon.png')))
+            ctk_update = customtkinter.CTkImage(dark_image=update)
 
             # buttons
             self.book_link_button = customtkinter.CTkButton(self.book_window, text="Update Link",
+                                                            image=ctk_update,
                                                             fg_color=light_pink, hover_color=dark_pink,
                                                             text_color=black,
                                                             command=lambda x=book, y=tag_json, z=authors_json:
                                                             self.link_update(x, y, z))
             self.book_name_button = customtkinter.CTkButton(self.book_window, text="Update Name",
+                                                            image=ctk_update,
                                                             fg_color=light_pink, hover_color=dark_pink,
                                                             text_color=black,
                                                             command=lambda x=book, y=tag_json, z=authors_json:
                                                             self.name_update(x, y, z))
             book_author_button = customtkinter.CTkButton(self.book_window, text="Update Author",
+                                                         image=ctk_update,
                                                          fg_color=light_pink, hover_color=dark_pink, text_color=black,
                                                          command=lambda x=book, y=tag_json, z=authors_json, a=authors:
                                                          self.author_update(x, y, z, a))
@@ -455,7 +468,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         tab_count = math.ceil(self.book_count / self.books_per_page)
 
         # put the current books into the array
-        if self.current_tab != self.get_tab_count()-1:
+        if self.current_tab != self.get_tab_count() - 1:
             while loopy < self.books_per_page:
                 books.append(
                     Book(books_json['book'][index_to_start_at]['path'],
@@ -786,7 +799,15 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
         button_frame = customtkinter.CTkFrame(self)
 
+        filter = Image.open(resource(os.path.join('button_icons', 'filter_icon.png')))
+        ctk_filter = customtkinter.CTkImage(dark_image=filter)
+
+        search = Image.open(resource(os.path.join('button_icons', 'search_icon.png')))
+        ctk_search = customtkinter.CTkImage(dark_image=search)
+
         sort_by_tag_button = customtkinter.CTkButton(button_frame, text="Filter by tag", width=520,
+                                                     image=ctk_filter,
+                                                     compound="left",
                                                      fg_color=light_pink,
                                                      text_color=black,
                                                      hover_color=dark_pink,
@@ -794,6 +815,8 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                          y=tag_json, z=authors_json: self.sort_by_tag_call(y, z))
 
         search_button = customtkinter.CTkButton(button_frame, text="Search by name", width=520,
+                                                image=ctk_search,
+                                                compound="left",
                                                 fg_color=light_pink,
                                                 text_color=black,
                                                 hover_color=dark_pink,
@@ -801,6 +824,8 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                     y=tag_json, z=authors_json: self.search_by_name_call(y, z))
 
         sort_by_author_button = customtkinter.CTkButton(button_frame, text="Filter by author", width=520,
+                                                        image=ctk_filter,
+                                                        compound="left",
                                                         fg_color=light_pink,
                                                         text_color=black,
                                                         hover_color=dark_pink,
@@ -831,18 +856,31 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 class TabNavigator(customtkinter.CTkFrame):
     def __init__(self, bookframe: BookFrame, tag_json: str, authors_json: str, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
-        next_tab = customtkinter.CTkButton(self, text="Next Page", command=lambda x=tag_json, z=authors_json:
-        bookframe.next_tab(x, z),
-                                           width=400,
+
+        next = Image.open(resource(os.path.join('button_icons', 'next_icon.png')))
+        ctk_next = customtkinter.CTkImage(dark_image=next)
+
+        prev = Image.open(resource(os.path.join('button_icons', 'prev_icon.png')))
+        ctk_prev = customtkinter.CTkImage(dark_image=prev)
+
+        next_tab = customtkinter.CTkButton(self, text="Next Tab",
+                                           image=ctk_next,
+                                           compound='right',
+                                           command=lambda x=tag_json, z=authors_json:
+                                           bookframe.next_tab(x, z),
+                                           width=520,
                                            fg_color=light_pink,
                                            text_color=black,
                                            hover_color=dark_pink)
-        prev_tab = customtkinter.CTkButton(self, text="Last Page", command=lambda x=tag_json, z=authors_json:
-        bookframe.prev_tab(x, z),
-                                           width=400,
+        prev_tab = customtkinter.CTkButton(self, text="Previous Tab",
+                                           image=ctk_prev,
+                                           compound='left',
+                                           command=lambda x=tag_json, z=authors_json:
+                                           bookframe.prev_tab(x, z),
+                                           width=520,
                                            fg_color=light_pink,
                                            text_color=black,
                                            hover_color=dark_pink)
 
-        prev_tab.grid(row=0, column=0, padx=100, pady=10)
-        next_tab.grid(row=0, column=2, padx=100, pady=10)
+        prev_tab.grid(row=0, column=0, padx=10, pady=10)
+        next_tab.grid(row=0, column=2, padx=10, pady=10)

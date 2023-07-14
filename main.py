@@ -75,8 +75,8 @@ root.tab_nav = TabNavigator(
 root.tagFrame.grid(row=0, column=0, padx=20, pady=20, rowspan=2)
 root.authorFrame.grid(row=2, column=0, padx=20, pady=20)
 root.importFrame.grid(row=3, column=0, padx=20, pady=0)
-root.bookDisplayTabs.grid(row=1, column=1, rowspan=10,
+root.bookDisplayTabs.grid(row=0, column=1, rowspan=10,
                           sticky="nsew", padx=5, pady=5)
-root.tab_nav.grid(row=0, column=1, padx=5, pady=5)
+root.tab_nav.grid(row=10, column=1, padx=5, pady=5)
 
 root.mainloop()
