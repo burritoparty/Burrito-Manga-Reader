@@ -93,6 +93,9 @@ class Book:
         im.putalpha(alpha)
         return im
 
+    def get_cover_width(self):
+        self.cover.cget("size")
+
     def __init__(self, path: str, name: str, author: str, link: str, tagged: list[str]):
         self.path = path
         self.name = name
@@ -100,7 +103,8 @@ class Book:
         self.link = link
         self.tagged = tagged
         self.cover = None
-        COVER_SIZE = (250, 350)
+        LANDSCAPE_COVER = (300, 250)
+        PORTRAIT_COVER = (250, 350)
         VALID_IMAGES = (".jpg", ".png")
 
         cover_im = None
@@ -109,12 +113,20 @@ class Book:
                 ext = os.path.splitext(f)[1]
                 if ext.lower() not in VALID_IMAGES:
                     continue
-                cover_im = Image.open(os.path.join(path, f)).resize(COVER_SIZE)
+                cover_im = Image.open(os.path.join(path, f))
                 break
 
             # There should have a cover image.
             assert cover_im
 
-            # set cover
-            self.cover = customtkinter.CTkImage(
-                dark_image=self.add_corners(cover_im, 10), size=COVER_SIZE)
+            w, h = cover_im.size
+            if w > h:
+                cover_im.resize(LANDSCAPE_COVER)
+                self.cover = customtkinter.CTkImage(
+                    dark_image=self.add_corners(cover_im, 10), size=LANDSCAPE_COVER)
+            else:
+                cover_im.resize(PORTRAIT_COVER)
+                self.cover = customtkinter.CTkImage(
+                    dark_image=self.add_corners(cover_im, 10), size=PORTRAIT_COVER)
+
+

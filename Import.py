@@ -402,4 +402,4 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.get_path_button.grid(row=0, column=1)
 
         # pulls window to the front
-        self.after(350, self.focus_import)
+        self.after(400, self.focus_import)
