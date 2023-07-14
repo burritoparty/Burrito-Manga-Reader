@@ -65,7 +65,7 @@ class Book:
     def get_full_cover(self):
         VALID_IMAGES = (".jpg", ".png")
         LANDSCAPE_COVER = (550, 400)
-        PORTRAIT_COVER = (400, 550)
+        PORTRAIT_COVER = (350, 500)
         cover_im = None
         for f in os.listdir(self.path):
             ext = os.path.splitext(f)[1]

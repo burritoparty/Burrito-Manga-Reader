@@ -424,10 +424,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.book_window.protocol(
                 'WM_DELETE_WINDOW', self.close_book_description)
 
-            # FIXME for some reason, if this isn't here then after you close the window and try to reopen the book,
-            #  it crashes, seems like book's data gets fucked, it is also taking some memory
-            self.load_tab(tag_json, authors_json)
-
             # focus the window
             self.after(1, self.focus_description)
 
