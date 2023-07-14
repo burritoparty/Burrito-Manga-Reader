@@ -848,6 +848,26 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
 
 class TabNavigator(customtkinter.CTkFrame):
+
+    def nav_next_tab(self, book_frame: BookFrame, tag_json, authors_json):
+        book_frame.next_tab(tag_json, authors_json)
+        if book_frame.current_tab + 1 < 10:
+            self.tab_tracker.configure(
+                text=("0" + str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
+        else:
+            self.tab_tracker.configure(
+                text=(str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
+
+    def nav_prev_tab(self, book_frame: BookFrame, tag_json, authors_json):
+        book_frame.prev_tab(tag_json, authors_json)
+        if book_frame.current_tab + 1 < 10:
+            self.tab_tracker.configure(
+                text=("0" + str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
+        else:
+            self.tab_tracker.configure(
+                text=(str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
+
+
     def __init__(self, bookframe: BookFrame, tag_json: str, authors_json: str, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
 
@@ -857,11 +877,15 @@ class TabNavigator(customtkinter.CTkFrame):
         prev = Image.open(resource(os.path.join('button_icons', 'prev_icon.png')))
         ctk_prev = customtkinter.CTkImage(dark_image=prev)
 
+        self.tab_tracker = customtkinter.CTkLabel(self,
+                                                  text=("01 / " + str(bookframe.get_tab_count())),
+                                                  font=("Roboto", 20))
+
         next_tab = customtkinter.CTkButton(self, text="Next Tab",
                                            image=ctk_next,
                                            compound='right',
-                                           command=lambda x=tag_json, z=authors_json:
-                                           bookframe.next_tab(x, z),
+                                           command=lambda b=bookframe, x=tag_json, z=authors_json:
+                                           self.nav_next_tab(b, x, z),
                                            width=520,
                                            fg_color=light_pink,
                                            text_color=black,
@@ -869,12 +893,13 @@ class TabNavigator(customtkinter.CTkFrame):
         prev_tab = customtkinter.CTkButton(self, text="Previous Tab",
                                            image=ctk_prev,
                                            compound='left',
-                                           command=lambda x=tag_json, z=authors_json:
-                                           bookframe.prev_tab(x, z),
+                                           command=lambda b=bookframe, x=tag_json, z=authors_json:
+                                           self.nav_prev_tab(b, x, z),
                                            width=520,
                                            fg_color=light_pink,
                                            text_color=black,
                                            hover_color=dark_pink)
 
         prev_tab.grid(row=0, column=0, padx=10, pady=10)
+        self.tab_tracker.grid(row=0, column=1)
         next_tab.grid(row=0, column=2, padx=10, pady=10)
