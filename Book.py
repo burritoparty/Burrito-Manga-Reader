@@ -64,20 +64,31 @@ class Book:
 
     def get_full_cover(self):
         VALID_IMAGES = (".jpg", ".png")
+        LANDSCAPE_COVER = (550, 400)
+        PORTRAIT_COVER = (400, 550)
         cover_im = None
         for f in os.listdir(self.path):
             ext = os.path.splitext(f)[1]
             if ext.lower() not in VALID_IMAGES:
                 continue
             cover_im = Image.open(os.path.join(
-                self.path, f)).resize((400, 550))
+                self.path, f))
             break
 
         # There should have a cover image.
         assert cover_im
 
-        return customtkinter.CTkImage(
-            dark_image=self.add_corners(cover_im, 10), size=(400, 550))
+        w, h = cover_im.size
+        if w > h:
+            cover_im.resize(LANDSCAPE_COVER)
+            return customtkinter.CTkImage(
+                dark_image=self.add_corners(cover_im, 10), size=LANDSCAPE_COVER)
+        else:
+            cover_im.resize(PORTRAIT_COVER)
+            return customtkinter.CTkImage(
+                dark_image=self.add_corners(cover_im, 10), size=PORTRAIT_COVER)
+
+
 
     def add_corners(self, im: Image.Image, rad: int):
         circle = Image.new('L', (rad * 2, rad * 2), 0)
