@@ -85,7 +85,6 @@ class TagFrame(customtkinter.CTkFrame):
 
     def tag_delete_call(self, library_json: str, tags_json: str, window: customtkinter.CTkToplevel | None,
                         authors_json: str, bookframe):
-        # TODO need to remove this tag from all entries in the library that have it
         tags: list[str] = []
         buttons: list[customtkinter.CTkButton] = []
         index = 0
@@ -203,7 +202,6 @@ class TagFrame(customtkinter.CTkFrame):
 
     def tag_rename_call(self, library_json: str, tags_json: str, window: customtkinter.CTkToplevel | None,
                         authors_json: str, bookframe):
-        # TODO need to rename this tag in all entries in the library that have it
         tags: list[str] = []
         buttons: list[customtkinter.CTkButton] = []
         index = 0

@@ -122,13 +122,11 @@ class ImportWindow(customtkinter.CTkToplevel):
                     self.name = self.name_entry.get()
                     self.link = self.link_entry.get()
 
-                    # now create and store book?
-                    # TODO get access to program files?
+                    # now create and store book
                     library_path = self.library_path
                     book = Book(self.path, self.name, self.author,
                                 self.link, self.tagged)
 
-                    # TODO need to restrict how long the name is for formatting reasons
                     # make new path based on name / .strip() to remove the whitespace from the end
                     self.name = self.name.strip()
                     # strip the path of all illegal characters
@@ -291,13 +289,7 @@ class ImportWindow(customtkinter.CTkToplevel):
     def __init__(self, library_path, library_json, tag_json, authors_json, book_frame, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # this is keeping the window at the top
         self.title("Import Book")
-        # TODO not very centered :/
-        # print("width: " + str(self.winfo_width()) + " screenwidth: " + str(self.winfo_screenwidth()))
-        # print("height: " + str(self.winfo_height()) + " screenheight: " + str(self.winfo_screenheight()))
-        # print("x: " + str(get_x_coordinates(self.winfo_width(), self.winfo_screenwidth())))
-        # print("y: " + str(get_y_coordinates(self.winfo_height(), self.winfo_screenheight())))
         self.geometry('%d+%d' % (
             800, 400
         ))
@@ -315,7 +307,6 @@ class ImportWindow(customtkinter.CTkToplevel):
             self, placeholder_text="Enter Link", width=750)
         self.link_entry.grid(row=0, column=0, padx=20, pady=20)
 
-        # TODO set string limit to 65 chars
         self.name_entry = customtkinter.CTkEntry(
             self, placeholder_text="Enter Name", width=750)
         self.name_entry.grid(row=1, column=0, padx=20, pady=20)
@@ -344,7 +335,6 @@ class ImportWindow(customtkinter.CTkToplevel):
             self.author_cbox.set("")
 
 
-        # TODO long tag names do not fit
         self.tag_frame = customtkinter.CTkScrollableFrame(self, label_text="Select Tags",
                                                           width=1100, label_text_color=light_pink)
         # align checkbox columns

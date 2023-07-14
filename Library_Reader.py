@@ -346,8 +346,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             r = 0
             c = 0
 
-            # TODO pull from a JSON
-
             # grab from the JSON and append to array
             tags: list[str] = []
             with open(tag_json, 'r') as f:
