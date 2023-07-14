@@ -176,14 +176,9 @@ class ImportWindow(customtkinter.CTkToplevel):
                         with open(self.library_json, 'w') as f:
                             json.dump(books_json, f, indent=4)
 
-                        start_time = time.time()
                         # update the library count here
                         book_frame.initialize_self()
-                        if book_frame.get_tab_count() - 1 == book_frame.current_tab:
-                            book_frame.load_tab(tag_json, authors_json)
-
-
-
+                        book_frame.load_tab(tag_json, authors_json)
 
                     self.destroy()
 

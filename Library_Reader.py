@@ -448,43 +448,52 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             with open(self.library_json) as f:
                 books_json = json.load(f)
 
+        # get the books
         books: list[Book] = []
-        # load all the books (metadata) into memory
-        for i in books_json['book']:
-            books.append(Book(i['path'], i['name'],
-                              i['author'], i['link'], i['tagged']))
-
-        # multiply number of books per page by the current page number
-        # to find the starting index to grab the books
-        # print("index to start at: " + str(self.current_tab * self.books_per_page))
+        loopy = 0
         index_to_start_at = self.current_tab * self.books_per_page
+        tab_count = math.ceil(self.book_count / self.books_per_page)
 
-        # print(str(len(books)))
-        # print("tab count: " + str(math.ceil(len(books) / self.books_per_page)))
-        tab_count = math.ceil(len(books) / self.books_per_page)
-        # excess books so say the library is 35, then this comes to 5 to grab the last few for the last page
+        # put the current books into the array
+        if self.current_tab != self.get_tab_count()-1:
+            while loopy < self.books_per_page:
+                books.append(
+                    Book(books_json['book'][index_to_start_at]['path'],
+                         books_json['book'][index_to_start_at]['name'],
+                         books_json['book'][index_to_start_at]['author'],
+                         books_json['book'][index_to_start_at]['link'],
+                         books_json['book'][index_to_start_at]['tagged']))
+                loopy += 1
+                index_to_start_at += 1
+        else:
+            while loopy < self.excess_books:
+                books.append(
+                    Book(books_json['book'][index_to_start_at]['path'],
+                         books_json['book'][index_to_start_at]['name'],
+                         books_json['book'][index_to_start_at]['author'],
+                         books_json['book'][index_to_start_at]['link'],
+                         books_json['book'][index_to_start_at]['tagged']))
+                loopy += 1
+                index_to_start_at += 1
 
+        # create the buttons
         counter = 0
-        # print("current tab: " + str(self.current_tab))
-        # print("books per page: " + str(self.books_per_page))
-        # print(str(tab_count) + " != " + str(self.current_tab+1))
         if self.book_count == 0:
-            # TODO  works but, make the conditional be less shit
             pass
 
         elif tab_count != self.current_tab + 1:
             # create the book objects
             while counter < self.books_per_page:
                 button = customtkinter.CTkButton(self, compound="top",
-                                                 image=books[index_to_start_at].get_cover(
+                                                 image=books[counter].get_cover(
                                                  ),
                                                  command=lambda
-                                                     x=books[index_to_start_at], y=tag_json,
+                                                     x=books[counter], y=tag_json,
                                                      z=authors_json: self.open_book_description(
                                                      x, y, z),
                                                  fg_color="transparent", hover_color=dark_pink,
                                                  text=indent_string(
-                                                     books[index_to_start_at].get_name()),
+                                                     books[counter].get_name()),
                                                  font=("Roboto", 18))
 
                 self.book_buttons.append(button)
@@ -494,15 +503,15 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # create the book objects
             while counter < self.excess_books:
                 button = customtkinter.CTkButton(self, compound="top",
-                                                 image=books[index_to_start_at].get_cover(
+                                                 image=books[counter].get_cover(
                                                  ),
                                                  command=lambda
-                                                     x=books[index_to_start_at], y=tag_json,
+                                                     x=books[counter], y=tag_json,
                                                      z=authors_json: self.open_book_description(
                                                      x, y, z),
                                                  fg_color="transparent", hover_color=dark_pink,
                                                  text=indent_string(
-                                                     books[index_to_start_at].get_name()),
+                                                     books[counter].get_name()),
                                                  font=("Roboto", 18))
 
                 self.book_buttons.append(button)
