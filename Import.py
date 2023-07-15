@@ -57,9 +57,8 @@ class ImportFrame(customtkinter.CTkFrame):
             fg_color=light_pink,
             text_color=black,
             hover_color=dark_pink,
-            command=lambda x=bookframe, y=tag_json, z=authors_json: self.open_import_window(
-                x, y, z
-            ),
+            command=lambda: self.open_import_window(
+                bookframe, tag_json, authors_json),
         )
         self.import_window = None
 
@@ -435,9 +434,8 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.submit_button = customtkinter.CTkButton(
             self,
             text="Submit Book",
-            command=lambda x=book_frame, y=tag_json, z=authors_json: self.finalize_book(
-                x, y, z
-            ),
+            command=lambda: self.finalize_book(
+                book_frame, tag_json, authors_json),
             fg_color=light_pink,
             hover_color=dark_pink,
             text_color=black,
@@ -447,7 +445,7 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.cancel_button = customtkinter.CTkButton(
             self,
             text="Add an author",
-            command=lambda x=authors_json: self.make_new_author(x),
+            command=lambda: self.make_new_author(authors_json),
             fg_color=light_pink,
             hover_color=dark_pink,
             text_color=black,

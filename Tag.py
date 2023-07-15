@@ -122,8 +122,15 @@ class TagFrame(customtkinter.CTkFrame):
                             fg_color=light_pink,
                             text_color=black,
                             hover_color=dark_pink,
-                            command=lambda w=window, x=tags_json, y=i, z=tags, a=load_tags, b=library_json, c=authors_json, d=bookframe: self.tag_deleter(
-                                w, x, y, z, a, b, c, d
+                            command=lambda i=i: self.tag_deleter(
+                                window,
+                                tags_json,
+                                i,
+                                tags,
+                                load_tags,
+                                library_json,
+                                authors_json,
+                                bookframe,
                             ),
                         )
                         buttons.append(button)
@@ -242,8 +249,15 @@ class TagFrame(customtkinter.CTkFrame):
                             fg_color=light_pink,
                             text_color=black,
                             hover_color=dark_pink,
-                            command=lambda w=window, x=tags_json, y=i, z=tags, a=load_tags, b=library_json, c=authors_json, d=bookframe: self.tag_rename_dialogue(
-                                w, x, y, z, a, b, c, d
+                            command=lambda i=i: self.tag_rename_dialogue(
+                                window,
+                                tags_json,
+                                i,
+                                tags,
+                                load_tags,
+                                library_json,
+                                authors_json,
+                                bookframe,
                             ),
                         )
                         buttons.append(button)
@@ -382,9 +396,8 @@ class TagFrame(customtkinter.CTkFrame):
             fg_color=light_pink,
             text_color=black,
             hover_color=dark_pink,
-            command=lambda x=tag_json, y=authors_json, z=bookframe: self.tag_append_call(
-                x, y, z
-            ),
+            command=lambda: self.tag_append_call(
+                tag_json, authors_json, bookframe),
         )
         self.tag_delete = customtkinter.CTkButton(
             self,
@@ -395,8 +408,8 @@ class TagFrame(customtkinter.CTkFrame):
             fg_color=light_pink,
             text_color=black,
             hover_color=dark_pink,
-            command=lambda w=library_json, x=tag_json, y=tags_delete_window, a=authors_json, b=bookframe: self.tag_delete_call(
-                w, x, y, a, b
+            command=lambda: self.tag_delete_call(
+                library_json, tag_json, tags_delete_window, authors_json, bookframe
             ),
         )
         self.tag_rename = customtkinter.CTkButton(
@@ -408,8 +421,8 @@ class TagFrame(customtkinter.CTkFrame):
             fg_color=light_pink,
             text_color=black,
             hover_color=dark_pink,
-            command=lambda w=library_json, x=tag_json, y=tags_rename_window, a=authors_json, b=bookframe: self.tag_rename_call(
-                w, x, y, a, b
+            command=lambda: self.tag_rename_call(
+                library_json, tag_json, tags_rename_window, authors_json, bookframe
             ),
         )
 
