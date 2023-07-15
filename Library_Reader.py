@@ -850,23 +850,44 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
 class TabNavigator(customtkinter.CTkFrame):
 
+    def nav_first_tab(self, book_frame: BookFrame, tag_json, authors_json):
+        book_frame.current_tab = 0
+        book_frame.load_tab(tag_json, authors_json)
+        if book_frame.current_tab + 1 < 10:
+            self.tab_tracker.configure(
+                text=("0" + str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
+        else:
+            self.tab_tracker.configure(
+                text=(str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
+
+
+    def nav_last_tab(self, book_frame: BookFrame, tag_json, authors_json):
+        book_frame.current_tab = book_frame.get_tab_count() - 1
+        book_frame.load_tab(tag_json, authors_json)
+        if book_frame.current_tab + 1 < 10:
+            self.tab_tracker.configure(
+                text=("0" + str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
+        else:
+            self.tab_tracker.configure(
+                text=(str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
+
     def nav_next_tab(self, book_frame: BookFrame, tag_json, authors_json):
         book_frame.next_tab(tag_json, authors_json)
         if book_frame.current_tab + 1 < 10:
             self.tab_tracker.configure(
-                text=("0" + str(book_frame.current_tab + 1) + " / 0" + str(book_frame.get_tab_count())))
+                text=("0" + str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
         else:
             self.tab_tracker.configure(
-                text=(str(book_frame.current_tab + 1) + " / 0" + str(book_frame.get_tab_count())))
+                text=(str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
 
     def nav_prev_tab(self, book_frame: BookFrame, tag_json, authors_json):
         book_frame.prev_tab(tag_json, authors_json)
         if book_frame.current_tab + 1 < 10:
             self.tab_tracker.configure(
-                text=("0" + str(book_frame.current_tab + 1) + " / 0" + str(book_frame.get_tab_count())))
+                text=("0" + str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
         else:
             self.tab_tracker.configure(
-                text=(str(book_frame.current_tab + 1) + " / 0" + str(book_frame.get_tab_count())))
+                text=(str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
 
 
     def __init__(self, bookframe: BookFrame, tag_json: str, authors_json: str, master: customtkinter.CTk, **kwargs):
@@ -878,9 +899,32 @@ class TabNavigator(customtkinter.CTkFrame):
         prev = Image.open(resource(os.path.join('button_icons', 'prev_icon.png')))
         ctk_prev = customtkinter.CTkImage(dark_image=prev)
 
+        jump_first = Image.open(resource(os.path.join('button_icons', 'jump_first_icon.png')))
+        ctk_jump_first = customtkinter.CTkImage(dark_image=jump_first)
+
+        jump_last = Image.open(resource(os.path.join('button_icons', 'jump_last_icon.png')))
+        ctk_jump_last = customtkinter.CTkImage(dark_image=jump_last)
+
         self.tab_tracker = customtkinter.CTkLabel(self,
-                                                  text=("01 / 0" + str(bookframe.get_tab_count())),
+                                                  text=("01 / " + str(bookframe.get_tab_count())),
                                                   font=("Roboto", 20))
+
+        first_tab = customtkinter.CTkButton(self, text="First Tab",
+                                            image=ctk_jump_first,
+                                            command=lambda b=bookframe, x=tag_json, z=authors_json:
+                                            self.nav_first_tab(b, x, z),
+                                           fg_color=light_pink,
+                                           text_color=black,
+                                           hover_color=dark_pink)
+
+        last_tab = customtkinter.CTkButton(self, text="Last Tab",
+                                           compound="right",
+                                           image=ctk_jump_last,
+                                           command=lambda b=bookframe, x=tag_json, z=authors_json:
+                                           self.nav_last_tab(b, x, z),
+                                           fg_color=light_pink,
+                                           text_color=black,
+                                           hover_color=dark_pink)
 
         next_tab = customtkinter.CTkButton(self, text="Next Tab",
                                            image=ctk_next,
@@ -901,6 +945,8 @@ class TabNavigator(customtkinter.CTkFrame):
                                            text_color=black,
                                            hover_color=dark_pink)
 
-        prev_tab.grid(row=0, column=0, padx=10, pady=10)
-        self.tab_tracker.grid(row=0, column=1)
-        next_tab.grid(row=0, column=2, padx=10, pady=10)
+        first_tab.grid(row=0, column=0, padx=10, pady=10)
+        prev_tab.grid(row=0, column=1, padx=10, pady=10)
+        self.tab_tracker.grid(row=0, column=2)
+        next_tab.grid(row=0, column=3, padx=10, pady=10)
+        last_tab.grid(row=0, column=4, padx=10, pady=10)
