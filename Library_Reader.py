@@ -653,25 +653,21 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             with open(self.library_json) as f:
                 books_json = json.load(f)
 
-        books: list[Book] = []
-        # create all the book objects
+        # iterate through the json
         for i in books_json['book']:
-            books.append(Book(i['path'], i['name'],
-                              i['author'], i['link'], i['tagged']))
-
-        # loop through each of these book objects
-        #      if the book has a matching tag append it to self.book_buttons
-
-        for b in books:
-            # load the current book's tags
-            if b.get_author() == author_cbox.get():
-                button = customtkinter.CTkButton(self, compound="top", image=b.get_cover(),
+            if author_cbox.get() == i['author']:
+                # make book only if tag matches
+                book = (Book(i['path'], i['name'],
+                             i['author'], i['link'], i['tagged']))
+                # make the button
+                button = customtkinter.CTkButton(self, compound="top", image=book.get_cover(),
                                                  command=lambda
-                                                     x=b, y=tag_json, z=authors_json:
+                                                     x=book, y=tag_json, z=authors_json:
                                                  self.open_book_description(x, y, z),
-                                                 text=indent_string(b.get_name()),
+                                                 text=indent_string(book.get_name()),
                                                  fg_color="transparent", hover_color=dark_pink,
                                                  font=("Roboto", 18))
+                # append to the buttons
                 self.book_buttons.append(button)
 
         self.print_page()
