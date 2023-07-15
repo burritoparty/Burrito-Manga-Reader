@@ -121,8 +121,15 @@ class AuthorFrame(customtkinter.CTkFrame):
                             fg_color=light_pink,
                             text_color=black,
                             hover_color=dark_pink,
-                            command=lambda w=window, x=tag_json, y=i, z=authors, a=load_authors, b=library_json, c=authors_json, d=bookframe: self.author_rename_dialogue(
-                                w, x, y, z, a, b, c, d
+                            command=lambda i=i: self.author_rename_dialogue(
+                                window,
+                                tag_json,
+                                i,
+                                authors,
+                                load_authors,
+                                library_json,
+                                authors_json,
+                                bookframe,
                             ),
                         )
                         buttons.append(button)
@@ -258,7 +265,7 @@ class AuthorFrame(customtkinter.CTkFrame):
             fg_color=light_pink,
             text_color=black,
             hover_color=dark_pink,
-            command=lambda x=authors_json: self.author_append_call(x),
+            command=lambda: self.author_append_call(authors_json),
         )
         self.author_rename = customtkinter.CTkButton(
             self,
@@ -269,8 +276,8 @@ class AuthorFrame(customtkinter.CTkFrame):
             fg_color=light_pink,
             text_color=black,
             hover_color=dark_pink,
-            command=lambda x=authors_json, y=authors_rename_window, z=tag_json, a=library_json, b=bookframe: self.author_rename_call(
-                x, y, z, a, b
+            command=lambda: self.author_rename_call(
+                authors_json, authors_rename_window, tag_json, library_json, bookframe
             ),
         )
         self.author_append.grid(row=0, column=0, padx=20, pady=20)
