@@ -730,7 +730,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # get the string to search for
             search_for = self.search_by_name_dialogue.get_input()
 
-            # make sure input is not empty and they didn't press the close button
+            # make sure input is not empty, and they didn't press the close button
             if search_for != '' and search_for is not None:
 
                 # if the library already has books, destroy them
@@ -747,25 +747,26 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                     with open(self.library_json) as f:
                         books_json = json.load(f)
 
-                books: list[Book] = []
-                # create all the book objects
+                # iterate through the json
                 for i in books_json['book']:
-                    books.append(Book(i['path'], i['name'],
-                                      i['author'], i['link'], i['tagged']))
-
-                for b in books:
-                    if search_for.lower() in b.get_name().lower():
-                        button = customtkinter.CTkButton(self, compound="top", image=b.get_cover(),
+                    # if name matches
+                    if search_for.lower() in i['name'].lower():
+                        # make book only if name matches
+                        book = (Book(i['path'], i['name'],
+                                     i['author'], i['link'], i['tagged']))
+                        # make the button
+                        button = customtkinter.CTkButton(self, compound="top", image=book.get_cover(),
                                                          command=lambda
-                                                             x=b, y=tag_json, z=authors_json:
+                                                             x=book, y=tag_json, z=authors_json:
                                                          self.open_book_description(x, y, z),
-                                                         text=indent_string(b.get_name()),
+                                                         text=indent_string(book.get_name()),
                                                          fg_color="transparent", hover_color=dark_pink,
                                                          font=("Roboto", 18))
+                        # append to the buttons
                         self.book_buttons.append(button)
 
+                # print it
                 self.print_page()
-
 
         else:
             self.search_by_name_dialogue.focus()
@@ -860,7 +861,6 @@ class TabNavigator(customtkinter.CTkFrame):
             self.tab_tracker.configure(
                 text=(str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
 
-
     def nav_last_tab(self, book_frame: BookFrame, tag_json, authors_json):
         book_frame.current_tab = book_frame.get_tab_count() - 1
         book_frame.load_tab(tag_json, authors_json)
@@ -889,7 +889,6 @@ class TabNavigator(customtkinter.CTkFrame):
             self.tab_tracker.configure(
                 text=(str(book_frame.current_tab + 1) + " / " + str(book_frame.get_tab_count())))
 
-
     def __init__(self, bookframe: BookFrame, tag_json: str, authors_json: str, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
 
@@ -913,9 +912,9 @@ class TabNavigator(customtkinter.CTkFrame):
                                             image=ctk_jump_first,
                                             command=lambda b=bookframe, x=tag_json, z=authors_json:
                                             self.nav_first_tab(b, x, z),
-                                           fg_color=light_pink,
-                                           text_color=black,
-                                           hover_color=dark_pink)
+                                            fg_color=light_pink,
+                                            text_color=black,
+                                            hover_color=dark_pink)
 
         last_tab = customtkinter.CTkButton(self, text="Last Tab",
                                            compound="right",
