@@ -72,9 +72,19 @@ class ImportWindow(customtkinter.CTkToplevel):
                 if ext.lower() not in valid_images:
                     continue
                 images.append(Image.open(os.path.join(self.path, f)))
+                break
 
-            cover = customtkinter.CTkImage(
-                dark_image=add_corners(images[0], 25), size=(200, 275))
+            w, h = images[0].size
+            if w > h:
+                images[0].resize((275, 200))
+                cover = customtkinter.CTkImage(
+                    dark_image=add_corners(images[0], 25), size=(275, 200))
+            else:
+                images[0].resize((200, 275))
+                cover = customtkinter.CTkImage(
+                    dark_image=add_corners(images[0], 25), size=(200, 275))
+
+
             cover = customtkinter.CTkLabel(self, image=cover, text="")
             cover.grid(row=0, column=2, rowspan=3, padx=20, pady=20)
 
@@ -284,15 +294,19 @@ class ImportWindow(customtkinter.CTkToplevel):
 
     def focus_import(self):
         assert self
-        self.focus()
+        self.lift()
+        self.focus_force()
 
     def __init__(self, library_path, library_json, tag_json, authors_json, book_frame, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        start_time = time.time()
 
         self.title("Import Book")
         self.geometry('%d+%d' % (
             800, 400
         ))
+        self.attributes('-topmost')
 
         # make attributes for new book
         self.path = None
@@ -322,6 +336,8 @@ class ImportWindow(customtkinter.CTkToplevel):
         for i in load_authors['authors']:
             authors.append(i['name'])
 
+
+
         self.author_cbox = customtkinter.CTkComboBox(self, width=750)
 
         self.author_cbox.grid(row=2, column=0)
@@ -333,6 +349,7 @@ class ImportWindow(customtkinter.CTkToplevel):
                                   frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
 
             self.author_cbox.set("")
+
 
 
         self.tag_frame = customtkinter.CTkScrollableFrame(self, label_text="Select Tags",
@@ -391,5 +408,9 @@ class ImportWindow(customtkinter.CTkToplevel):
                                                        fg_color=light_pink, hover_color=dark_pink, text_color=black)
         self.get_path_button.grid(row=0, column=1)
 
+        # get the time it takes function to run then wait that long until focus + 10
+        end_time = int(((time.time() - start_time) * 1000) + 10)
+        # print("--- %s seconds ---" % (end_time))
+
         # pulls window to the front
-        self.after(400, self.focus_import)
+        self.after(end_time, self.focus_import)
