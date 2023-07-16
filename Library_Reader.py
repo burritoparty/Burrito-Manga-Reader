@@ -5,7 +5,7 @@ import os
 import time
 from os import path
 import customtkinter
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 
 from Book import Book
 from CTkScrollableDropdown import CTkScrollableDropdown
@@ -484,7 +484,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                     loopy += 1
                     index_to_start_at += 1
 
-            with ProcessPoolExecutor() as executor:
+            with ThreadPoolExecutor() as executor:
                 for book in executor.map(_create_book, books_json_to_load):
                     books.append(book)
 
