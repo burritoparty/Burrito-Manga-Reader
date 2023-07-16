@@ -5,6 +5,7 @@ import os
 import time
 from os import path
 import customtkinter
+from concurrent.futures import ThreadPoolExecutor
 
 from Book import Book
 from CTkScrollableDropdown import CTkScrollableDropdown
@@ -14,6 +15,14 @@ from Functions import *
 
 # test line
 
+def _create_book(book_json_entry: dict) -> Book:
+    return Book(
+        book_json_entry["path"],
+        book_json_entry["name"],
+        book_json_entry["author"],
+        book_json_entry["link"],
+        book_json_entry["tagged"],
+    )
 
 class BookFrame(customtkinter.CTkScrollableFrame):
 
@@ -111,11 +120,11 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             ctk_exit = customtkinter.CTkImage(dark_image=exit)
 
             # buttons
-            next_page = customtkinter.CTkButton(self.reader_window, command=self.next_page, image=ctk_next, text=None,
+            next_page = customtkinter.CTkButton(self.reader_window, command=self.next_page, image=ctk_next, text="",
                                                 hover_color=dark_pink, fg_color=light_pink, text_color=black)
-            prev_page = customtkinter.CTkButton(self.reader_window, command=self.prev_page, image=ctk_prev, text=None,
+            prev_page = customtkinter.CTkButton(self.reader_window, command=self.prev_page, image=ctk_prev, text="",
                                                 hover_color=dark_pink, fg_color=light_pink, text_color=black)
-            close = customtkinter.CTkButton(self.reader_window, command=self.close_reader, image=ctk_exit, text=None,
+            close = customtkinter.CTkButton(self.reader_window, command=self.close_reader, image=ctk_exit, text="",
                                             hover_color=dark_pink, fg_color=light_pink, text_color=black)
 
             # page
@@ -463,26 +472,21 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
         if self.book_count != 0:
             # put the current books into the array
+            books_json_to_load: list[dict] = []
             if self.current_tab != self.get_tab_count() - 1:
                 while loopy < self.books_per_page:
-                    books.append(
-                        Book(books_json['book'][index_to_start_at]['path'],
-                             books_json['book'][index_to_start_at]['name'],
-                             books_json['book'][index_to_start_at]['author'],
-                             books_json['book'][index_to_start_at]['link'],
-                             books_json['book'][index_to_start_at]['tagged']))
+                    books_json_to_load.append(books_json['book'][index_to_start_at])
                     loopy += 1
                     index_to_start_at += 1
             else:
                 while loopy < self.excess_books:
-                    books.append(
-                        Book(books_json['book'][index_to_start_at]['path'],
-                             books_json['book'][index_to_start_at]['name'],
-                             books_json['book'][index_to_start_at]['author'],
-                             books_json['book'][index_to_start_at]['link'],
-                             books_json['book'][index_to_start_at]['tagged']))
+                    books_json_to_load.append(books_json['book'][index_to_start_at])
                     loopy += 1
                     index_to_start_at += 1
+
+            with ThreadPoolExecutor() as executor:
+                for book in executor.map(_create_book, books_json_to_load):
+                    books.append(book)
 
         # create the buttons
         counter = 0
