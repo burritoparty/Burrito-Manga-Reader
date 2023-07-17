@@ -1,4 +1,5 @@
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 import customtkinter
 from PIL import Image, ImageDraw
@@ -24,14 +25,7 @@ class Book:
     def get_tags(self):
         return self.tagged
 
-    # if you need the pages as thumbnail size, set `is_thumbnail` to True
-    def get_pages(self, is_thumbnail: bool):
-
-        # load pages
-        images: list[Image.Image] = []
-        pages: list[customtkinter.CTkImage] = []
-        valid_images = [".jpg", ".png"]
-
+    def _get_page(self, file_name: str, is_thumbnail: bool):
         if is_thumbnail:
             single_page_size = (175, 250)
             double_page_size = (175, 250)
@@ -39,28 +33,27 @@ class Book:
             single_page_size = (950, 1300)
             double_page_size = (1600, 1200)
 
-        for f in os.listdir(self.path):
-            ext = os.path.splitext(f)[1]
-            if ext.lower() not in valid_images:
-                continue
-            w, h = (Image.open(os.path.join(self.path, f))).size
-            if w < h:
-                images.append(Image.open(os.path.join(
-                    self.path, f)).resize(single_page_size))
-            else:
-                images.append(Image.open(os.path.join(
-                    self.path, f)).resize(double_page_size))
+        img = Image.open(os.path.join(self.path, file_name))
+        w, h = img.size
+        size = single_page_size if w < h else double_page_size
+        img = img.resize(size)
+        return customtkinter.CTkImage(dark_image=img, size=size)
 
-        for i in images:
-            w, h = i.size
-            if w < h:
-                pages.append((customtkinter.CTkImage(
-                    dark_image=i, size=single_page_size)))
-            else:
-                pages.append((customtkinter.CTkImage(
-                    dark_image=i, size=double_page_size)))
+    # if you need the pages as thumbnail size, set `is_thumbnail` to True
+    def get_pages(self, is_thumbnail: bool):
 
-        return pages
+        # load pages
+        valid_images = [".jpg", ".png"]
+
+        files = [
+            f for f in os.listdir(self.path)
+            if os.path.splitext(f)[1].lower() in valid_images
+        ]
+        with ThreadPoolExecutor() as executor:
+            return [
+                image for image in executor.map(
+                    lambda f: self._get_page(f, is_thumbnail), files)
+            ]
 
     def get_full_cover(self):
         VALID_IMAGES = (".jpg", ".png")
@@ -87,8 +80,6 @@ class Book:
             cover_im.resize(PORTRAIT_COVER)
             return customtkinter.CTkImage(
                 dark_image=self.add_corners(cover_im, 10), size=PORTRAIT_COVER)
-
-
 
     def add_corners(self, im: Image.Image, rad: int):
         circle = Image.new('L', (rad * 2, rad * 2), 0)
