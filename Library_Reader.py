@@ -24,6 +24,7 @@ def _create_book(book_json_entry: dict) -> Book:
         book_json_entry["tagged"],
     )
 
+
 class BookFrame(customtkinter.CTkScrollableFrame):
 
     def focus_reader(self):
@@ -449,7 +450,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.load_tab(tag_json, authors_json)
 
     def load_tab(self, tag_json: str, authors_json: str):
-
         # if the library already has books, destroy them
         for i in self.book_buttons:
             i.destroy()
@@ -472,21 +472,26 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
         if self.book_count != 0:
             # put the current books into the array
-            books_json_to_load: list[dict] = []
             if self.current_tab != self.get_tab_count() - 1:
                 while loopy < self.books_per_page:
-                    books_json_to_load.append(books_json['book'][index_to_start_at])
+                    books.append(
+                        Book(books_json['book'][index_to_start_at]['path'],
+                             books_json['book'][index_to_start_at]['name'],
+                             books_json['book'][index_to_start_at]['author'],
+                             books_json['book'][index_to_start_at]['link'],
+                             books_json['book'][index_to_start_at]['tagged']))
                     loopy += 1
                     index_to_start_at += 1
             else:
                 while loopy < self.excess_books:
-                    books_json_to_load.append(books_json['book'][index_to_start_at])
+                    books.append(
+                        Book(books_json['book'][index_to_start_at]['path'],
+                             books_json['book'][index_to_start_at]['name'],
+                             books_json['book'][index_to_start_at]['author'],
+                             books_json['book'][index_to_start_at]['link'],
+                             books_json['book'][index_to_start_at]['tagged']))
                     loopy += 1
                     index_to_start_at += 1
-
-            with ThreadPoolExecutor() as executor:
-                for book in executor.map(_create_book, books_json_to_load):
-                    books.append(book)
 
         # create the buttons
         counter = 0
