@@ -75,11 +75,11 @@ class Book:
         if w > h:
             cover_im.resize(LANDSCAPE_COVER)
             return customtkinter.CTkImage(
-                dark_image=self.add_corners(cover_im, 10), size=LANDSCAPE_COVER)
+                dark_image=cover_im, size=LANDSCAPE_COVER)
         else:
             cover_im.resize(PORTRAIT_COVER)
             return customtkinter.CTkImage(
-                dark_image=self.add_corners(cover_im, 10), size=PORTRAIT_COVER)
+                dark_image=cover_im, size=PORTRAIT_COVER)
 
     def add_corners(self, im: Image.Image, rad: int):
         circle = Image.new('L', (rad * 2, rad * 2), 0)
@@ -125,10 +125,10 @@ class Book:
             if w > h:
                 cover_im.resize(LANDSCAPE_COVER)
                 self.cover = customtkinter.CTkImage(
-                    dark_image=self.add_corners(cover_im, 10), size=LANDSCAPE_COVER)
+                    dark_image=cover_im, size=LANDSCAPE_COVER)
             else:
                 cover_im.resize(PORTRAIT_COVER)
                 self.cover = customtkinter.CTkImage(
-                    dark_image=self.add_corners(cover_im, 10), size=PORTRAIT_COVER)
+                    dark_image=cover_im, size=PORTRAIT_COVER)
 
 

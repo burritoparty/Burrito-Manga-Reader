@@ -78,11 +78,11 @@ class ImportWindow(customtkinter.CTkToplevel):
             if w > h:
                 images[0].resize((275, 200))
                 cover = customtkinter.CTkImage(
-                    dark_image=add_corners(images[0], 25), size=(275, 200))
+                    dark_image=images[0], size=(275, 200))
             else:
                 images[0].resize((200, 275))
                 cover = customtkinter.CTkImage(
-                    dark_image=add_corners(images[0], 25), size=(200, 275))
+                    dark_image=images[0], size=(200, 275))
 
             cover = customtkinter.CTkLabel(self, image=cover, text="")
             cover.grid(row=0, column=2, rowspan=3, padx=20, pady=20)
