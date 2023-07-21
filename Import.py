@@ -84,7 +84,6 @@ class ImportWindow(customtkinter.CTkToplevel):
                 cover = customtkinter.CTkImage(
                     dark_image=add_corners(images[0], 25), size=(200, 275))
 
-
             cover = customtkinter.CTkLabel(self, image=cover, text="")
             cover.grid(row=0, column=2, rowspan=3, padx=20, pady=20)
 
@@ -127,71 +126,85 @@ class ImportWindow(customtkinter.CTkToplevel):
         else:
             # making sure no inputs were left empty
             if self.path is not None and self.author_cbox.get() != "" and self.name_entry.get() != "":
-                if self.path != '':
-                    self.author = self.author_cbox.get()
-                    self.name = self.name_entry.get()
-                    self.link = self.link_entry.get()
 
-                    # now create and store book
-                    library_path = self.library_path
-                    book = Book(self.path, self.name, self.author,
-                                self.link, self.tagged)
+                library_path = self.library_path
 
-                    # make new path based on name / .strip() to remove the whitespace from the end
-                    self.name = self.name.strip()
-                    # strip the path of all illegal characters
-                    strip_name = self.name
-                    strip_name = strip_name.replace('/', '')
-                    strip_name = strip_name.replace('\\', '')
-                    strip_name = strip_name.replace(':', '')
-                    strip_name = strip_name.replace('*', '')
-                    strip_name = strip_name.replace('?', '')
-                    strip_name = strip_name.replace('"', '')
-                    strip_name = strip_name.replace('<', '')
-                    strip_name = strip_name.replace('>', '')
-                    strip_name = strip_name.replace('|', '')
-                    strip_name = strip_name.strip()
-                    newpath = os.path.join(library_path, strip_name)
-                    os.mkdir(os.path.join(library_path, newpath))
+                # make new path based on name / .strip() to remove the whitespace from the end
+                self.name = self.name_entry.get()
+                self.name = self.name.strip()
+                # strip the path of all illegal characters
+                strip_name = self.name
+                strip_name = strip_name.replace('/', '')
+                strip_name = strip_name.replace('\\', '')
+                strip_name = strip_name.replace(':', '')
+                strip_name = strip_name.replace('*', '')
+                strip_name = strip_name.replace('?', '')
+                strip_name = strip_name.replace('"', '')
+                strip_name = strip_name.replace('<', '')
+                strip_name = strip_name.replace('>', '')
+                strip_name = strip_name.replace('|', '')
+                strip_name = strip_name.replace('.', '')
+                strip_name = strip_name.strip()
+                new_path = os.path.join(library_path, strip_name)
 
-                    # copy from old path to new path
+                # check if the path exists
+                if not os.path.exists(new_path):
+                    if self.path != '':
+                        os.mkdir(new_path)
+                        self.author = self.author_cbox.get()
+                        self.link = self.link_entry.get()
 
-                    files = os.listdir(self.path)
-                    for i in files:
-                        shutil.copy(os.path.join(self.path, i),
-                                    os.path.join(newpath, i))
+                        # now create and store book
 
-                    # now update object's path
-                    book.path = newpath
+                        book = Book(self.path, self.name, self.author,
+                                    self.link, self.tagged)
 
+                        # copy from old path to new path
 
+                        files = os.listdir(self.path)
+                        for i in files:
+                            shutil.copy(os.path.join(self.path, i),
+                                        os.path.join(new_path, i))
 
-                    # import to JSON
-                    if os.path.isfile(self.library_json) is False:
-                        print("FILE NOT FOUND")
+                        # now update object's path
+                        book.path = new_path
+
+                        # import to JSON
+                        if os.path.isfile(self.library_json) is False:
+                            print("FILE NOT FOUND")
+                        else:
+                            with open(self.library_json) as f:
+                                books_json = json.load(f)
+
+                            books_json['book'].append({
+                                "path": book.get_path(),
+                                "name": book.get_name(),
+                                "author": book.get_author(),
+                                "link": book.get_link(),
+                                "tagged": book.get_tags()
+                            })
+
+                            with open(self.library_json, 'w') as f:
+                                json.dump(books_json, f, indent=4)
+
+                            # update the library count here
+                            book_frame.initialize_self()
+                            book_frame.load_tab(tag_json, authors_json)
+
+                        self.destroy()
+
                     else:
-                        with open(self.library_json) as f:
-                            books_json = json.load(f)
-
-                        books_json['book'].append({
-                            "path": book.get_path(),
-                            "name": book.get_name(),
-                            "author": book.get_author(),
-                            "link": book.get_link(),
-                            "tagged": book.get_tags()
-                        })
-
-                        with open(self.library_json, 'w') as f:
-                            json.dump(books_json, f, indent=4)
-
-                        # update the library count here
-                        book_frame.initialize_self()
-                        book_frame.load_tab(tag_json, authors_json)
-
-                    self.destroy()
-
+                        # this is for if the user presses the cancel button in the path entry
+                        self.lower()
+                        error_window = customtkinter.CTkToplevel()
+                        error_window.attributes('-topmost', 2)
+                        error_window.geometry('150x100+1275+720')
+                        error_window.grid_columnconfigure(0, weight=1)
+                        error_window.columnconfigure(0, weight=1)
+                        label = customtkinter.CTkLabel(
+                            error_window, text="Path invalid")
+                        label.grid(row=0, column=0, padx=10, pady=10)
                 else:
-                    # this is for if the user presses the cancel button in the path entry
                     self.lower()
                     error_window = customtkinter.CTkToplevel()
                     error_window.attributes('-topmost', 2)
@@ -199,7 +212,7 @@ class ImportWindow(customtkinter.CTkToplevel):
                     error_window.grid_columnconfigure(0, weight=1)
                     error_window.columnconfigure(0, weight=1)
                     label = customtkinter.CTkLabel(
-                        error_window, text="Path invalid")
+                        error_window, text="Filepath exists in library")
                     label.grid(row=0, column=0, padx=10, pady=10)
 
             else:
@@ -282,7 +295,6 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.author_cbox = customtkinter.CTkComboBox(self, width=750)
         self.author_cbox.grid(row=2, column=0)
         if len(authors) != 0:
-
             CTkScrollableDropdown(self.author_cbox, values=authors, justify="left", button_color="transparent",
                                   resize=False, autocomplete=True,
                                   frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
@@ -336,21 +348,16 @@ class ImportWindow(customtkinter.CTkToplevel):
         for i in load_authors['authors']:
             authors.append(i['name'])
 
-
-
         self.author_cbox = customtkinter.CTkComboBox(self, width=750)
 
         self.author_cbox.grid(row=2, column=0)
 
         if len(authors) != 0:
-
             CTkScrollableDropdown(self.author_cbox, values=authors, justify="left", button_color="transparent",
                                   resize=False, autocomplete=True,
                                   frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
 
             self.author_cbox.set("")
-
-
 
         self.tag_frame = customtkinter.CTkScrollableFrame(self, label_text="Select Tags",
                                                           width=1100, label_text_color=light_pink)
@@ -400,7 +407,7 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.submit_button.grid(row=1, column=1, padx=20, pady=20)
 
         self.cancel_button = customtkinter.CTkButton(self, text="Add an author",
-                                                     command=lambda x=authors_json:self.make_new_author(x),
+                                                     command=lambda x=authors_json: self.make_new_author(x),
                                                      fg_color=light_pink, hover_color=dark_pink, text_color=black)
         self.cancel_button.grid(row=2, column=1, padx=20, pady=20)
 
