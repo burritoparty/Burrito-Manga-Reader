@@ -8,9 +8,11 @@ from Library_Reader import *
 from Tag import *
 
 arg_parser = argparse.ArgumentParser(prog='Burrito-Manga-Reader')
-arg_parser.add_argument('mangaloc', type=pathlib.Path,
+arg_parser.add_argument('mangaloc',
+                        type=pathlib.Path,
                         default="D:\\Burrito Manga Reader Library",
                         nargs='?')
+
 
 def main():
     args = arg_parser.parse_args()
@@ -51,22 +53,51 @@ def main():
             json.dump(books_json, f, indent=2)
             file.close()
 
+    with open(library_json) as f:
+        books_json: dict = json.load(f)
+
+    # make the library into a list and sort it
+    list_to_sort: list[dict] = books_json['book']
+    list_to_sort.sort(key=lambda x: x['name'])
+
+    # clear the library json, give it 'book'
+    books_json = {
+        "book": [
+        ]
+    }
+
+    # iterate through the newly sorted list and append it to the books_json
+    for i in list_to_sort:
+        books_json['book'].append({
+            "path": i.get('path'),
+            "name": i.get('name'),
+            "author": i.get('author'),
+            "link": i.get('link'),
+            "tagged": i.get('tagged')
+        })
+
+    # dump it back into json
+    with open(library_json, 'w') as f:
+        json.dump(books_json, f, indent=4)
+
     customtkinter.set_appearance_mode("dark")
     root = customtkinter.CTk()  # main window
     root.title("Burrito Manga Reader")  # name of program
     # set dimensions and center window
     root.geometry('%dx%d+%d+%d' % (1920, 1080,
-                                get_x_coordinates(
-                                    1920, root.winfo_screenwidth()),
-                                get_y_coordinates(1080, root.winfo_screenheight())))
+                                   get_x_coordinates(
+                                       1920, root.winfo_screenwidth()),
+                                   get_y_coordinates(1080, root.winfo_screenheight())))
 
     # make frames
     root.bookDisplayTabs = BookFrame(
         library_json=library_json, tag_json=tags_json, authors_json=authors_json, master=root, width=1650, height=1000)
     root.tagFrame = TagFrame(
-        library_json=library_json, authors_json=authors_json, tag_json=tags_json, bookframe=root.bookDisplayTabs, master=root)
+        library_json=library_json, authors_json=authors_json, tag_json=tags_json, bookframe=root.bookDisplayTabs,
+        master=root)
     root.authorFrame = AuthorFrame(
-        library_json=library_json, authors_json=authors_json, tag_json=tags_json, bookframe=root.bookDisplayTabs, master=root)
+        library_json=library_json, authors_json=authors_json, tag_json=tags_json, bookframe=root.bookDisplayTabs,
+        master=root)
     root.importFrame = ImportFrame(
         library_json=library_json, library_path=args.mangaloc, tag_json=tags_json, authors_json=authors_json,
         bookframe=root.bookDisplayTabs, master=root)
@@ -78,10 +109,11 @@ def main():
     root.authorFrame.grid(row=2, column=0, padx=20, pady=20)
     root.importFrame.grid(row=3, column=0, padx=20, pady=0)
     root.bookDisplayTabs.grid(row=0, column=1, rowspan=10,
-                            sticky="nsew", padx=5, pady=5)
+                              sticky="nsew", padx=5, pady=5)
     root.tab_nav.grid(row=10, column=1, padx=5, pady=5)
 
     root.mainloop()
+
 
 if __name__ == '__main__':
     main()
