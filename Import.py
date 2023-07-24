@@ -360,7 +360,7 @@ class ImportWindow(customtkinter.CTkToplevel):
             self.author_cbox.set("")
 
         self.tag_frame = customtkinter.CTkScrollableFrame(self, label_text="Select Tags",
-                                                          width=1100, label_text_color=light_pink)
+                                                          width=1100, height=500, label_text_color=light_pink)
         # align checkbox columns
         self.tag_frame.columnconfigure(0, weight=1)
         self.tag_frame.columnconfigure(1, weight=1)
@@ -391,7 +391,7 @@ class ImportWindow(customtkinter.CTkToplevel):
                                                           x),
                                                       hover_color=light_pink, fg_color=dark_pink,
                                                       text_color=light_pink)
-            self.checkbox.grid(row=r, column=c, pady=15, padx=15)
+            self.checkbox.grid(row=r, column=c, pady=15, padx=15, sticky='w')
 
             if c == 7:
                 c = 0
