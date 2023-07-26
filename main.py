@@ -73,6 +73,8 @@ def main():
             "name": i.get('name'),
             "author": i.get('author'),
             "link": i.get('link'),
+            "read_later": i.get('read_later'),
+            "favorite": i.get('favorite'),
             "tagged": i.get('tagged')
         })
 

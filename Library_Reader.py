@@ -259,6 +259,56 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 # updates the tab to refresh tags when clicked again
                 self.load_tab(tag_json, authors_json)
 
+    def read_book_callback(self, book: Book, tag_json: str, authors_json, unread, read):
+        with open(self.library_json) as f:
+            # load the library
+            books_json = json.load(f)
+            # loops through book's JSON elements
+            for b in books_json['book']:
+                # if b's path matches our current book's path
+                if b['path'] == book.get_path():
+                    # update read later
+                    if book.read_later:
+                        book.read_later = False
+                        b['read_later'] = False
+                        self.book_read_later_button.configure(image=unread)
+                    else:
+                        book.read_later = True
+                        b['read_later'] = True
+                        self.book_read_later_button.configure(image=read)
+
+            # write to the JSON
+            with open(self.library_json, 'w') as f:
+                json.dump(books_json, f, indent=2)
+
+            # updates the tab to refresh tags when clicked again
+            self.load_tab(tag_json, authors_json)
+
+    def favorite_book_callback(self, book: Book, tag_json: str, authors_json, unfavorite, favorite):
+        with open(self.library_json) as f:
+            # load the library
+            books_json = json.load(f)
+            # loops through book's JSON elements
+            for b in books_json['book']:
+                # if b's path matches our current book's path
+                if b['path'] == book.get_path():
+                    # update read later
+                    if book.favorite:
+                        book.favorite = False
+                        b['favorite'] = False
+                        self.book_favorite_button.configure(image=unfavorite)
+                    else:
+                        book.favorite = True
+                        b['favorite'] = True
+                        self.book_favorite_button.configure(image=favorite)
+
+            # write to the JSON
+            with open(self.library_json, 'w') as f:
+                json.dump(books_json, f, indent=2)
+
+            # updates the tab to refresh tags when clicked again
+            self.load_tab(tag_json, authors_json)
+
     def focus_description(self):
         assert self.book_window
         self.book_window.focus()
@@ -293,11 +343,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # make widgets
             # read button, making new cover to resize
             self.read_button = customtkinter.CTkButton(self.book_window, compound="top", fg_color="transparent",
-                                                       hover_color=dark_pink, font=(
-                    "Roboto", 16),
+                                                       hover_color=dark_pink, font=("Roboto", 16),
                                                        image=book.get_full_cover(),
-                                                       command=lambda x=book: self.open_reader(
-                                                           x),
+                                                       command=lambda x=book: self.open_reader(x),
                                                        text=indent_string(book.get_name()))
 
             # labels
@@ -308,27 +356,63 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             book_author_label = customtkinter.CTkLabel(self.book_window, text="Author", font=("Roboto", 20),
                                                        text_color=light_pink)
 
+            # icons
             update = Image.open(resource(os.path.join('button_icons', 'update_icon.png')))
             ctk_update = customtkinter.CTkImage(dark_image=update)
 
+            unread_later = Image.open(resource(os.path.join('button_icons', 'unread_later.png')))
+            ctk_unread = customtkinter.CTkImage(dark_image=unread_later)
+            read_later = Image.open(resource(os.path.join('button_icons', 'read_later.png')))
+            ctk_read = customtkinter.CTkImage(dark_image=read_later)
+
+            unfavorite = Image.open(resource(os.path.join('button_icons', 'unfavorite.png')))
+            ctk_unfavorite = customtkinter.CTkImage(dark_image=unfavorite)
+            favorite = Image.open(resource(os.path.join('button_icons', 'favorite.png')))
+            ctk_favorite = customtkinter.CTkImage(dark_image=favorite)
+
             # buttons
-            self.book_link_button = customtkinter.CTkButton(self.book_window, text="Update Link",
+            self.book_link_button = customtkinter.CTkButton(self.book_window, text="Update Link", height=50,
                                                             image=ctk_update,
                                                             fg_color=light_pink, hover_color=dark_pink,
                                                             text_color=black,
                                                             command=lambda x=book, y=tag_json, z=authors_json:
                                                             self.link_update(x, y, z))
-            self.book_name_button = customtkinter.CTkButton(self.book_window, text="Update Name",
+            self.book_name_button = customtkinter.CTkButton(self.book_window, text="Update Name", height=50,
                                                             image=ctk_update,
                                                             fg_color=light_pink, hover_color=dark_pink,
                                                             text_color=black,
                                                             command=lambda x=book, y=tag_json, z=authors_json:
                                                             self.name_update(x, y, z))
-            book_author_button = customtkinter.CTkButton(self.book_window, text="Update Author",
+            book_author_button = customtkinter.CTkButton(self.book_window, text="Update Author", height=50,
                                                          image=ctk_update,
                                                          fg_color=light_pink, hover_color=dark_pink, text_color=black,
                                                          command=lambda x=book, y=tag_json, z=authors_json, a=authors:
                                                          self.author_update(x, y, z, a))
+            self.book_read_later_button = customtkinter.CTkButton(self.book_window, text="Read Later", height=50,
+                                                                  image=ctk_unread,
+                                                                  command=lambda a=ctk_unread, b=ctk_read,
+                                                                                 x=book, y=tag_json, z=authors_json:
+                                                                  self.read_book_callback(x, y, z, a, b),
+                                                                  fg_color=light_pink, hover_color=dark_pink,
+                                                                  text_color=black)
+            self.book_favorite_button = customtkinter.CTkButton(self.book_window, text="Favorite", height=50,
+                                                                command=lambda a=ctk_unfavorite, b=ctk_favorite,
+                                                                               x=book, y=tag_json, z=authors_json:
+                                                                self.favorite_book_callback(x, y, z, a, b),
+                                                                image=ctk_unfavorite,
+                                                                fg_color=light_pink, hover_color=dark_pink,
+                                                                text_color=black)
+
+            # conditionals to set the favorite/readlater icons
+            if book.read_later:
+                self.book_read_later_button.configure(image=ctk_read)
+            else:
+                self.book_read_later_button.configure(image=ctk_unread)
+
+            if book.favorite:
+                self.book_favorite_button.configure(image=ctk_favorite)
+            else:
+                self.book_favorite_button.configure(image=ctk_unfavorite)
 
             # entry
             w = 800
@@ -416,18 +500,21 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 row=5, column=1, columnspan=2, padx=pad, pady=pad)
 
             self.book_link_button.grid(
-                row=0, column=2, sticky="ns", padx=pad, pady=pad)
+                row=0, column=2, padx=pad, pady=pad)
             self.book_name_button.grid(
-                row=2, column=2, sticky="ns", padx=pad, pady=pad)
+                row=2, column=2, padx=pad, pady=pad)
             book_author_button.grid(
-                row=4, column=2, sticky="ns", padx=pad, pady=pad)
+                row=4, column=2, padx=pad, pady=pad)
+            self.book_read_later_button.grid(row=0, column=3, padx=pad, pady=pad)
+            self.book_favorite_button.grid(row=0, column=4, padx=pad, pady=pad)
+
             # align checkbox columns
             tag_scroller.grid_columnconfigure(0, weight=1)
             tag_scroller.grid_columnconfigure(1, weight=1)
             tag_scroller.grid_columnconfigure(1, weight=1)
-            tag_scroller.grid(row=0, column=3, rowspan=6, padx=pad, pady=pad)
+            tag_scroller.grid(row=1, column=3, columnspan=2, rowspan=5, padx=pad, pady=pad)
             page_scroller.grid(
-                row=6, column=0, columnspan=4, padx=pad, pady=pad)
+                row=6, column=0, columnspan=5, padx=pad, pady=pad)
 
             self.book_window.protocol(
                 'WM_DELETE_WINDOW', self.close_book_description)
@@ -479,6 +566,8 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                              books_json['book'][index_to_start_at]['name'],
                              books_json['book'][index_to_start_at]['author'],
                              books_json['book'][index_to_start_at]['link'],
+                             books_json['book'][index_to_start_at]['read_later'],
+                             books_json['book'][index_to_start_at]['favorite'],
                              books_json['book'][index_to_start_at]['tagged']))
                     loopy += 1
                     index_to_start_at += 1
@@ -489,6 +578,8 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                              books_json['book'][index_to_start_at]['name'],
                              books_json['book'][index_to_start_at]['author'],
                              books_json['book'][index_to_start_at]['link'],
+                             books_json['book'][index_to_start_at]['read_later'],
+                             books_json['book'][index_to_start_at]['favorite'],
                              books_json['book'][index_to_start_at]['tagged']))
                     loopy += 1
                     index_to_start_at += 1
@@ -538,7 +629,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.print_page()
 
     def print_page(self):
-        r = 1
+        r = 2
         c = 0
         # print(str(len(self.book_buttons)))
         for i in self.book_buttons:
@@ -594,7 +685,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             if tag_cbox.get() in tags:
                 # make book only if tag matches
                 book = (Book(i['path'], i['name'],
-                             i['author'], i['link'], i['tagged']))
+                             i['author'], i['link'],
+                             i['read_later'], i['favorite'],
+                             i['tagged']))
                 # make the button
                 button = customtkinter.CTkButton(self, compound="top", image=book.get_cover(),
                                                  command=lambda
@@ -612,7 +705,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         if self.sort_by_tag_window is None or not self.sort_by_tag_window.winfo_exists():
             self.sort_by_tag_window = customtkinter.CTkToplevel()
             self.sort_by_tag_window.geometry('1275+720')
-            self.sort_by_tag_window.title("Filter by tag")
+            self.sort_by_tag_window.title("Filter by Tag")
             tags = []
             with open(tag_json, 'r') as f:
                 load_tags = json.load(f)
@@ -667,7 +760,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             if author_cbox.get() == i['author']:
                 # make book only if tag matches
                 book = (Book(i['path'], i['name'],
-                             i['author'], i['link'], i['tagged']))
+                             i['author'], i['link'],
+                             i['read_later'], i['favorite'],
+                             i['tagged']))
                 # make the button
                 button = customtkinter.CTkButton(self, compound="top", image=book.get_cover(),
                                                  command=lambda
@@ -685,7 +780,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         if self.sort_by_author_window is None or not self.sort_by_author_window.winfo_exists():
             self.sort_by_author_window = customtkinter.CTkToplevel()
             self.sort_by_author_window.geometry('1275+720')
-            self.sort_by_author_window.title("Filter by author")
+            self.sort_by_author_window.title("Filter by Author")
             authors = []
             with open(authors_json, 'r') as f:
                 load_authors = json.load(f)
@@ -723,8 +818,8 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.search_by_name_dialogue = customtkinter.CTkInputDialog(button_fg_color=light_pink,
                                                                         button_hover_color=dark_pink,
                                                                         button_text_color=black,
-                                                                        text="Search by book name")
-            self.search_by_name_dialogue.title("Search by book name")
+                                                                        text="Search by Book Name")
+            self.search_by_name_dialogue.title("Search by Book Name")
             # get the string to search for
             search_for = self.search_by_name_dialogue.get_input()
 
@@ -751,7 +846,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                     if search_for.lower() in i['name'].lower():
                         # make book only if name matches
                         book = (Book(i['path'], i['name'],
-                                     i['author'], i['link'], i['tagged']))
+                                     i['author'], i['link'],
+                                     i['read_later'], i['favorite'],
+                                     i['tagged']))
                         # make the button
                         button = customtkinter.CTkButton(self, compound="top", image=book.get_cover(),
                                                          command=lambda
@@ -769,6 +866,78 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         else:
             self.search_by_name_dialogue.focus()
 
+    def show_read_later_callback(self, tag_json: str, authors_json: str):
+        # if the library already has books, destroy them
+        for i in self.book_buttons:
+            i.destroy()
+        self.book_buttons.clear()
+
+        books_json = {}
+
+        # load the JSON
+        if path.isfile(self.library_json) is False:
+            print("FILE NOT FOUND")
+        else:
+            with open(self.library_json) as f:
+                books_json = json.load(f)
+
+        for i in books_json['book']:
+            # if is to be read later
+            if i['read_later']:
+                book = (Book(i['path'], i['name'],
+                             i['author'], i['link'],
+                             i['read_later'], i['favorite'],
+                             i['tagged']))
+                # make the button
+                button = customtkinter.CTkButton(self, compound="top", image=book.get_cover(),
+                                                 command=lambda
+                                                     x=book, y=tag_json, z=authors_json:
+                                                 self.open_book_description(x, y, z),
+                                                 text=indent_string(book.get_name()),
+                                                 fg_color="transparent", hover_color=dark_pink,
+                                                 font=("Roboto", 18))
+                # append to the buttons
+                self.book_buttons.append(button)
+
+        # print it
+        self.print_page()
+
+    def show_favorite_callback(self, tag_json: str, authors_json: str):
+        # if the library already has books, destroy them
+        for i in self.book_buttons:
+            i.destroy()
+        self.book_buttons.clear()
+
+        books_json = {}
+
+        # load the JSON
+        if path.isfile(self.library_json) is False:
+            print("FILE NOT FOUND")
+        else:
+            with open(self.library_json) as f:
+                books_json = json.load(f)
+
+        for i in books_json['book']:
+            # if favorite
+            if i['favorite']:
+                book = (Book(i['path'], i['name'],
+                             i['author'], i['link'],
+                             i['read_later'], i['favorite'],
+                             i['tagged']))
+                # make the button
+                button = customtkinter.CTkButton(self, compound="top", image=book.get_cover(),
+                                                 command=lambda
+                                                     x=book, y=tag_json, z=authors_json:
+                                                 self.open_book_description(x, y, z),
+                                                 text=indent_string(book.get_name()),
+                                                 fg_color="transparent", hover_color=dark_pink,
+                                                 font=("Roboto", 18))
+                # append to the buttons
+                self.book_buttons.append(button)
+
+        # print it
+        self.print_page()
+
     def get_tab_count(self):
         # take the book count
         # divide by books per page
@@ -777,8 +946,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
     def __init__(self, library_json: str, tag_json: str, authors_json: str, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
-
-        # keyboard.clear_all_hotkeys()
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
@@ -791,7 +958,11 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.sort_by_author_window = None
         self.search_by_name_dialogue = None
 
+        # create frames
         button_frame = customtkinter.CTkFrame(self)
+        read_favorite_frame = customtkinter.CTkFrame(self)
+
+        # create icons
 
         filter = Image.open(resource(os.path.join('button_icons', 'filter_icon.png')))
         ctk_filter = customtkinter.CTkImage(dark_image=filter)
@@ -799,7 +970,12 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         search = Image.open(resource(os.path.join('button_icons', 'search_icon.png')))
         ctk_search = customtkinter.CTkImage(dark_image=search)
 
-        sort_by_tag_button = customtkinter.CTkButton(button_frame, text="Filter by tag", width=520,
+        read_later = Image.open(resource(os.path.join('button_icons', 'read_later.png')))
+        ctk_read = customtkinter.CTkImage(dark_image=read_later)
+        favorite = Image.open(resource(os.path.join('button_icons', 'favorite.png')))
+        ctk_favorite = customtkinter.CTkImage(dark_image=favorite)
+
+        sort_by_tag_button = customtkinter.CTkButton(button_frame, text="Filter by Tag", width=520,
                                                      image=ctk_filter,
                                                      compound="left",
                                                      fg_color=light_pink,
@@ -808,7 +984,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                      command=lambda
                                                          y=tag_json, z=authors_json: self.sort_by_tag_call(y, z))
 
-        search_button = customtkinter.CTkButton(button_frame, text="Search by name", width=520,
+        search_button = customtkinter.CTkButton(button_frame, text="Search by Name", width=520,
                                                 image=ctk_search,
                                                 compound="left",
                                                 fg_color=light_pink,
@@ -817,7 +993,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                 command=lambda
                                                     y=tag_json, z=authors_json: self.search_by_name_call(y, z))
 
-        sort_by_author_button = customtkinter.CTkButton(button_frame, text="Filter by author", width=520,
+        sort_by_author_button = customtkinter.CTkButton(button_frame, text="Filter by Author", width=520,
                                                         image=ctk_filter,
                                                         compound="left",
                                                         fg_color=light_pink,
@@ -826,11 +1002,31 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                         command=lambda
                                                             y=tag_json, z=authors_json: self.sort_by_author_call(y, z))
 
-        sort_by_tag_button.grid(row=0, column=0, sticky="ew", padx=10)
-        search_button.grid(row=0, column=1, sticky="ew", padx=10)
-        sort_by_author_button.grid(row=0, column=2, sticky="ew", padx=10)
+        show_read_later = customtkinter.CTkButton(read_favorite_frame, text="Read Later", width=785,
+                                                  command=lambda x=tag_json, y=authors_json:
+                                                  self.show_read_later_callback(x, y),
+                                                  image=ctk_read,
+                                                  compound="left",
+                                                  fg_color=light_pink,
+                                                  text_color=black,
+                                                  hover_color=dark_pink)
+        show_favorite = customtkinter.CTkButton(read_favorite_frame, text="Favorites", width=785,
+                                                command=lambda x=tag_json, y=authors_json:
+                                                self.show_favorite_callback(x, y),
+                                                image=ctk_favorite,
+                                                compound="left",
+                                                fg_color=light_pink,
+                                                text_color=black,
+                                                hover_color=dark_pink)
 
-        button_frame.grid(row=0, column=0, columnspan=6, padx=10, pady=10)
+        sort_by_tag_button.grid(row=1, column=0, sticky="ew", padx=10)
+        search_button.grid(row=1, column=1, sticky="ew", padx=10)
+        sort_by_author_button.grid(row=1, column=2, sticky="ew", padx=10)
+        show_read_later.grid(row=0, column=0, sticky="ew", padx=10)
+        show_favorite.grid(row=0, column=2, sticky="ew", padx=10)
+
+        read_favorite_frame.grid(row=0, column=0, columnspan=6, padx=5, pady=5)
+        button_frame.grid(row=1, column=0, columnspan=6, padx=5, pady=5)
 
         # books_per_page should be divisible by 12
         self.books_per_page = 12

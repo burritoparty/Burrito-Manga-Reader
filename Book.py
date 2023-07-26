@@ -98,13 +98,16 @@ class Book:
     def get_cover_width(self):
         self.cover.cget("size")
 
-    def __init__(self, path: str, name: str, author: str, link: str, tagged: list[str]):
+    def __init__(self, path: str, name: str, author: str, link: str, read_later: bool, favorite: bool,
+                 tagged: list[str]):
         self.path = path
         self.name = name
         self.author = author
         self.link = link
         self.tagged = tagged
         self.cover = None
+        self.read_later = read_later
+        self.favorite = favorite
         LANDSCAPE_COVER = (300, 250)
         PORTRAIT_COVER = (250, 350)
         VALID_IMAGES = (".jpg", ".png")

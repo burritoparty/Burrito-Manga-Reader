@@ -85,7 +85,7 @@ class ImportWindow(customtkinter.CTkToplevel):
                     dark_image=images[0], size=(200, 275))
 
             cover = customtkinter.CTkLabel(self, image=cover, text="")
-            cover.grid(row=0, column=2, rowspan=3, padx=20, pady=20)
+            cover.grid(row=0, column=3, rowspan=3, padx=20, pady=20)
 
             if self.name_entry.get() == "":
                 self.name_entry.insert(0, os.path.basename(self.path))
@@ -94,8 +94,6 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.tagged.append(tag)
 
     def finalize_book(self, book_frame, tag_json, authors_json):
-
-        full_time = time.time()
 
         # making sure the author input is valid
         authors = []
@@ -157,7 +155,7 @@ class ImportWindow(customtkinter.CTkToplevel):
                         # now create and store book
 
                         book = Book(self.path, self.name, self.author,
-                                    self.link, self.tagged)
+                                    self.link, self.read_later, self.favorite, self.tagged)
 
                         # copy from old path to new path
 
@@ -181,6 +179,8 @@ class ImportWindow(customtkinter.CTkToplevel):
                                 "name": book.get_name(),
                                 "author": book.get_author(),
                                 "link": book.get_link(),
+                                "read_later": book.read_later,
+                                "favorite": book.favorite,
                                 "tagged": book.get_tags()
                             })
 
@@ -304,6 +304,22 @@ class ImportWindow(customtkinter.CTkToplevel):
         # focus the import window
         self.after(250, self.focus_import)
 
+    def read_later_callback(self, unread, read):
+        if self.read_later:
+            self.read_later = False
+            self.read_later_button.configure(image=unread)
+        else:
+            self.read_later = True
+            self.read_later_button.configure(image=read)
+
+    def favorite_callback(self, unfave, fave):
+        if self.favorite:
+            self.favorite = False
+            self.favorite_button.configure(image=unfave)
+        else:
+            self.favorite = True
+            self.favorite_button.configure(image=fave)
+
     def focus_import(self):
         assert self
         self.lift()
@@ -316,7 +332,7 @@ class ImportWindow(customtkinter.CTkToplevel):
 
         self.title("Import Book")
         self.geometry('%d+%d' % (
-            800, 400
+            800, 220
         ))
         self.attributes('-topmost')
 
@@ -325,6 +341,8 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.name = None
         self.author = None
         self.link = None
+        self.read_later = False
+        self.favorite = False
         self.tagged: list[str] = []
         self.library_path = library_path
         self.library_json = library_json
@@ -360,7 +378,7 @@ class ImportWindow(customtkinter.CTkToplevel):
             self.author_cbox.set("")
 
         self.tag_frame = customtkinter.CTkScrollableFrame(self, label_text="Select Tags",
-                                                          width=1100, height=500, label_text_color=light_pink)
+                                                          width=1300, height=450, label_text_color=light_pink)
         # align checkbox columns
         self.tag_frame.columnconfigure(0, weight=1)
         self.tag_frame.columnconfigure(1, weight=1)
@@ -369,7 +387,7 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.tag_frame.columnconfigure(4, weight=1)
         self.tag_frame.columnconfigure(5, weight=1)
         self.tag_frame.columnconfigure(6, weight=1)
-        self.tag_frame.grid(row=4, column=0, columnspan=4, padx=20, pady=20)
+        self.tag_frame.grid(row=4, column=0, columnspan=5, padx=20, pady=20)
 
         num_loops = 0
         r = 0
@@ -414,6 +432,27 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.get_path_button = customtkinter.CTkButton(self, text="Select Book", command=self.input_path,
                                                        fg_color=light_pink, hover_color=dark_pink, text_color=black)
         self.get_path_button.grid(row=0, column=1)
+
+        unread_later = Image.open(resource(os.path.join('button_icons', 'unread_later.png')))
+        ctk_unread = customtkinter.CTkImage(dark_image=unread_later)
+        read_later = Image.open(resource(os.path.join('button_icons', 'read_later.png')))
+        ctk_read = customtkinter.CTkImage(dark_image=read_later)
+
+        unfavorite = Image.open(resource(os.path.join('button_icons', 'unfavorite.png')))
+        ctk_unfavorite = customtkinter.CTkImage(dark_image=unfavorite)
+        favorite = Image.open(resource(os.path.join('button_icons', 'favorite.png')))
+        ctk_favorite = customtkinter.CTkImage(dark_image=favorite)
+
+        self.read_later_button = customtkinter.CTkButton(self, text="Read Later", compound="left",
+                                                         command=lambda x=ctk_unread, y=ctk_read:
+                                                         self.read_later_callback(x, y), image=ctk_unread,
+                                                         fg_color=light_pink, hover_color=dark_pink, text_color=black)
+        self.favorite_button = customtkinter.CTkButton(self, text="Favorite", compound="left",
+                                                       command=lambda x=ctk_unfavorite, y=ctk_favorite:
+                                                       self.favorite_callback(x, y), image=ctk_unfavorite,
+                                                       fg_color=light_pink, hover_color=dark_pink, text_color=black)
+        self.read_later_button.grid(row=0, column=2, rowspan=2, padx=20, pady=20)
+        self.favorite_button.grid(row=1, column=2, rowspan=2, padx=20, pady=20)
 
         # get the time it takes function to run then wait that long until focus + 10
         end_time = int(((time.time() - start_time) * 1000) + 10)
