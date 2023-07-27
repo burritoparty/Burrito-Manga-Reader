@@ -433,7 +433,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 self.book_window, width=1850, height=440)
 
             # get pages
+            start_time = time.time()
             page_thumbs = book.get_pages(True)
+            print("--- %s seconds ---" % (time.time() - start_time))
 
             tag_checks: list[customtkinter.CTkCheckBox] = []
 

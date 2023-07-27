@@ -19,7 +19,7 @@ class TagFrame(customtkinter.CTkFrame):
         else:
             # create the dialogue box
             tags_append_dialogue = customtkinter.CTkInputDialog(
-                text="New tag: ", title="Append a new tag",
+                text="New tag: ", title="Append a new tag.",
                 button_fg_color=light_pink,
                 button_text_color=black,
                 button_hover_color=dark_pink)
@@ -44,7 +44,7 @@ class TagFrame(customtkinter.CTkFrame):
                 error = customtkinter.CTkToplevel()
                 error.geometry("0+0")
                 label = customtkinter.CTkLabel(error,
-                                               text="this tag already exists\n(not case sensitive)",
+                                               text="This Tag already exists.",
                                                font=("Roboto", 20))
                 label.grid(padx=10, pady=10)
             else:
@@ -284,7 +284,7 @@ class TagFrame(customtkinter.CTkFrame):
             error.attributes('-topmost', 2)
             error.geometry("0+0")
             label = customtkinter.CTkLabel(error,
-                                           text="Please enter a new name for the tag",
+                                           text="Please enter a new name for the tag.",
                                            font=("Roboto", 20))
             label.grid(padx=10, pady=10)
         else:

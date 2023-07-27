@@ -42,7 +42,7 @@ class AuthorFrame(customtkinter.CTkFrame):
                 error = customtkinter.CTkToplevel()
                 error.geometry("0+0")
                 label = customtkinter.CTkLabel(error,
-                                               text="this tag already exists\n(not case sensitive)",
+                                               text="This Author already exists.",
                                                font=("Roboto", 20))
                 label.grid(padx=10, pady=10)
             else:
@@ -161,7 +161,7 @@ class AuthorFrame(customtkinter.CTkFrame):
             error.attributes('-topmost', 2)
             error.geometry("0+0")
             label = customtkinter.CTkLabel(error,
-                                           text="Please enter a new name for the author",
+                                           text="Please enter a new name for the Author.",
                                            font=("Roboto", 20))
             label.grid(padx=10, pady=10)
         else:

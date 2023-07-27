@@ -1,4 +1,5 @@
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 import customtkinter
@@ -26,7 +27,11 @@ class Book:
         return self.tagged
 
     '''
-        def _get_page(self, file_name: str, is_thumbnail: bool):
+    
+    
+    '''
+
+    def _get_page(self, file_name: str, is_thumbnail: bool):
         if is_thumbnail:
             single_page_size = (175, 250)
             double_page_size = (175, 250)
@@ -42,7 +47,6 @@ class Book:
 
     # if you need the pages as thumbnail size, set `is_thumbnail` to True
     def get_pages(self, is_thumbnail: bool):
-
         # load pages
         valid_images = [".jpg", ".png"]
 
@@ -50,53 +54,11 @@ class Book:
             f for f in os.listdir(self.path)
             if os.path.splitext(f)[1].lower() in valid_images
         ]
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(max_workers=8) as executor:
             return [
                 image for image in executor.map(
                     lambda f: self._get_page(f, is_thumbnail), files)
             ]
-    
-    '''
-
-
-    # if you need the pages as thumbnail size, set `is_thumbnail` to True
-    def get_pages(self, is_thumbnail: bool):
-
-        # load pages
-        images: list[Image.Image] = []
-        pages: list[customtkinter.CTkImage] = []
-        valid_images = [".jpg", ".png"]
-
-        if is_thumbnail:
-            single_page_size = (175, 250)
-            double_page_size = (175, 250)
-        else:
-            single_page_size = (950, 1300)
-            double_page_size = (1600, 1200)
-
-        for f in os.listdir(self.path):
-            ext = os.path.splitext(f)[1]
-            if ext.lower() not in valid_images:
-                continue
-            w, h = (Image.open(os.path.join(self.path, f))).size
-            if w < h:
-                images.append(Image.open(os.path.join(
-                    self.path, f)).resize(single_page_size))
-            else:
-                images.append(Image.open(os.path.join(
-                    self.path, f)).resize(double_page_size))
-
-        for i in images:
-            w, h = i.size
-            if w < h:
-                pages.append((customtkinter.CTkImage(
-                    dark_image=i, size=single_page_size)))
-            else:
-                pages.append((customtkinter.CTkImage(
-                    dark_image=i, size=double_page_size)))
-
-        return pages
-
 
     def get_full_cover(self):
         VALID_IMAGES = (".jpg", ".png")

@@ -74,21 +74,33 @@ class ImportWindow(customtkinter.CTkToplevel):
                 images.append(Image.open(os.path.join(self.path, f)))
                 break
 
-            w, h = images[0].size
-            if w > h:
-                images[0].resize((275, 200))
-                cover = customtkinter.CTkImage(
-                    dark_image=images[0], size=(275, 200))
+            # checking if path is valid
+            if len(images) > 0:
+                w, h = images[0].size
+                if w > h:
+                    images[0].resize((275, 200))
+                    cover = customtkinter.CTkImage(
+                        dark_image=images[0], size=(275, 200))
+                else:
+                    images[0].resize((200, 275))
+                    cover = customtkinter.CTkImage(
+                        dark_image=images[0], size=(200, 275))
+
+                cover = customtkinter.CTkLabel(self, image=cover, text="")
+                cover.grid(row=0, column=3, rowspan=3, padx=20, pady=20)
+
+                if self.name_entry.get() == "":
+                    self.name_entry.insert(0, os.path.basename(self.path))
             else:
-                images[0].resize((200, 275))
-                cover = customtkinter.CTkImage(
-                    dark_image=images[0], size=(200, 275))
-
-            cover = customtkinter.CTkLabel(self, image=cover, text="")
-            cover.grid(row=0, column=3, rowspan=3, padx=20, pady=20)
-
-            if self.name_entry.get() == "":
-                self.name_entry.insert(0, os.path.basename(self.path))
+                error_window = customtkinter.CTkToplevel()
+                error_window.attributes('-topmost', 2)
+                error_window.geometry('150x100+1275+720')
+                error_window.grid_columnconfigure(0, weight=1)
+                error_window.columnconfigure(0, weight=1)
+                label = customtkinter.CTkLabel(
+                    error_window, text="Path invalid")
+                label.grid(row=0, column=0, padx=10, pady=10)
+                self.after(100, self.focus_import)
 
     def input_tag(self, tag):
         self.tagged.append(tag)
