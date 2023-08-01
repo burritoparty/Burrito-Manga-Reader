@@ -100,7 +100,10 @@ class TagFrame(customtkinter.CTkFrame):
                 window = customtkinter.CTkToplevel()
                 window.attributes('-topmost', 1)
                 window.title("Delete tag")
-                window.geometry("0+0")
+                window.geometry("340+220")
+
+                button_frame = customtkinter.CTkScrollableFrame(window, width=550, height=500)
+                button_frame.grid(padx=10, pady=10)
 
                 # load the JSON
                 with open(tags_json, 'r') as f:
@@ -114,7 +117,7 @@ class TagFrame(customtkinter.CTkFrame):
                 if len(tags) != 0:
                     # make the buttons
                     for i in tags:
-                        button = customtkinter.CTkButton(window, text=i,
+                        button = customtkinter.CTkButton(button_frame, text=i,
                                                          fg_color=light_pink,
                                                          text_color=black,
                                                          hover_color=dark_pink,
@@ -217,7 +220,10 @@ class TagFrame(customtkinter.CTkFrame):
                 window = customtkinter.CTkToplevel()
                 window.attributes('-topmost', 1)
                 window.title("Rename tag")
-                window.geometry("0+0")
+                window.geometry("340+220")
+
+                button_frame = customtkinter.CTkScrollableFrame(window, width=550, height=500)
+                button_frame.grid(padx=10, pady=10)
 
                 # load the JSON
                 with open(tags_json, 'r') as f:
@@ -231,7 +237,7 @@ class TagFrame(customtkinter.CTkFrame):
                 if len(tags) != 0:
                     # make the buttons
                     for i in tags:
-                        button = customtkinter.CTkButton(window, text=i,
+                        button = customtkinter.CTkButton(button_frame, text=i,
                                                          fg_color=light_pink,
                                                          text_color=black,
                                                          hover_color=dark_pink,

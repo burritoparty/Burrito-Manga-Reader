@@ -96,7 +96,10 @@ class AuthorFrame(customtkinter.CTkFrame):
                 window = customtkinter.CTkToplevel()
                 window.attributes('-topmost', 1)
                 window.title("Rename author")
-                window.geometry("0+0")
+                window.geometry("340+220")
+
+                button_frame = customtkinter.CTkScrollableFrame(window, width=550, height=500)
+                button_frame.grid(padx=10, pady=10)
 
                 # load the JSON
                 with open(authors_json, 'r') as f:
@@ -110,7 +113,7 @@ class AuthorFrame(customtkinter.CTkFrame):
                 if len(authors) != 0:
                     # make the buttons
                     for i in authors:
-                        button = customtkinter.CTkButton(window, text=i,
+                        button = customtkinter.CTkButton(button_frame, text=i,
                                                          fg_color=light_pink,
                                                          text_color=black,
                                                          hover_color=dark_pink,
