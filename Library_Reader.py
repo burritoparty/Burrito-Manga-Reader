@@ -867,30 +867,30 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         else:
             self.search_by_name_dialogue.focus()
 
-    def next_read_later_callback(self, tag_json, author_json):
+    def next_filter_callback(self, tag_json, author_json):
         if self.current_read_tab < self.read_tab_count - 1:
             self.current_read_tab += 1
-            self.load_read_later(tag_json, author_json)
+            self.load_filter(tag_json, author_json)
 
-    def prev_read_later_callback(self, tag_json, author_json):
+    def prev_filter_callback(self, tag_json, author_json):
         if self.current_read_tab != 0:
             self.current_read_tab -= 1
-            self.load_read_later(tag_json, author_json)
+            self.load_filter(tag_json, author_json)
 
-    def first_read_later_callback(self, tag_json, author_json):
+    def first_filter_callback(self, tag_json, author_json):
         self.current_read_tab = 0
-        self.load_read_later(tag_json, author_json)
+        self.load_filter(tag_json, author_json)
 
-    def last_read_later_callback(self, tag_json, author_json):
+    def last_filter_callback(self, tag_json, author_json):
         self.current_read_tab = self.read_tab_count - 1
-        self.load_read_later(tag_json, author_json)
+        self.load_filter(tag_json, author_json)
 
-    def print_read_later(self, books_to_print, tag_json, author_json):
+    def print_filter(self, books_to_print, tag_json, author_json):
 
         # rid of buttons in memory
-        for i in self.read_later_buttons:
+        for i in self.filter_buttons:
             i.destroy()
-        self.read_later_buttons.clear()
+        self.filter_buttons.clear()
 
         # create book button objects
         count = 0
@@ -905,12 +905,12 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                  x=books_to_print[count], y=tag_json,
                                                  z=author_json: self.open_book_description(x, y, z))
             count += 1
-            self.read_later_buttons.append(button)
+            self.filter_buttons.append(button)
         # print the buttons
         r = 2
         c = 0
         # print(str(len(self.book_buttons)))
-        for i in self.read_later_buttons:
+        for i in self.filter_buttons:
             i.grid(row=r, column=c)
             if c == 5:
                 c = 0
@@ -920,7 +920,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
         # print them
 
-    def load_read_later(self, tag_json, author_json):
+    def load_filter(self, tag_json, author_json):
         books_to_print = []
         index_to_start_at = self.current_read_tab * self.books_per_page
         counter = 0
@@ -957,26 +957,26 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 counter += 1
                 index_to_start_at += 1
 
-        self.print_read_later(books_to_print, tag_json, author_json)
+        self.print_filter(books_to_print, tag_json, author_json)
 
-    def read_later_focus(self):
-        assert self.read_later_window
-        self.read_later_window.lift()
+    def filter_focus(self):
+        assert self.filter_window
+        self.filter_window.lift()
         self.focus_force()
 
-    def show_read_later_callback(self, tag_json: str, authors_json: str, display_type: str):
+    def show_filter_callback(self, tag_json: str, authors_json: str, display_type: str):
 
-        if self.read_later_window is None or not self.read_later_window.winfo_exists():
+        if self.filter_window is None or not self.filter_window.winfo_exists():
 
             # make the new window
-            self.read_later_window = customtkinter.CTkToplevel()
-            self.read_later_window.geometry('1750x1050+550+220')
-            self.read_later_buttons = []
+            self.filter_window = customtkinter.CTkToplevel()
+            self.filter_window.geometry('1750x1050+550+220')
+            self.filter_buttons = []
 
             # build the UI
-            self.read_frame = customtkinter.CTkScrollableFrame(self.read_later_window, width=1700, height=900)
+            self.read_frame = customtkinter.CTkScrollableFrame(self.filter_window, width=1700, height=900)
 
-            label = customtkinter.CTkLabel(self.read_later_window, text="", font=("Roboto", 20))
+            label = customtkinter.CTkLabel(self.filter_window, text="", font=("Roboto", 20))
 
             next = Image.open(resource(os.path.join('button_icons', 'next_icon.png')))
             ctk_next = customtkinter.CTkImage(dark_image=next)
@@ -991,14 +991,14 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             ctk_jump_last = customtkinter.CTkImage(dark_image=jump_last)
 
             w = 520
-            button_frame = customtkinter.CTkFrame(self.read_later_window)
+            button_frame = customtkinter.CTkFrame(self.filter_window)
             first_button = customtkinter.CTkButton(button_frame, text="First Tab",
                                                    image=ctk_jump_first,
                                                    fg_color=light_pink,
                                                    text_color=black,
                                                    hover_color=dark_pink,
                                                    command=lambda x=tag_json, y=authors_json:
-                                                   self.first_read_later_callback(x, y))
+                                                   self.first_filter_callback(x, y))
             prev_button = customtkinter.CTkButton(button_frame, text="Previous Tab",
                                                   image=ctk_prev,
                                                   width=w,
@@ -1006,7 +1006,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                   text_color=black,
                                                   hover_color=dark_pink,
                                                   command=lambda x=tag_json, y=authors_json:
-                                                  self.prev_read_later_callback(x, y))
+                                                  self.prev_filter_callback(x, y))
             next_button = customtkinter.CTkButton(button_frame, text="Next Tab",
                                                   compound='right',
                                                   image=ctk_next,
@@ -1015,7 +1015,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                   text_color=black,
                                                   hover_color=dark_pink,
                                                   command=lambda x=tag_json, y=authors_json:
-                                                  self.next_read_later_callback(x, y))
+                                                  self.next_filter_callback(x, y))
             last_button = customtkinter.CTkButton(button_frame, text="Last Tab",
                                                   compound='right',
                                                   image=ctk_jump_last,
@@ -1023,7 +1023,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                   text_color=black,
                                                   hover_color=dark_pink,
                                                   command=lambda x=tag_json, y=authors_json:
-                                                  self.last_read_later_callback(x, y))
+                                                  self.last_filter_callback(x, y))
 
             pad = 10
             label.grid(row=0, column=0, columnspan=2, padx=pad, pady=pad)
@@ -1068,12 +1068,12 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             self.current_read_tab = 0
             self.read_tab_count = math.ceil(len(self.to_be_read) / self.books_per_page)
             # now load the first 12
-            self.load_read_later(tag_json, authors_json)
+            self.load_filter(tag_json, authors_json)
 
-            self.read_later_window.after(200, self.read_later_focus)
+            self.filter_window.after(200, self.filter_focus)
 
         else:
-            self.read_later_window.focus()
+            self.filter_window.focus()
 
         # # if the library already has books, destroy them
         # for i in self.book_buttons:
@@ -1166,7 +1166,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.sort_by_author_window = None
         self.search_by_name_dialogue = None
 
-        self.read_later_window = None
+        self.filter_window = None
 
         # create frames
         button_frame = customtkinter.CTkFrame(self)
@@ -1214,7 +1214,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
         show_read_later = customtkinter.CTkButton(read_favorite_frame, text="Read Later", width=785,
                                                   command=lambda x=tag_json, y=authors_json, z="read_later":
-                                                  self.show_read_later_callback(x, y, z),
+                                                  self.show_filter_callback(x, y, z),
                                                   image=ctk_read,
                                                   compound="left",
                                                   fg_color=light_pink,
@@ -1222,7 +1222,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                   hover_color=dark_pink)
         show_favorite = customtkinter.CTkButton(read_favorite_frame, text="Favorites", width=785,
                                                 command=lambda x=tag_json, y=authors_json, z="favorite":
-                                                self.show_read_later_callback(x, y, z),
+                                                self.show_filter_callback(x, y, z),
                                                 image=ctk_favorite,
                                                 compound="left",
                                                 fg_color=light_pink,
