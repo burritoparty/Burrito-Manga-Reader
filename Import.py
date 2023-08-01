@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import shutil
 import time
 from tkinter.filedialog import askdirectory
@@ -90,7 +91,14 @@ class ImportWindow(customtkinter.CTkToplevel):
                 cover.grid(row=0, column=3, rowspan=3, padx=20, pady=20)
 
                 if self.name_entry.get() == "":
-                    self.name_entry.insert(0, os.path.basename(self.path))
+                    # format the string to remove brackets, parenthesis, curly brackets and their contents
+                    format = re.sub("\\(.*?\\)","", os.path.basename(self.path))
+                    format = re.sub("\\[.*?\\]","", format)
+                    format = re.sub("\\{.*?\\}", "", format)
+                    # removes characters before two spaces
+                    format = re.sub(r'^.*?  ', '  ', format)
+                    format = format.strip()
+                    self.name_entry.insert(0, format)
             else:
                 error_window = customtkinter.CTkToplevel()
                 error_window.attributes('-topmost', 2)
