@@ -21,7 +21,7 @@ class AuthorFrame(customtkinter.CTkFrame):
                 button_fg_color=light_pink,
                 button_text_color=black,
                 button_hover_color=dark_pink)
-            authors_append_dialogue.geometry('0+0')
+            authors_append_dialogue.geometry("340+220")
 
             # load the JSON
             with open(authors_json, 'r') as f:
@@ -40,7 +40,7 @@ class AuthorFrame(customtkinter.CTkFrame):
                 pass
             elif check_exists(new_author, authors, False) is False:
                 error = customtkinter.CTkToplevel()
-                error.geometry("0+0")
+                error.geometry("340+220")
                 label = customtkinter.CTkLabel(error,
                                                text="This Author already exists.",
                                                font=("Roboto", 20))
@@ -153,7 +153,7 @@ class AuthorFrame(customtkinter.CTkFrame):
         author_rename_dialogue = customtkinter.CTkInputDialog(
             text=text, title="Rename an author",
         button_text_color=black, button_fg_color=light_pink, button_hover_color=dark_pink)
-        author_rename_dialogue.geometry('0+0')
+        author_rename_dialogue.geometry("340+220")
 
         # get the author's new name
         new_name = author_rename_dialogue.get_input() or ""
@@ -162,7 +162,7 @@ class AuthorFrame(customtkinter.CTkFrame):
         if not check_exists(new_name, author_array, True):
             error = customtkinter.CTkToplevel()
             error.attributes('-topmost', 2)
-            error.geometry("0+0")
+            error.geometry("340+220")
             label = customtkinter.CTkLabel(error,
                                            text="Please enter a new name for the Author.",
                                            font=("Roboto", 20))

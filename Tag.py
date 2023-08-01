@@ -23,7 +23,7 @@ class TagFrame(customtkinter.CTkFrame):
                 button_fg_color=light_pink,
                 button_text_color=black,
                 button_hover_color=dark_pink)
-            tags_append_dialogue.geometry('0+0')
+            tags_append_dialogue.geometry("340+220")
 
             # load the JSON
             with open(tags_json, 'r') as f:
@@ -42,7 +42,7 @@ class TagFrame(customtkinter.CTkFrame):
                 pass
             elif check_exists(new_tag, tags, False) is False:
                 error = customtkinter.CTkToplevel()
-                error.geometry("0+0")
+                error.geometry("340+220")
                 label = customtkinter.CTkLabel(error,
                                                text="This Tag already exists.",
                                                font=("Roboto", 20))
@@ -279,7 +279,7 @@ class TagFrame(customtkinter.CTkFrame):
         tags_rename_dialogue = customtkinter.CTkInputDialog(
             text=text, title="Rename a tag",
         button_text_color=black, button_fg_color=light_pink, button_hover_color=dark_pink)
-        tags_rename_dialogue.geometry('0+0')
+        tags_rename_dialogue.geometry("340+220")
 
         # get the tag's new name
         new_name = tags_rename_dialogue.get_input() or ""
@@ -288,7 +288,7 @@ class TagFrame(customtkinter.CTkFrame):
         if not check_exists(new_name, tag_array, True):
             error = customtkinter.CTkToplevel()
             error.attributes('-topmost', 2)
-            error.geometry("0+0")
+            error.geometry("340+220")
             label = customtkinter.CTkLabel(error,
                                            text="Please enter a new name for the tag.",
                                            font=("Roboto", 20))

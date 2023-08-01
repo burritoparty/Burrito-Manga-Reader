@@ -451,6 +451,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
             for i in tags:
                 check_box = customtkinter.CTkCheckBox(tag_scroller, text=i,
+                                                      checkbox_height=35, checkbox_width=35, font=("Roboto", 14),
                                                       hover_color=light_pink, fg_color=dark_pink, text_color=light_pink,
                                                       command=lambda
                                                           x=book,

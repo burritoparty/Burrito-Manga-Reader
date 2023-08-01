@@ -245,7 +245,7 @@ class ImportWindow(customtkinter.CTkToplevel):
             button_fg_color=light_pink,
             button_text_color=black,
             button_hover_color=dark_pink)
-        authors_append_dialogue.geometry('0+0')
+        authors_append_dialogue.geometry('340+220')
 
         # load the JSON
         with open(authors_json, 'r') as f:
@@ -264,7 +264,7 @@ class ImportWindow(customtkinter.CTkToplevel):
             pass
         elif check_exists(new_author, authors, False) is False:
             error = customtkinter.CTkToplevel()
-            error.geometry("0+0")
+            error.geometry("340+220")
             label = customtkinter.CTkLabel(error,
                                            text="this tag already exists\n(not case sensitive)",
                                            font=("Roboto", 20))
@@ -343,9 +343,7 @@ class ImportWindow(customtkinter.CTkToplevel):
         start_time = time.time()
 
         self.title("Import Book")
-        self.geometry('%d+%d' % (
-            800, 220
-        ))
+        self.geometry('550+220')
         self.attributes('-topmost')
 
         # make attributes for new book
@@ -390,7 +388,7 @@ class ImportWindow(customtkinter.CTkToplevel):
             self.author_cbox.set("")
 
         self.tag_frame = customtkinter.CTkScrollableFrame(self, label_text="Select Tags",
-                                                          width=1300, height=450, label_text_color=light_pink)
+                                                          width=1600, height=575, label_text_color=light_pink)
         # align checkbox columns
         self.tag_frame.columnconfigure(0, weight=1)
         self.tag_frame.columnconfigure(1, weight=1)
@@ -417,13 +415,13 @@ class ImportWindow(customtkinter.CTkToplevel):
 
         for i in tags:
             self.checkbox = customtkinter.CTkCheckBox(self.tag_frame, text=i,
-                                                      command=lambda x=i: self.tagged.append(
-                                                          x),
+                                                      checkbox_height=35, checkbox_width=35, font=("Roboto", 16),
+                                                      command=lambda x=i: self.tagged.append(x),
                                                       hover_color=light_pink, fg_color=dark_pink,
                                                       text_color=light_pink)
-            self.checkbox.grid(row=r, column=c, pady=15, padx=15, sticky='w')
+            self.checkbox.grid(row=r, column=c, pady=10, padx=10, sticky='w')
 
-            if c == 7:
+            if c == 9:
                 c = 0
                 r += 1
             else:
