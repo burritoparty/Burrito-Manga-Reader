@@ -964,7 +964,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.read_later_window.lift()
         self.focus_force()
 
-    def show_read_later_callback(self, tag_json: str, authors_json: str):
+    def show_read_later_callback(self, tag_json: str, authors_json: str, display_type: str):
 
         if self.read_later_window is None or not self.read_later_window.winfo_exists():
 
@@ -976,7 +976,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             # build the UI
             self.read_frame = customtkinter.CTkScrollableFrame(self.read_later_window, width=1700, height=900)
 
-            label = customtkinter.CTkLabel(self.read_later_window, text="Read Later", font=("Roboto", 20))
+            label = customtkinter.CTkLabel(self.read_later_window, text="", font=("Roboto", 20))
 
             next = Image.open(resource(os.path.join('button_icons', 'next_icon.png')))
             ctk_next = customtkinter.CTkImage(dark_image=next)
@@ -1035,18 +1035,35 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             next_button.grid(row=0, column=2, padx=pad, pady=pad)
             last_button.grid(row=0, column=3, padx=pad, pady=pad)
 
-            self.to_be_read = []
-            # load the JSON
-            if path.isfile(self.library_json) is False:
-                print("FILE NOT FOUND")
-            else:
-                with open(self.library_json) as f:
-                    books_json = json.load(f)
+            if display_type == "read_later":
 
-            for i in books_json['book']:
-                # if is to be read later
-                if i['read_later']:
-                    self.to_be_read.append(i)
+                self.to_be_read = []
+                label.configure(text="Read Later")
+                # load the JSON
+                if path.isfile(self.library_json) is False:
+                    print("FILE NOT FOUND")
+                else:
+                    with open(self.library_json) as f:
+                        books_json = json.load(f)
+
+                for i in books_json['book']:
+                    # if is to be read later
+                    if i['read_later']:
+                        self.to_be_read.append(i)
+            elif display_type == "favorite":
+                self.to_be_read = []
+                label.configure(text="Favorites")
+                # load the JSON
+                if path.isfile(self.library_json) is False:
+                    print("FILE NOT FOUND")
+                else:
+                    with open(self.library_json) as f:
+                        books_json = json.load(f)
+
+                for i in books_json['book']:
+                    # if is to be read later
+                    if i['favorite']:
+                        self.to_be_read.append(i)
 
             self.current_read_tab = 0
             self.read_tab_count = math.ceil(len(self.to_be_read) / self.books_per_page)
@@ -1196,16 +1213,16 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                             y=tag_json, z=authors_json: self.sort_by_author_call(y, z))
 
         show_read_later = customtkinter.CTkButton(read_favorite_frame, text="Read Later", width=785,
-                                                  command=lambda x=tag_json, y=authors_json:
-                                                  self.show_read_later_callback(x, y),
+                                                  command=lambda x=tag_json, y=authors_json, z="read_later":
+                                                  self.show_read_later_callback(x, y, z),
                                                   image=ctk_read,
                                                   compound="left",
                                                   fg_color=light_pink,
                                                   text_color=black,
                                                   hover_color=dark_pink)
         show_favorite = customtkinter.CTkButton(read_favorite_frame, text="Favorites", width=785,
-                                                command=lambda x=tag_json, y=authors_json:
-                                                self.show_favorite_callback(x, y),
+                                                command=lambda x=tag_json, y=authors_json, z="favorite":
+                                                self.show_read_later_callback(x, y, z),
                                                 image=ctk_favorite,
                                                 compound="left",
                                                 fg_color=light_pink,
