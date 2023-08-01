@@ -95,8 +95,16 @@ class ImportWindow(customtkinter.CTkToplevel):
                     format = re.sub("\\(.*?\\)","", os.path.basename(self.path))
                     format = re.sub("\\[.*?\\]","", format)
                     format = re.sub("\\{.*?\\}", "", format)
+                    format = re.sub("\\=.*?\\=", "", format)
+                    format = format.strip()
                     # removes characters before two spaces
                     format = re.sub(r'^.*?  ', '  ', format)
+                    format = re.sub(r'^.*?｜', '｜', format)
+                    format = re.sub(r'^.*? - ', ' - ', format)
+
+                    format = format.replace('_', '')
+                    format = format.replace(' - ', '')
+                    format = format.replace('｜', '')
                     format = format.strip()
                     self.name_entry.insert(0, format)
             else:
