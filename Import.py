@@ -266,7 +266,7 @@ class ImportWindow(customtkinter.CTkToplevel):
             error = customtkinter.CTkToplevel()
             error.geometry("340+220")
             label = customtkinter.CTkLabel(error,
-                                           text="this tag already exists\n(not case sensitive)",
+                                           text="this Author already exists",
                                            font=("Roboto", 20))
             label.grid(padx=10, pady=10)
         else:
@@ -312,6 +312,9 @@ class ImportWindow(customtkinter.CTkToplevel):
                                   frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
 
             self.author_cbox.set("")
+
+        # set the new author into the combobox
+        self.author_cbox.set(new_author)
 
         # focus the import window
         self.after(250, self.focus_import)
@@ -434,10 +437,10 @@ class ImportWindow(customtkinter.CTkToplevel):
                                                      fg_color=light_pink, hover_color=dark_pink, text_color=black)
         self.submit_button.grid(row=1, column=1, padx=20, pady=20)
 
-        self.cancel_button = customtkinter.CTkButton(self, text="Add an author",
-                                                     command=lambda x=authors_json: self.make_new_author(x),
-                                                     fg_color=light_pink, hover_color=dark_pink, text_color=black)
-        self.cancel_button.grid(row=2, column=1, padx=20, pady=20)
+        self.add_author_button = customtkinter.CTkButton(self, text="Add an author",
+                                                         command=lambda x=authors_json: self.make_new_author(x),
+                                                         fg_color=light_pink, hover_color=dark_pink, text_color=black)
+        self.add_author_button.grid(row=2, column=1, padx=20, pady=20)
 
         self.get_path_button = customtkinter.CTkButton(self, text="Select Book", command=self.input_path,
                                                        fg_color=light_pink, hover_color=dark_pink, text_color=black)
