@@ -25,6 +25,13 @@ def _create_book(book_json_entry: dict) -> Book:
     )
 
 
+def checking(tagged: list, check: str):
+    if check not in tagged:
+        tagged.append(check)
+    else:
+        tagged.remove(check)
+
+
 class BookFrame(customtkinter.CTkScrollableFrame):
 
     def focus_reader(self):
@@ -660,232 +667,46 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         # start_time = time.time()
         # print("--- %s seconds ---" % (time.time() - start_time))
 
-    def focus_sort_by_tag_call(self):
-        assert self.sort_by_tag_window
-        self.sort_by_tag_window.focus()
+    def focus_filter_window(self):
+        assert self.filter_window
+        self.filter_window.focus()
 
-    def load_tab_tag(self, tag_cbox, tag_json, authors_json):
-        # if the library already has books, destroy them
-        for i in self.book_buttons:
-            i.destroy()
-        self.book_buttons.clear()
+    def focus_filter_library(self):
+        assert self.filter_library
+        self.filter_library.focus()
 
-        books_json = {}
+    def first_filtered_tab(self, tag_json: str, authors_json, filtered_result):
+        self.current_filter_tab = 0
+        self.load_filtered(tag_json, authors_json, filtered_result)
+        self.filter_tab_tracker.configure(text=str(self.current_filter_tab + 1) + " / " +
+                                               str(math.ceil(len(filtered_result) / self.books_per_page)))
+        self.filter_tab_tracker.grid(row=0, column=2, padx=10, pady=10)
 
-        # load the JSON
-        if path.isfile(self.library_json) is False:
-            print("FILE NOT FOUND")
-        else:
-            with open(self.library_json) as f:
-                books_json = json.load(f)
+    def last_filtered_tab(self, tag_json: str, authors_json, filtered_result):
+        self.current_filter_tab = math.ceil(len(filtered_result) / self.books_per_page) - 1
+        self.load_filtered(tag_json, authors_json, filtered_result)
+        self.filter_tab_tracker.configure(text=str(self.current_filter_tab + 1) + " / " +
+                                               str(math.ceil(len(filtered_result) / self.books_per_page)))
+        self.filter_tab_tracker.grid(row=0, column=2, padx=10, pady=10)
 
-        # iterate through the json
-        for i in books_json['book']:
-            # load current book's tagged
-            tags = i['tagged']
-            if tag_cbox.get() in tags:
-                # make book only if tag matches
-                book = (Book(i['path'], i['name'],
-                             i['author'], i['link'],
-                             i['read_later'], i['favorite'],
-                             i['tagged']))
-                # make the button
-                button = customtkinter.CTkButton(self, compound="top", image=book.get_cover(),
-                                                 command=lambda
-                                                     x=book, y=tag_json, z=authors_json:
-                                                 self.open_book_description(x, y, z),
-                                                 text=indent_string(book.get_name()),
-                                                 fg_color="transparent", hover_color=dark_pink,
-                                                 font=("Roboto", 18))
-                # append to the buttons
-                self.book_buttons.append(button)
+    def next_filtered_tab(self, tag_json: str, authors_json, filtered_result):
+        # print(str(self.current_tab) + " < " + str(math.ceil((self.book_count - 1) / 10)))
+        if self.current_filter_tab < math.ceil(len(filtered_result) / self.books_per_page) - 1:
+            self.current_filter_tab += 1
+            self.load_filtered(tag_json, authors_json, filtered_result)
+            self.filter_tab_tracker.configure(text=str(self.current_filter_tab + 1) + " / " +
+                                                   str(math.ceil(len(filtered_result) / self.books_per_page)))
+            self.filter_tab_tracker.grid(row=0, column=2, padx=10, pady=10)
 
-        self.print_page()
+    def prev_filtered_tab(self, tag_json: str, authors_json, filtered_result):
+        if self.current_filter_tab != 0:
+            self.current_filter_tab -= 1
+            self.load_filtered(tag_json, authors_json, filtered_result)
+            self.filter_tab_tracker.configure(text=str(self.current_filter_tab + 1) + " / " +
+                                                   str(math.ceil(len(filtered_result) / self.books_per_page)))
+            self.filter_tab_tracker.grid(row=0, column=2, padx=10, pady=10)
 
-    def sort_by_tag_call(self, tag_json: str, authors_json: str):
-        if self.sort_by_tag_window is None or not self.sort_by_tag_window.winfo_exists():
-            self.sort_by_tag_window = customtkinter.CTkToplevel()
-            self.sort_by_tag_window.geometry('1275+720')
-            self.sort_by_tag_window.title("Filter by Tag")
-            tags = []
-            with open(tag_json, 'r') as f:
-                load_tags = json.load(f)
-
-            # load the tag names from the JSON into an array
-            for i in load_tags['tags']:
-                tags.append(i['name'])
-
-            tag_cbox = customtkinter.CTkComboBox(self.sort_by_tag_window, values=tags, width=300)
-            tag_cbox.grid(padx=10, pady=10)
-            if len(tags) != 0:
-                CTkScrollableDropdown(tag_cbox, values=tags, justify="left", button_color="transparent",
-                                      resize=False, autocomplete=True,
-                                      frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
-
-            # button to submit
-            tag_button = customtkinter.CTkButton(self.sort_by_tag_window, text="Filter",
-                                                 fg_color=light_pink,
-                                                 text_color=black,
-                                                 hover_color=dark_pink,
-                                                 command=lambda x=tag_cbox,
-                                                                y=tag_json, z=authors_json: self.load_tab_tag(x, y, z))
-            tag_button.grid(padx=10, pady=10)
-
-            # focus it
-            self.after(100, self.focus_sort_by_tag_call)
-
-        else:
-            self.sort_by_tag_window.focus()
-
-    def focus_sort_by_author_call(self):
-        assert self.sort_by_author_window
-        self.sort_by_author_window.focus()
-
-    def load_tab_author(self, author_cbox, tag_json: str, authors_json: str):
-        # if the library already has books, destroy them
-        for i in self.book_buttons:
-            i.destroy()
-        self.book_buttons.clear()
-
-        books_json = {}
-
-        # load the JSON
-        if path.isfile(self.library_json) is False:
-            print("FILE NOT FOUND")
-        else:
-            with open(self.library_json) as f:
-                books_json = json.load(f)
-
-        # iterate through the json
-        for i in books_json['book']:
-            if author_cbox.get() == i['author']:
-                # make book only if tag matches
-                book = (Book(i['path'], i['name'],
-                             i['author'], i['link'],
-                             i['read_later'], i['favorite'],
-                             i['tagged']))
-                # make the button
-                button = customtkinter.CTkButton(self, compound="top", image=book.get_cover(),
-                                                 command=lambda
-                                                     x=book, y=tag_json, z=authors_json:
-                                                 self.open_book_description(x, y, z),
-                                                 text=indent_string(book.get_name()),
-                                                 fg_color="transparent", hover_color=dark_pink,
-                                                 font=("Roboto", 18))
-                # append to the buttons
-                self.book_buttons.append(button)
-
-        self.print_page()
-
-    def sort_by_author_call(self, tag_json: str, authors_json: str):
-        if self.sort_by_author_window is None or not self.sort_by_author_window.winfo_exists():
-            self.sort_by_author_window = customtkinter.CTkToplevel()
-            self.sort_by_author_window.geometry('1275+720')
-            self.sort_by_author_window.title("Filter by Author")
-            authors = []
-            with open(authors_json, 'r') as f:
-                load_authors = json.load(f)
-
-            # load the tag names from the JSON into an array
-            for i in load_authors['authors']:
-                authors.append(i['name'])
-
-            author_cbox = customtkinter.CTkComboBox(self.sort_by_author_window, values=authors, width=300)
-            author_cbox.grid(padx=10, pady=10)
-            if len(authors) != 0:
-                CTkScrollableDropdown(author_cbox, values=authors, justify="left", button_color="transparent",
-                                      resize=False, autocomplete=True,
-                                      frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
-
-            # button to submit
-            tag_button = customtkinter.CTkButton(self.sort_by_author_window, text="Filter",
-                                                 fg_color=light_pink,
-                                                 text_color=black,
-                                                 hover_color=dark_pink,
-                                                 command=lambda
-                                                     x=author_cbox,
-                                                     y=tag_json,
-                                                     z=authors_json: self.load_tab_author(x, y, z))
-            tag_button.grid(padx=10, pady=10)
-
-            # focus it
-            self.after(100, self.focus_sort_by_author_call)
-
-        else:
-            self.sort_by_author_window.focus()
-
-    def search_by_name_call(self, tag_json: str, authors_json: str):
-        if self.search_by_name_dialogue is None or not self.search_by_name_dialogue.winfo_exists():
-            self.search_by_name_dialogue = customtkinter.CTkInputDialog(button_fg_color=light_pink,
-                                                                        button_hover_color=dark_pink,
-                                                                        button_text_color=black,
-                                                                        text="Search by Book Name")
-            self.search_by_name_dialogue.title("Search by Book Name")
-            # get the string to search for
-            search_for = self.search_by_name_dialogue.get_input()
-
-            # make sure input is not empty, and they didn't press the close button
-            if search_for != '' and search_for is not None:
-
-                # if the library already has books, destroy them
-                for i in self.book_buttons:
-                    i.destroy()
-                self.book_buttons.clear()
-
-                books_json = {}
-
-                # load the JSON
-                if path.isfile(self.library_json) is False:
-                    print("FILE NOT FOUND")
-                else:
-                    with open(self.library_json) as f:
-                        books_json = json.load(f)
-
-                # iterate through the json
-                for i in books_json['book']:
-                    # if name matches
-                    if search_for.lower() in i['name'].lower():
-                        # make book only if name matches
-                        book = (Book(i['path'], i['name'],
-                                     i['author'], i['link'],
-                                     i['read_later'], i['favorite'],
-                                     i['tagged']))
-                        # make the button
-                        button = customtkinter.CTkButton(self, compound="top", image=book.get_cover(),
-                                                         command=lambda
-                                                             x=book, y=tag_json, z=authors_json:
-                                                         self.open_book_description(x, y, z),
-                                                         text=indent_string(book.get_name()),
-                                                         fg_color="transparent", hover_color=dark_pink,
-                                                         font=("Roboto", 18))
-                        # append to the buttons
-                        self.book_buttons.append(button)
-
-                # print it
-                self.print_page()
-
-        else:
-            self.search_by_name_dialogue.focus()
-
-    def next_filter_callback(self, tag_json, author_json):
-        if self.current_read_tab < self.read_tab_count - 1:
-            self.current_read_tab += 1
-            self.load_filter(tag_json, author_json)
-
-    def prev_filter_callback(self, tag_json, author_json):
-        if self.current_read_tab != 0:
-            self.current_read_tab -= 1
-            self.load_filter(tag_json, author_json)
-
-    def first_filter_callback(self, tag_json, author_json):
-        self.current_read_tab = 0
-        self.load_filter(tag_json, author_json)
-
-    def last_filter_callback(self, tag_json, author_json):
-        self.current_read_tab = self.read_tab_count - 1
-        self.load_filter(tag_json, author_json)
-
-    def print_filter(self, books_to_print, tag_json, author_json):
+    def print_filtered(self, tag_json: str, authors_json: str, books_to_print):
 
         # rid of buttons in memory
         for i in self.filter_buttons:
@@ -903,7 +724,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                              font=("Roboto", 18),
                                              command=lambda
                                                  x=books_to_print[count], y=tag_json,
-                                                 z=author_json: self.open_book_description(x, y, z))
+                                                 z=authors_json: self.open_book_description(x, y, z))
             count += 1
             self.filter_buttons.append(button)
         # print the buttons
@@ -918,233 +739,361 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             else:
                 c += 1
 
-        # print them
-
-    def load_filter(self, tag_json, author_json):
+    def load_filtered(self, tag_json: str, authors_json: str, filtered_result):
         books_to_print = []
-        index_to_start_at = self.current_read_tab * self.books_per_page
+        index_to_start_at = self.current_filter_tab * self.books_per_page
         counter = 0
         if self.book_count == 0:
             pass
-        elif self.read_tab_count != self.current_read_tab + 1:
+        elif self.filter_tab_count != self.current_filter_tab + 1:
             # create the books
             while counter < self.books_per_page:
                 # create book objects
-                book = Book(self.to_be_read[index_to_start_at].get('path'),
-                            self.to_be_read[index_to_start_at].get('name'),
-                            self.to_be_read[index_to_start_at].get('author'),
-                            self.to_be_read[index_to_start_at].get('link'),
-                            self.to_be_read[index_to_start_at].get('read_later'),
-                            self.to_be_read[index_to_start_at].get('favorite'),
-                            self.to_be_read[index_to_start_at].get('tagged'))
+                book = Book(filtered_result[index_to_start_at].get('path'),
+                            filtered_result[index_to_start_at].get('name'),
+                            filtered_result[index_to_start_at].get('author'),
+                            filtered_result[index_to_start_at].get('link'),
+                            filtered_result[index_to_start_at].get('read_later'),
+                            filtered_result[index_to_start_at].get('favorite'),
+                            filtered_result[index_to_start_at].get('tagged'))
                 books_to_print.append(book)
                 counter += 1
                 index_to_start_at += 1
         else:
             # calculate how many excess books there are
-            excess_books = self.books_per_page - (math.ceil(len(self.to_be_read) / self.books_per_page)
-                                                  * self.books_per_page - len(self.to_be_read))
+            excess_books = self.books_per_page - (math.ceil(len(filtered_result) / self.books_per_page)
+                                                  * self.books_per_page - len(filtered_result))
             while counter < excess_books:
                 # create book objects
-                book = Book(self.to_be_read[index_to_start_at].get('path'),
-                            self.to_be_read[index_to_start_at].get('name'),
-                            self.to_be_read[index_to_start_at].get('author'),
-                            self.to_be_read[index_to_start_at].get('link'),
-                            self.to_be_read[index_to_start_at].get('read_later'),
-                            self.to_be_read[index_to_start_at].get('favorite'),
-                            self.to_be_read[index_to_start_at].get('tagged'))
+                book = Book(filtered_result[index_to_start_at].get('path'),
+                            filtered_result[index_to_start_at].get('name'),
+                            filtered_result[index_to_start_at].get('author'),
+                            filtered_result[index_to_start_at].get('link'),
+                            filtered_result[index_to_start_at].get('read_later'),
+                            filtered_result[index_to_start_at].get('favorite'),
+                            filtered_result[index_to_start_at].get('tagged'))
                 books_to_print.append(book)
                 counter += 1
                 index_to_start_at += 1
 
-        self.print_filter(books_to_print, tag_json, author_json)
+        self.print_filtered(tag_json, authors_json, books_to_print)
 
-    def filter_focus(self):
-        assert self.filter_window
-        self.filter_window.lift()
-        self.focus_force()
+    def build_filter_window(self, tag_json: str, authors_json: str, filtered_result, filter_by):
+        if self.filter_library is None or not self.filter_library.winfo_exists():
 
-    def show_filter_callback(self, tag_json: str, authors_json: str, display_type: str):
+            # make sure books exist
+            if len(filtered_result) != 0:
+                # make the new window
+                self.filter_library = customtkinter.CTkToplevel()
+                self.filter_library.geometry('1750x1050+550+220')
+                self.filter_buttons = []
 
-        if self.filter_window is None or not self.filter_window.winfo_exists():
+                self.filter_library.title("Books")
 
-            # make the new window
-            self.filter_window = customtkinter.CTkToplevel()
-            self.filter_window.geometry('1750x1050+550+220')
-            self.filter_buttons = []
+                if filter_by == "tag":
+                    self.filter_library.title("Filter by Tag")
+                elif filter_by == "search":
+                    self.filter_library.title("Search")
+                elif filter_by == "author":
+                    self.filter_library.title("Filter by Author")
+                elif filter_by == "read_later":
+                    self.filter_library.title("Read Later")
+                elif filter_by == "favorite":
+                    self.filter_library.title("Favorites")
 
-            # build the UI
-            self.read_frame = customtkinter.CTkScrollableFrame(self.filter_window, width=1700, height=900)
+                # build the UI
+                self.read_frame = customtkinter.CTkScrollableFrame(self.filter_library, width=1700, height=950)
+                self.read_frame.grid_columnconfigure(0, weight=1)
+                self.read_frame.grid_columnconfigure(1, weight=1)
+                self.read_frame.grid_columnconfigure(2, weight=1)
+                self.read_frame.grid_columnconfigure(3, weight=1)
+                self.read_frame.grid_columnconfigure(4, weight=1)
+                self.read_frame.grid_columnconfigure(5, weight=1)
+                self.read_frame.grid_rowconfigure(0, weight=1)
+                self.read_frame.grid_rowconfigure(1, weight=1)
 
-            label = customtkinter.CTkLabel(self.filter_window, text="", font=("Roboto", 20))
+                next = Image.open(resource(os.path.join('button_icons', 'next_icon.png')))
+                ctk_next = customtkinter.CTkImage(dark_image=next)
 
-            next = Image.open(resource(os.path.join('button_icons', 'next_icon.png')))
-            ctk_next = customtkinter.CTkImage(dark_image=next)
+                prev = Image.open(resource(os.path.join('button_icons', 'prev_icon.png')))
+                ctk_prev = customtkinter.CTkImage(dark_image=prev)
 
-            prev = Image.open(resource(os.path.join('button_icons', 'prev_icon.png')))
-            ctk_prev = customtkinter.CTkImage(dark_image=prev)
+                jump_first = Image.open(resource(os.path.join('button_icons', 'jump_first_icon.png')))
+                ctk_jump_first = customtkinter.CTkImage(dark_image=jump_first)
 
-            jump_first = Image.open(resource(os.path.join('button_icons', 'jump_first_icon.png')))
-            ctk_jump_first = customtkinter.CTkImage(dark_image=jump_first)
+                jump_last = Image.open(resource(os.path.join('button_icons', 'jump_last_icon.png')))
+                ctk_jump_last = customtkinter.CTkImage(dark_image=jump_last)
 
-            jump_last = Image.open(resource(os.path.join('button_icons', 'jump_last_icon.png')))
-            ctk_jump_last = customtkinter.CTkImage(dark_image=jump_last)
+                w = 520
+                button_frame = customtkinter.CTkFrame(self.filter_library)
+                first_button = customtkinter.CTkButton(button_frame, text="First Tab",
+                                                       image=ctk_jump_first,
+                                                       fg_color=light_pink,
+                                                       text_color=black,
+                                                       hover_color=dark_pink,
+                                                       command=lambda x=tag_json, y=authors_json, z=filtered_result:
+                                                       self.first_filtered_tab(x, y, z))
+                prev_button = customtkinter.CTkButton(button_frame, text="Previous Tab",
+                                                      image=ctk_prev,
+                                                      width=w,
+                                                      fg_color=light_pink,
+                                                      text_color=black,
+                                                      hover_color=dark_pink,
+                                                      command=lambda x=tag_json, y=authors_json, z=filtered_result:
+                                                      self.prev_filtered_tab(x, y, z))
+                next_button = customtkinter.CTkButton(button_frame, text="Next Tab",
+                                                      compound='right',
+                                                      image=ctk_next,
+                                                      width=w,
+                                                      fg_color=light_pink,
+                                                      text_color=black,
+                                                      hover_color=dark_pink,
+                                                      command=lambda x=tag_json, y=authors_json, z=filtered_result:
+                                                      self.next_filtered_tab(x, y, z))
+                last_button = customtkinter.CTkButton(button_frame, text="Last Tab",
+                                                      compound='right',
+                                                      image=ctk_jump_last,
+                                                      fg_color=light_pink,
+                                                      text_color=black,
+                                                      hover_color=dark_pink,
+                                                      command=lambda x=tag_json, y=authors_json, z=filtered_result:
+                                                      self.last_filtered_tab(x, y, z))
 
-            w = 520
-            button_frame = customtkinter.CTkFrame(self.filter_window)
-            first_button = customtkinter.CTkButton(button_frame, text="First Tab",
-                                                   image=ctk_jump_first,
-                                                   fg_color=light_pink,
-                                                   text_color=black,
-                                                   hover_color=dark_pink,
-                                                   command=lambda x=tag_json, y=authors_json:
-                                                   self.first_filter_callback(x, y))
-            prev_button = customtkinter.CTkButton(button_frame, text="Previous Tab",
-                                                  image=ctk_prev,
-                                                  width=w,
-                                                  fg_color=light_pink,
-                                                  text_color=black,
-                                                  hover_color=dark_pink,
-                                                  command=lambda x=tag_json, y=authors_json:
-                                                  self.prev_filter_callback(x, y))
-            next_button = customtkinter.CTkButton(button_frame, text="Next Tab",
-                                                  compound='right',
-                                                  image=ctk_next,
-                                                  width=w,
-                                                  fg_color=light_pink,
-                                                  text_color=black,
-                                                  hover_color=dark_pink,
-                                                  command=lambda x=tag_json, y=authors_json:
-                                                  self.next_filter_callback(x, y))
-            last_button = customtkinter.CTkButton(button_frame, text="Last Tab",
-                                                  compound='right',
-                                                  image=ctk_jump_last,
-                                                  fg_color=light_pink,
-                                                  text_color=black,
-                                                  hover_color=dark_pink,
-                                                  command=lambda x=tag_json, y=authors_json:
-                                                  self.last_filter_callback(x, y))
+                pad = 10
+                self.read_frame.grid(row=1, columnspan=2, padx=pad, pady=pad)
+                button_frame.grid(row=2, columnspan=2)
 
-            pad = 10
-            label.grid(row=0, column=0, columnspan=2, padx=pad, pady=pad)
-            self.read_frame.grid(row=1, columnspan=2, padx=pad, pady=pad)
-            button_frame.grid(row=2, columnspan=2)
+                self.current_filter_tab = 0
+                self.filter_tab_count = math.ceil(len(filtered_result) / self.books_per_page)
 
-            first_button.grid(row=0, column=0, padx=pad, pady=pad)
-            prev_button.grid(row=0, column=1, padx=pad, pady=pad)
-            next_button.grid(row=0, column=2, padx=pad, pady=pad)
-            last_button.grid(row=0, column=3, padx=pad, pady=pad)
+                self.filter_tab_tracker = customtkinter.CTkLabel(button_frame,
+                                                                 text=("1 / " + str(self.filter_tab_count)),
+                                                                 font=("Roboto", 20))
 
-            if display_type == "read_later":
+                first_button.grid(row=0, column=0, padx=pad, pady=pad)
+                prev_button.grid(row=0, column=1, padx=pad, pady=pad)
+                self.filter_tab_tracker.grid(row=0, column=2, padx=pad, pady=pad)
+                next_button.grid(row=0, column=3, padx=pad, pady=pad)
+                last_button.grid(row=0, column=4, padx=pad, pady=pad)
 
-                self.to_be_read = []
-                label.configure(text="Read Later")
-                # load the JSON
-                if path.isfile(self.library_json) is False:
-                    print("FILE NOT FOUND")
-                else:
-                    with open(self.library_json) as f:
-                        books_json = json.load(f)
+                # now load the first 12 books
+                self.load_filtered(tag_json, authors_json, filtered_result)
 
-                for i in books_json['book']:
-                    # if is to be read later
-                    if i['read_later']:
-                        self.to_be_read.append(i)
-            elif display_type == "favorite":
-                self.to_be_read = []
-                label.configure(text="Favorites")
-                # load the JSON
-                if path.isfile(self.library_json) is False:
-                    print("FILE NOT FOUND")
-                else:
-                    with open(self.library_json) as f:
-                        books_json = json.load(f)
-
-                for i in books_json['book']:
-                    # if is to be read later
-                    if i['favorite']:
-                        self.to_be_read.append(i)
-
-            self.current_read_tab = 0
-            self.read_tab_count = math.ceil(len(self.to_be_read) / self.books_per_page)
-            # now load the first 12
-            self.load_filter(tag_json, authors_json)
-
-            self.filter_window.after(200, self.filter_focus)
+                self.filter_library.after(100, self.focus_filter_library)
 
         else:
-            self.filter_window.focus()
+            self.filter_library.focus()
 
-        # # if the library already has books, destroy them
-        # for i in self.book_buttons:
-        #     i.destroy()
-        # self.book_buttons.clear()
-        #
-        # books_json = {}
-        #
-        # # load the JSON
-        # if path.isfile(self.library_json) is False:
-        #     print("FILE NOT FOUND")
-        # else:
-        #     with open(self.library_json) as f:
-        #         books_json = json.load(f)
-        #
-        # for i in books_json['book']:
-        #     # if is to be read later
-        #     if i['read_later']:
-        #         book = (Book(i['path'], i['name'],
-        #                      i['author'], i['link'],
-        #                      i['read_later'], i['favorite'],
-        #                      i['tagged']))
-        #         # make the button
-        #         button = customtkinter.CTkButton(self, compound="top", image=book.get_cover(),
-        #                                          command=lambda
-        #                                              x=book, y=tag_json, z=authors_json:
-        #                                          self.open_book_description(x, y, z),
-        #                                          text=indent_string(book.get_name()),
-        #                                          fg_color="transparent", hover_color=dark_pink,
-        #                                          font=("Roboto", 18))
-        #         # append to the buttons
-        #         self.book_buttons.append(button)
-        #
-        # # print it
-        # self.print_page()
+    def get_json(self, tag_json, author_json, find, filter_by: str):
+        # this destroy is to remove the contents of the dict
+        if self.filter_window is not None:
+            self.filter_window.destroy()
 
-    def show_favorite_callback(self, tag_json: str, authors_json: str):
-        # if the library already has books, destroy them
-        for i in self.book_buttons:
-            i.destroy()
-        self.book_buttons.clear()
+        if filter_by == "tag":
 
-        books_json = {}
+            filtered_json = []
+            # load the JSON
+            if path.isfile(self.library_json) is False:
+                print("FILE NOT FOUND")
+            else:
+                with open(self.library_json) as f:
+                    books_json = json.load(f)
 
-        # load the JSON
-        if path.isfile(self.library_json) is False:
-            print("FILE NOT FOUND")
-        else:
-            with open(self.library_json) as f:
-                books_json = json.load(f)
+            # only search if tags are checked
+            if len(find) != 0:
 
-        for i in books_json['book']:
-            # if favorite
-            if i['favorite']:
-                book = (Book(i['path'], i['name'],
-                             i['author'], i['link'],
-                             i['read_later'], i['favorite'],
-                             i['tagged']))
-                # make the button
-                button = customtkinter.CTkButton(self, compound="top", image=book.get_cover(),
-                                                 command=lambda
-                                                     x=book, y=tag_json, z=authors_json:
-                                                 self.open_book_description(x, y, z),
-                                                 text=indent_string(book.get_name()),
-                                                 fg_color="transparent", hover_color=dark_pink,
-                                                 font=("Roboto", 18))
-                # append to the buttons
-                self.book_buttons.append(button)
+                for x in books_json['book']:
+                    for y in find:
+                        for z in x["tagged"]:
+                            if y == z:
+                                filtered_json.append(x)
 
-        # print it
-        self.print_page()
+                # remove dupes
+                final_filtered_json = []
+                for i in range(len(filtered_json)):
+                    if filtered_json[i] not in filtered_json[i + 1:]:
+                        final_filtered_json.append(filtered_json[i])
+
+                self.build_filter_window(tag_json, author_json, final_filtered_json, filter_by)
+
+        elif filter_by == "search":
+            filtered_json = []
+            # load the JSON
+            if path.isfile(self.library_json) is False:
+                print("FILE NOT FOUND")
+            else:
+                with open(self.library_json) as f:
+                    books_json = json.load(f)
+
+            for x in books_json['book']:
+                # if name matches
+                if find.lower() in x['name'].lower():
+                    # make book only if name matches
+                    filtered_json.append(x)
+
+            self.build_filter_window(tag_json, author_json, filtered_json, filter_by)
+
+        elif filter_by == "author":
+            filtered_json = []
+            # load the JSON
+            if path.isfile(self.library_json) is False:
+                print("FILE NOT FOUND")
+            else:
+                with open(self.library_json) as f:
+                    books_json = json.load(f)
+
+            for x in books_json['book']:
+                if find == x["author"]:
+                    filtered_json.append(x)
+
+            self.build_filter_window(tag_json, author_json, filtered_json, filter_by)
+
+        elif filter_by == "read_later":
+            filtered_json = []
+            # load the JSON
+            if path.isfile(self.library_json) is False:
+                print("FILE NOT FOUND")
+            else:
+                with open(self.library_json) as f:
+                    books_json = json.load(f)
+
+            for x in books_json['book']:
+                if x["read_later"]:
+                    filtered_json.append(x)
+
+            self.build_filter_window(tag_json, author_json, filtered_json, filter_by)
+        elif filter_by == "favorite":
+            filtered_json = []
+            # load the JSON
+            if path.isfile(self.library_json) is False:
+                print("FILE NOT FOUND")
+            else:
+                with open(self.library_json) as f:
+                    books_json = json.load(f)
+
+            for x in books_json['book']:
+                if x["favorite"]:
+                    filtered_json.append(x)
+
+            self.build_filter_window(tag_json, author_json, filtered_json, filter_by)
+
+    def get_filter(self, tag_json, author_json, filter_by: str):
+        if filter_by == "tag":
+            if self.filter_window is None or not self.filter_window.winfo_exists():
+                self.filter_window = customtkinter.CTkToplevel()
+                self.filter_window.geometry("550+225")
+                self.filter_window.title("Filter by Tags")
+
+                tags = []
+                tagged = []
+
+                r = 0
+                c = 0
+                num_loops = 0
+                scrollableframe = customtkinter.CTkScrollableFrame(self.filter_window, width=1550, height=500)
+                filter_button = customtkinter.CTkButton(self.filter_window, text="Filter",
+                                                        fg_color=light_pink, hover_color=dark_pink, text_color=black,
+                                                        font=("Roboto", 16),
+                                                        command=lambda x=tag_json, y=author_json, a=tagged, b=filter_by:
+                                                        self.get_json(x, y, a, b))
+
+                filter_button.grid(padx=10, pady=10, sticky="ew")
+                scrollableframe.grid(padx=10, pady=10)
+
+                # load the JSON
+                with open(tag_json, 'r') as f:
+                    load_tags = json.load(f)
+
+                # load the tag names from the JSON into an array
+                for i in load_tags['tags']:
+                    tags.append(i['name'])
+
+                for i in tags:
+                    checkbox = customtkinter.CTkCheckBox(scrollableframe, text=i,
+                                                         checkbox_height=35, checkbox_width=35,
+                                                         font=("Roboto", 16),
+                                                         command=lambda
+                                                             y=tagged, z=i: checking(y, z),
+                                                         hover_color=light_pink, fg_color=dark_pink,
+                                                         text_color=light_pink)
+                    checkbox.grid(row=r, column=c, pady=10, padx=10, sticky='w')
+
+                    if c == 9:
+                        c = 0
+                        r += 1
+                    else:
+                        c += 1
+                    num_loops += 1
+
+                self.filter_window.after(100, self.focus_filter_window)
+
+            else:
+                self.filter_window.focus()
+        elif filter_by == "search":
+            if self.filter_window is None or not self.filter_window.winfo_exists():
+                self.filter_window = customtkinter.CTkToplevel()
+                self.filter_window.geometry("550+225")
+                self.filter_window.title("Search by name")
+                authors = []
+                with open(author_json, 'r') as f:
+                    load_authors = json.load(f)
+
+                # load the tag names from the JSON into an array
+                for i in load_authors['authors']:
+                    authors.append(i['name'])
+
+                search = customtkinter.CTkEntry(self.filter_window, width=500)
+                search.grid(padx=10, pady=10)
+
+                # button to submit
+                button = customtkinter.CTkButton(self.filter_window, text="Filter",
+                                                 fg_color=light_pink,
+                                                 text_color=black,
+                                                 hover_color=dark_pink,
+                                                 command=lambda x=tag_json, y=author_json, a=search, b=filter_by:
+                                                 self.get_json(x, y, a.get(), b))
+                button.grid(padx=10, pady=10)
+
+                self.filter_window.after(100, self.focus_filter_window)
+                search.after(100, search.focus)
+
+            else:
+                self.filter_window.focus()
+        elif filter_by == "author":
+            if self.filter_window is None or not self.filter_window.winfo_exists():
+                self.filter_window = customtkinter.CTkToplevel()
+                self.filter_window.geometry("550+225")
+                self.filter_window.title("Filter by Author")
+                authors = []
+                with open(author_json, 'r') as f:
+                    load_authors = json.load(f)
+
+                # load the tag names from the JSON into an array
+                for i in load_authors['authors']:
+                    authors.append(i['name'])
+
+                author_cbox = customtkinter.CTkComboBox(self.filter_window, values=authors, width=300)
+                author_cbox.grid(padx=10, pady=10)
+                if len(authors) != 0:
+                    CTkScrollableDropdown(author_cbox, values=authors, justify="left",
+                                          button_color="transparent",
+                                          resize=False, autocomplete=True,
+                                          frame_border_color=light_pink,
+                                          scrollbar_button_hover_color=light_pink)
+                # button to submit
+                button = customtkinter.CTkButton(self.filter_window, text="Filter",
+                                                 fg_color=light_pink,
+                                                 text_color=black,
+                                                 hover_color=dark_pink,
+                                                 command=lambda x=tag_json, y=author_json, a=author_cbox, b=filter_by:
+                                                 self.get_json(x, y, a.get(), b))
+                button.grid(padx=10, pady=10)
+
+                self.filter_window.after(100, self.focus_filter_window)
+                author_cbox.after(100, author_cbox.focus)
+
+            else:
+                self.filter_window.focus()
 
     def get_tab_count(self):
         # take the book count
@@ -1166,6 +1115,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
         self.sort_by_author_window = None
         self.search_by_name_dialogue = None
 
+        self.filter_library = None
         self.filter_window = None
 
         # create frames
@@ -1192,7 +1142,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                      text_color=black,
                                                      hover_color=dark_pink,
                                                      command=lambda
-                                                         y=tag_json, z=authors_json: self.sort_by_tag_call(y, z))
+                                                         y=tag_json, z=authors_json, a="tag": self.get_filter(y, z, a))
 
         search_button = customtkinter.CTkButton(button_frame, text="Search by Name", width=520,
                                                 image=ctk_search,
@@ -1201,7 +1151,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                 text_color=black,
                                                 hover_color=dark_pink,
                                                 command=lambda
-                                                    y=tag_json, z=authors_json: self.search_by_name_call(y, z))
+                                                    y=tag_json, z=authors_json, a="search": self.get_filter(y, z, a))
 
         sort_by_author_button = customtkinter.CTkButton(button_frame, text="Filter by Author", width=520,
                                                         image=ctk_filter,
@@ -1210,19 +1160,21 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                         text_color=black,
                                                         hover_color=dark_pink,
                                                         command=lambda
-                                                            y=tag_json, z=authors_json: self.sort_by_author_call(y, z))
+                                                            y=tag_json, z=authors_json, a="author": self.get_filter(y,
+                                                                                                                    z,
+                                                                                                                    a))
 
         show_read_later = customtkinter.CTkButton(read_favorite_frame, text="Read Later", width=785,
-                                                  command=lambda x=tag_json, y=authors_json, z="read_later":
-                                                  self.show_filter_callback(x, y, z),
+                                                  command=lambda x=tag_json, y=authors_json, a="", z="read_later":
+                                                  self.get_json(x, y, a, z),
                                                   image=ctk_read,
                                                   compound="left",
                                                   fg_color=light_pink,
                                                   text_color=black,
                                                   hover_color=dark_pink)
         show_favorite = customtkinter.CTkButton(read_favorite_frame, text="Favorites", width=785,
-                                                command=lambda x=tag_json, y=authors_json, z="favorite":
-                                                self.show_filter_callback(x, y, z),
+                                                command=lambda x=tag_json, y=authors_json, a="", z="favorite":
+                                                self.get_json(x, y, a, z),
                                                 image=ctk_favorite,
                                                 compound="left",
                                                 fg_color=light_pink,
