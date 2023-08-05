@@ -46,7 +46,7 @@ class Book:
         return customtkinter.CTkImage(dark_image=img, size=size)
 
     # if you need the pages as thumbnail size, set `is_thumbnail` to True
-    def get_pages(self, is_thumbnail: bool):
+    def get_pages(self, is_thumbnail: bool, natsort=None):
         # load pages
         valid_images = [".jpg", ".png"]
 
@@ -54,6 +54,7 @@ class Book:
             f for f in os.listdir(self.path)
             if os.path.splitext(f)[1].lower() in valid_images
         ]
+        files.sort(key=len)
         with ThreadPoolExecutor(max_workers=8) as executor:
             return [
                 image for image in executor.map(
