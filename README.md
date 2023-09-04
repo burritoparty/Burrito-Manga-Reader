@@ -34,7 +34,7 @@ To change the library location, on first launch run the following in Windows Pow
   >  ".\Burrito Manga Reader.exe" D:\Library
 
 ## Usage
-The main UI contains all books in the library.
+The main UI contains all books in the library. <br>
 **Tags**
 - Add Tag: Adds a tag to be used when editing book information.
 - Delete Tag: Removes an existing tag.
