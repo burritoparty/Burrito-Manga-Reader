@@ -34,28 +34,28 @@ To change the library location, on first launch run the following in Windows Pow
   >  ".\Burrito Manga Reader.exe" D:\Library
 
 ## Usage
-The main UI contains all books in the library. <br>
-**Tags**
+The main UI contains all books in the library.
+<br>**Tags**
 - Add Tag: Adds a tag to be used when editing book information.
 - Delete Tag: Removes an existing tag.
 - Edit Tag: Renames an existing tag.
-**Authors**
+<br>**Authors**
 - Add Author: Adds an author to be used when editing book information.
 - Edit Author: Renames an existing author.
-**Import Book**
+<br>**Import Book**
 - Opens a window to import a new book.
-**Sorting and Filtering**
+<br>**Sorting and Filtering**
 - Read Later: Opens a new window to browse books that are saved to Read Later.
 - Favorites: Opens a new window to browse books that are saved to Favorites.
 - Filter by Tag: Opens a new window to select tags to filter by.
 - Search by Name: Opens a new window to search by name.
 - Filter by Author: Opens a new window to select an author to filter by.
-**Tab navigator**
+<br>**Tab navigator**
 - First Tab: Jumps to the first tab in the library.
 - Previous Tab: Goes back by one tab.
 - Next Tab: Goes to the next tab.
 - Last Tab: Goes to last tab in the library.
-**Library**
+<br>**Library**
 - Clicking a book will open it's description.
 ![readermainui](https://github.com/burritoparty/Burrito-Manga-Reader/assets/117869058/02083e21-5974-4d02-8322-3cc7ba952872)
 
