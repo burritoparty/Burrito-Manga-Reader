@@ -17,6 +17,11 @@ arg_parser.add_argument('mangaloc',
 def main():
     args = arg_parser.parse_args()
 
+    # if manga lib location doesn't exist, make it
+
+    if os.path.exists(args.mangaloc) is False:
+        os.mkdir(args.mangaloc)
+
     # create database
     library_json = os.path.join(args.mangaloc, "library.json")
     if os.path.exists(library_json) is False:
