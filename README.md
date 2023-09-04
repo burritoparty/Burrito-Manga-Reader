@@ -83,7 +83,7 @@ Click the Cover on the left to begin reading.
 
 ### Book Reader
 Hotkeys:
-Previous Page: left arrow, a
-Next Page: right arrow, d
-Exit Reader: esc
+- Previous Page: left arrow, a
+- Next Page: right arrow, d
+- Exit Reader: esc
 ![Screenshot 2023-09-04 135450](https://github.com/burritoparty/Burrito-Manga-Reader/assets/117869058/112a97a8-c214-471d-8fdb-664df5c3ac38)
