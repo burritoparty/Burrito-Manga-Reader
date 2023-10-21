@@ -608,7 +608,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                      z=authors_json: self.open_book_description(
                                                      x, y, z),
                                                  fg_color="transparent", hover_color=dark_pink,
-                                                 text=indent_string(
+                                                 text=shorten_string(
                                                      books[counter].get_name()),
                                                  font=("Roboto", 18))
 
@@ -626,7 +626,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                      z=authors_json: self.open_book_description(
                                                      x, y, z),
                                                  fg_color="transparent", hover_color=dark_pink,
-                                                 text=indent_string(
+                                                 text=shorten_string(
                                                      books[counter].get_name()),
                                                  font=("Roboto", 18))
 
@@ -720,7 +720,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             button = customtkinter.CTkButton(self.read_frame,
                                              fg_color="transparent", hover_color=dark_pink, compound="top",
                                              image=books_to_print[count].get_cover(),
-                                             text=indent_string(books_to_print[count].get_name()),
+                                             text=shorten_string(books_to_print[count].get_name()),
                                              font=("Roboto", 18),
                                              command=lambda
                                                  x=books_to_print[count], y=tag_json,

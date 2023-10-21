@@ -3,6 +3,7 @@ import sys
 
 from PIL import Image, ImageDraw
 
+
 # test line
 def resource(relative_path):
     base_path = getattr(
@@ -10,6 +11,7 @@ def resource(relative_path):
         '_MEIPASS',
         os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)
+
 
 def add_corners(im: Image.Image, rad: int):
     circle = Image.new('L', (rad * 2, rad * 2), 0)
@@ -64,7 +66,24 @@ def check_exists(new_string: str, db_list: list, check_case: bool):
     return is_new
 
 
-# indents a string at whitespace every thirty characters up to 100 chars and returns it
+# shortens title with an ellipse
+def shorten_string(title: str):
+    twentyfive = False
+    fifty = False
+    # lol there's def a better way to do this, but it works so whatever
+    for (index, _) in enumerate(title):
+        if index > 25 and twentyfive is False and str(title[index]).isspace():
+            title = title[:index + 1] + "\n" + title[index + 1:]
+            twentyfive = True
+        elif index > 50 and fifty is False and str(title[index]).isspace():
+            title = title[:index + 1] + "\n" + title[index + 1:]
+            fifty = True
+            title = title[0:index]
+            title += "..."
+
+    return title
+
+# places \n
 def indent_string(title: str):
     twentyfive = False
     fifty = False
