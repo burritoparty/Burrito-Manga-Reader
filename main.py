@@ -73,6 +73,10 @@ def main():
 
     # iterate through the newly sorted list and append it to the books_json
     for i in list_to_sort:
+        # start by removing duplicates in tags
+        z = i.get("tagged")
+        z = list(set(z))
+
         books_json['book'].append({
             "path": i.get('path'),
             "name": i.get('name'),
@@ -80,7 +84,7 @@ def main():
             "link": i.get('link'),
             "read_later": i.get('read_later'),
             "favorite": i.get('favorite'),
-            "tagged": i.get('tagged')
+            "tagged": z
         })
 
     # dump it back into json

@@ -899,7 +899,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 with open(self.library_json) as f:
                     books_json = json.load(f)
 
-            tags_that_match = 0
             tags_needed = len(find)
 
             # only search if tags are checked
@@ -916,12 +915,6 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                 # if the amount of tags that match is equal to the amount needed, add it filteredjson
                                 if tags_that_match == tags_needed:
                                     filtered_json.append(x)
-                                    # print(x['name'])
-                                    # print(find)
-                                    # print(x['tagged'])
-                                    # print("matches: " + str(tags_that_match))
-                                    # print("matches needed: " + str(tags_needed))
-                                    # print("\n")
 
                 # remove dupes
                 final_filtered_json = []
