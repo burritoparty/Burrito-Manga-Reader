@@ -365,6 +365,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             book_author_label = customtkinter.CTkLabel(self.book_window, text="Author", font=("Roboto", 20),
                                                        text_color=light_pink)
 
+            book_page_count_label = customtkinter.CTkLabel(self.book_window, text="0", font=("Roboto", 20),
+                                                       text_color=light_pink)
+
             # icons
             update = Image.open(resource(os.path.join('button_icons', 'update_icon.png')))
             ctk_update = customtkinter.CTkImage(dark_image=update)
@@ -439,7 +442,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             tag_scroller = customtkinter.CTkScrollableFrame(
                 self.book_window, label_text="Tags", label_text_color=light_pink, width=500, height=410)
             page_scroller = customtkinter.CTkScrollableFrame(
-                self.book_window, width=1850, height=440)
+                self.book_window, width=1850, height=420)
 
             # get pages
             page_thumbs = book.get_pages(True)
@@ -494,10 +497,15 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 else:
                     c += 1
 
+            # update the page count label
+
+            book_page_count_label.configure(text="Page Count: " + str(len(page_thumbs)))
+
             # place widgets
             pad = 20
-            self.read_button.grid(row=0, column=0, rowspan=6)
+            self.read_button.grid(row=1, column=0, rowspan=5)
 
+            book_page_count_label.grid(row=0, column=0, padx=pad, pady=pad)
             book_link_label.grid(row=0, column=1, padx=pad, pady=pad)
             book_name_label.grid(row=2, column=1, padx=pad, pady=pad)
             book_author_label.grid(row=4, column=1, padx=pad, pady=pad)
