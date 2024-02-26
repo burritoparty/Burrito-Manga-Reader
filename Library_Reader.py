@@ -4,6 +4,8 @@ import math
 import os
 import time
 from os import path
+from tkinter import ttk
+
 import customtkinter
 from concurrent.futures import ThreadPoolExecutor
 
@@ -1072,7 +1074,36 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 self.filter_window = customtkinter.CTkToplevel()
                 self.filter_window.geometry("550+225")
                 self.filter_window.title("Filter by Author")
+                # authors = []
+                # with open(author_json, 'r') as f:
+                #     load_authors = json.load(f)
+                #
+                # # load the tag names from the JSON into an array
+                # for i in load_authors['authors']:
+                #     authors.append(i['name'])
+                #
+                # author_cbox = customtkinter.CTkComboBox(self.filter_window, values=authors, width=300)
+                # author_cbox.grid(padx=10, pady=10)
+                # if len(authors) != 0:
+                #     CTkScrollableDropdown(author_cbox, values=authors, justify="left",
+                #                           button_color="transparent",
+                #                           resize=False, autocomplete=True,
+                #                           frame_border_color=light_pink,
+                #                           scrollbar_button_hover_color=light_pink)
+                # # button to submit
+                # button = customtkinter.CTkButton(self.filter_window, text="Filter",
+                #                                  fg_color=light_pink,
+                #                                  text_color=black,
+                #                                  hover_color=dark_pink,
+                #                                  command=lambda x=tag_json, y=author_json, a=author_cbox, b=filter_by:
+                #                                  self.get_json(x, y, a.get(), b))
+                # button.grid(padx=10, pady=10)
+
+                # self.filter_window.after(100, self.focus_filter_window)
+                # author_cbox.after(100, author_cbox.focus)
+
                 authors = []
+
                 with open(author_json, 'r') as f:
                     load_authors = json.load(f)
 
@@ -1080,25 +1111,36 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 for i in load_authors['authors']:
                     authors.append(i['name'])
 
-                author_cbox = customtkinter.CTkComboBox(self.filter_window, values=authors, width=300)
-                author_cbox.grid(padx=10, pady=10)
-                if len(authors) != 0:
-                    CTkScrollableDropdown(author_cbox, values=authors, justify="left",
-                                          button_color="transparent",
-                                          resize=False, autocomplete=True,
-                                          frame_border_color=light_pink,
-                                          scrollbar_button_hover_color=light_pink)
+                def check_input(event):
+                    value = event.widget.get()
+
+                    if value == '':
+                        self.filter_window.author_cbox['values'] = authors
+                    else:
+                        data = []
+                        for item in authors:
+                            if value.lower() in item.lower():
+                                data.append(item)
+
+                        self.filter_window.author_cbox['values'] = data
+
+                self.filter_window.author_cbox = ttk.Combobox(self.filter_window)
+                self.filter_window.author_cbox['values'] = authors
+                self.filter_window.author_cbox.bind('<KeyRelease>', check_input)
+                self.filter_window.author_cbox.grid(row=2, column=0, padx=60, pady=30)
+
                 # button to submit
                 button = customtkinter.CTkButton(self.filter_window, text="Filter",
                                                  fg_color=light_pink,
                                                  text_color=black,
                                                  hover_color=dark_pink,
-                                                 command=lambda x=tag_json, y=author_json, a=author_cbox, b=filter_by:
+                                                 command=lambda x=tag_json, y=author_json,
+                                                                a=self.filter_window.author_cbox, b=filter_by:
                                                  self.get_json(x, y, a.get(), b))
                 button.grid(padx=10, pady=10)
 
                 self.filter_window.after(100, self.focus_filter_window)
-                author_cbox.after(100, author_cbox.focus)
+                self.filter_window.author_cbox.after(100, self.filter_window.author_cbox.focus)
 
             else:
                 self.filter_window.focus()
