@@ -3,7 +3,11 @@ import os
 import re
 import shutil
 import time
+import tkinter
 from tkinter.filedialog import askdirectory
+
+from tkinter import *
+from tkinter import ttk
 
 import customtkinter
 from PIL import Image
@@ -92,8 +96,8 @@ class ImportWindow(customtkinter.CTkToplevel):
 
                 if self.name_entry.get() == "":
                     # format the string to remove brackets, parenthesis, curly brackets and their contents
-                    format = re.sub("\\(.*?\\)","", os.path.basename(self.path))
-                    format = re.sub("\\[.*?\\]","", format)
+                    format = re.sub("\\(.*?\\)", "", os.path.basename(self.path))
+                    format = re.sub("\\[.*?\\]", "", format)
                     format = re.sub("\\{.*?\\}", "", format)
                     format = re.sub("\\=.*?\\=", "", format)
                     format = format.strip()
@@ -320,20 +324,26 @@ class ImportWindow(customtkinter.CTkToplevel):
                 json.dump(load_authors, f, indent=2)
 
         # reload the cbox
-        self.author_cbox = customtkinter.CTkComboBox(self, width=750)
+
+        self.author_cbox['values'] = authors
         self.author_cbox.grid(row=2, column=0)
-        if len(authors) != 0:
-            CTkScrollableDropdown(self.author_cbox, values=authors, justify="left", button_color="transparent",
-                                  resize=False, autocomplete=True,
-                                  frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
 
-            self.author_cbox.set("")
 
-        # set the new author into the combobox
-        self.author_cbox.set(new_author)
-
-        # focus the import window
-        self.after(250, self.focus_import)
+        # # reload the cbox
+        # self.author_cbox = customtkinter.CTkComboBox(self, width=750)
+        # self.author_cbox.grid(row=2, column=0)
+        # if len(authors) != 0:
+        #     CTkScrollableDropdown(self.author_cbox, values=authors, justify="left", button_color="transparent",
+        #                           resize=False, autocomplete=True,
+        #                           frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
+        #
+        #     self.author_cbox.set("")
+        #
+        # # set the new author into the combobox
+        # self.author_cbox.set(new_author)
+        #
+        # # focus the import window
+        # self.after(250, self.focus_import)
 
     def read_later_callback(self, unread, read):
         if self.read_later:
@@ -359,6 +369,7 @@ class ImportWindow(customtkinter.CTkToplevel):
     def __init__(self, library_path, library_json, tag_json, authors_json, book_frame, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.combo_box = None
         start_time = time.time()
 
         self.title("Import Book")
@@ -387,7 +398,27 @@ class ImportWindow(customtkinter.CTkToplevel):
         # get from JSON
         # grab from the JSON and append to array
         # load the JSON
+        # authors = []
+        # with open(authors_json, 'r') as f:
+        #     load_authors = json.load(f)
+        #
+        # # load the tag names from the JSON into an array
+        # for i in load_authors['authors']:
+        #     authors.append(i['name'])
+        #
+        # self.author_cbox = customtkinter.CTkComboBox(self, width=750)
+        #
+        # self.author_cbox.grid(row=2, column=0)
+        #
+        # if len(authors) != 0:
+        #     CTkScrollableDropdown(self.author_cbox, values=authors, justify="left", button_color="transparent",
+        #                           resize=False, autocomplete=True,
+        #                           frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
+        #
+        #     self.author_cbox.set("")
+
         authors = []
+
         with open(authors_json, 'r') as f:
             load_authors = json.load(f)
 
@@ -395,16 +426,26 @@ class ImportWindow(customtkinter.CTkToplevel):
         for i in load_authors['authors']:
             authors.append(i['name'])
 
-        self.author_cbox = customtkinter.CTkComboBox(self, width=750)
 
+        def check_input(event):
+            value = event.widget.get()
+
+            if value == '':
+                self.author_cbox['values'] = authors
+            else:
+                data = []
+                for item in authors:
+                    if value.lower() in item.lower():
+                        data.append(item)
+
+                self.author_cbox['values'] = data
+
+        self.author_cbox = ttk.Combobox(self)
+        self.author_cbox['values'] = authors
+        self.author_cbox.bind('<KeyRelease>', check_input)
         self.author_cbox.grid(row=2, column=0)
 
-        if len(authors) != 0:
-            CTkScrollableDropdown(self.author_cbox, values=authors, justify="left", button_color="transparent",
-                                  resize=False, autocomplete=True,
-                                  frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
 
-            self.author_cbox.set("")
 
         self.tag_frame = customtkinter.CTkScrollableFrame(self, label_text="Select Tags",
                                                           width=1600, height=575, label_text_color=light_pink)
