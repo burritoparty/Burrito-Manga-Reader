@@ -7,9 +7,7 @@ This manga reader is my very first large programming project, thus the code is m
 However, the manga reader has been throughly tested on windows and works correctly. With that being said, I hope you enjoy the
 reader and I hope to someday build this again from the ground up to make it more efficient. Thank you.
 ## Known bugs
-- Import window slows down when adding hundreds of authors
 - Very rare crashes when selecting a book to read from library
-- UI freezes when importing more than 30 books in one launch instance. (to fix this simply restart the program) 
 
 ## Support on the following Operating Systems
 - Windows 10/11 (tested)
