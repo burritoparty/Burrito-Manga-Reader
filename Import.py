@@ -325,7 +325,22 @@ class ImportWindow(customtkinter.CTkToplevel):
 
         # reload the cbox
 
+        def check_input(event):
+            value = event.widget.get()
+
+            if value == '':
+                self.author_cbox['values'] = authors
+            else:
+                data = []
+                for item in authors:
+                    if value.lower() in item.lower():
+                        data.append(item)
+
+                self.author_cbox['values'] = data
+
+        self.author_cbox = ttk.Combobox(self)
         self.author_cbox['values'] = authors
+        self.author_cbox.bind('<KeyRelease>', check_input)
         self.author_cbox.grid(row=2, column=0)
 
 
