@@ -33,13 +33,21 @@ class ImportFrame(customtkinter.CTkFrame):
         else:
             self.import_window.focus()  # if window exists focus it
 
-    def __init__(self, library_path, library_json, tag_json, authors_json, bookframe, master, **kwargs):
+    def __init__(self,
+                 num_books: int,
+                 library_path, library_json, tag_json, authors_json,
+                 bookframe, master, **kwargs):
         super().__init__(master, **kwargs)
         self.library_path = library_path
         self.library_json = library_json
 
         import_icon = Image.open(resource(os.path.join('button_icons', 'import_icon.png')))
         ctk_import = customtkinter.CTkImage(dark_image=import_icon)
+
+        self.book_count = customtkinter.CTkLabel(self,
+                                                   text=(f'{num_books:,}' + " Books"),
+                                                   font=("Roboto", 20),
+                                                   text_color=light_pink)
 
         # add new book button
         self.import_book = customtkinter.CTkButton(self,
@@ -57,7 +65,8 @@ class ImportFrame(customtkinter.CTkFrame):
                                                    self.open_import_window(x, y, z))
         self.import_window = None
 
-        self.import_book.grid(row=0, column=0, padx=20, pady=20)
+        self.book_count.grid(row=0, column=0, padx=20, pady=20)
+        self.import_book.grid(row=1, column=0, padx=20, pady=20)
 
 
 class ImportWindow(customtkinter.CTkToplevel):
@@ -342,6 +351,7 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.author_cbox['values'] = authors
         self.author_cbox.bind('<KeyRelease>', check_input)
         self.author_cbox.grid(row=2, column=0)
+        self.author_cbox.set(new_author)
 
 
         # # reload the cbox

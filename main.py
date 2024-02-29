@@ -91,6 +91,23 @@ def main():
     with open(library_json, 'w') as f:
         json.dump(books_json, f, indent=4)
 
+    # get numbers
+    num_books = len(books_json['book'])
+    # print(num_books)
+
+    # load the JSON
+    with open(authors_json, 'r') as f:
+        load_authors = json.load(f)
+        num_authors = len(load_authors["authors"])
+        f.close()
+    # print(num_authors)
+
+    with open(tags_json, 'r') as f:
+        load_tags = json.load(f)
+        num_tags = len(load_tags["tags"])
+        f.close()
+    # print(num_tags)
+
     customtkinter.set_appearance_mode("dark")
     root = customtkinter.CTk()  # main window
     root.title("Burrito Manga Reader")  # name of program
@@ -104,12 +121,15 @@ def main():
     root.bookDisplayTabs = BookFrame(
         library_json=library_json, tag_json=tags_json, authors_json=authors_json, master=root, width=1650, height=1000)
     root.tagFrame = TagFrame(
+        num_tags=num_tags,
         library_json=library_json, authors_json=authors_json, tag_json=tags_json, bookframe=root.bookDisplayTabs,
         master=root)
     root.authorFrame = AuthorFrame(
+        num_authors=num_authors,
         library_json=library_json, authors_json=authors_json, tag_json=tags_json, bookframe=root.bookDisplayTabs,
         master=root)
     root.importFrame = ImportFrame(
+        num_books=num_books,
         library_json=library_json, library_path=args.mangaloc, tag_json=tags_json, authors_json=authors_json,
         bookframe=root.bookDisplayTabs, master=root)
     root.tab_nav = TabNavigator(

@@ -349,7 +349,9 @@ class TagFrame(customtkinter.CTkFrame):
 
 
 
-    def __init__(self, library_json, authors_json, tag_json: str, bookframe: BookFrame, master: customtkinter.CTk, **kwargs):
+    def __init__(self, num_tags: int,
+                 library_json, authors_json, tag_json: str,
+                 bookframe: BookFrame, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
 
         # make windows
@@ -363,6 +365,11 @@ class TagFrame(customtkinter.CTkFrame):
         rename = Image.open(resource(os.path.join('button_icons', 'rename_icon.png')))
         ctk_rename = customtkinter.CTkImage(dark_image=rename)
 
+        # make label
+        self.author_count = customtkinter.CTkLabel(self,
+                                                   text=(f'{num_tags:,}' + " Tags"),
+                                                   font=("Roboto", 20),
+                                                   text_color=light_pink)
 
         # make the buttons
         self.tag_append = customtkinter.CTkButton(self,
@@ -398,6 +405,7 @@ class TagFrame(customtkinter.CTkFrame):
                                                   a=authors_json, b=bookframe:
                                                   self.tag_rename_call(w, x, y, a, b))
 
-        self.tag_append.grid(row=0, column=0, padx=20, pady=20)
-        self.tag_delete.grid(row=1, column=0, padx=20, pady=20)
-        self.tag_rename.grid(row=2, column=0, padx=20, pady=20)
+        self.author_count.grid(row=0, column=0, padx=20, pady=20)
+        self.tag_append.grid(row=1, column=0, padx=20, pady=20)
+        self.tag_delete.grid(row=2, column=0, padx=20, pady=20)
+        self.tag_rename.grid(row=3, column=0, padx=20, pady=20)

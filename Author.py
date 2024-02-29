@@ -118,14 +118,14 @@ class AuthorFrame(customtkinter.CTkFrame):
                                                          text_color=black,
                                                          hover_color=dark_pink,
                                                          command=lambda
-                                                         w=window,
-                                                         x=tag_json,
-                                                         y=i,
-                                                         z=authors,
-                                                         a=load_authors,
-                                                         b=library_json,
-                                                         c=authors_json,
-                                                         d=bookframe:
+                                                             w=window,
+                                                             x=tag_json,
+                                                             y=i,
+                                                             z=authors,
+                                                             a=load_authors,
+                                                             b=library_json,
+                                                             c=authors_json,
+                                                             d=bookframe:
                                                          self.author_rename_dialogue(w, x, y, z, a, b, c, d))
                         buttons.append(button)
                         buttons[index].grid(row=r, column=c, padx=20, pady=20)
@@ -146,13 +146,13 @@ class AuthorFrame(customtkinter.CTkFrame):
                 window.focus()
 
     def author_rename_dialogue(self, window: customtkinter.CTkToplevel, tags_json: str,
-            author_to_rename: str, author_array: list[str], author_loader: dict,
-            library_json: str, authors_json: str, bookframe):
+                               author_to_rename: str, author_array: list[str], author_loader: dict,
+                               library_json: str, authors_json: str, bookframe):
         # create dialogue entry
         text = "Rename author: " + author_to_rename
         author_rename_dialogue = customtkinter.CTkInputDialog(
             text=text, title="Rename an author",
-        button_text_color=black, button_fg_color=light_pink, button_hover_color=dark_pink)
+            button_text_color=black, button_fg_color=light_pink, button_hover_color=dark_pink)
         author_rename_dialogue.geometry("340+220")
 
         # get the author's new name
@@ -220,7 +220,9 @@ class AuthorFrame(customtkinter.CTkFrame):
 
             window.destroy()
 
-    def __init__(self, library_json: str, authors_json: str, tag_json: str, bookframe: BookFrame, master: customtkinter.CTk, **kwargs):
+    def __init__(self, num_authors: int,
+                 library_json: str, authors_json: str, tag_json: str,
+                 bookframe: BookFrame, master: customtkinter.CTk, **kwargs):
         super().__init__(master, **kwargs)
 
         # make windows
@@ -230,6 +232,12 @@ class AuthorFrame(customtkinter.CTkFrame):
         ctk_add = customtkinter.CTkImage(dark_image=add)
         rename = Image.open(resource(os.path.join('button_icons', 'rename_icon.png')))
         ctk_rename = customtkinter.CTkImage(dark_image=rename)
+
+        # make label
+        self.author_count = customtkinter.CTkLabel(self,
+                                                   text=(f'{num_authors:,}' + " Authors"),
+                                                   font=("Roboto", 20),
+                                                   text_color=light_pink)
 
         # make the buttons
         self.author_append = customtkinter.CTkButton(self,
@@ -250,10 +258,12 @@ class AuthorFrame(customtkinter.CTkFrame):
                                                      text_color=black,
                                                      hover_color=dark_pink,
                                                      command=lambda
-                                                     x=authors_json,
-                                                     y=authors_rename_window,
-                                                     z=tag_json,
-                                                     a=library_json,
-                                                     b=bookframe: self.author_rename_call(x, y, z, a, b))
-        self.author_append.grid(row=0, column=0, padx=20, pady=20)
-        self.author_rename.grid(row=1, column=0, padx=20, pady=20)
+                                                         x=authors_json,
+                                                         y=authors_rename_window,
+                                                         z=tag_json,
+                                                         a=library_json,
+                                                         b=bookframe: self.author_rename_call(x, y, z, a, b))
+
+        self.author_count.grid(row=0, column=0, padx=20, pady=20)
+        self.author_append.grid(row=1, column=0, padx=20, pady=20)
+        self.author_rename.grid(row=2, column=0, padx=20, pady=20)
