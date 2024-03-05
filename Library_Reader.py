@@ -5,6 +5,9 @@ import os
 import time
 from os import path
 from tkinter import ttk
+import subprocess
+from tkinter import filedialog
+from tkinter import *
 
 import customtkinter
 from concurrent.futures import ThreadPoolExecutor
@@ -32,6 +35,12 @@ def checking(tagged: list, check: str):
         tagged.append(check)
     else:
         tagged.remove(check)
+
+
+def open_file_location(path):
+    # r'explorer /select,"C:\"'
+    final_path = r'explorer /open,"' + path
+    subprocess.Popen(final_path)
 
 
 class BookFrame(customtkinter.CTkScrollableFrame):
@@ -366,7 +375,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                        text_color=light_pink)
 
             book_page_count_label = customtkinter.CTkLabel(self.book_window, text="0", font=("Roboto", 20),
-                                                       text_color=light_pink)
+                                                           text_color=light_pink)
 
             # icons
             update = Image.open(resource(os.path.join('button_icons', 'update_icon.png')))
@@ -381,6 +390,9 @@ class BookFrame(customtkinter.CTkScrollableFrame):
             ctk_unfavorite = customtkinter.CTkImage(dark_image=unfavorite)
             favorite = Image.open(resource(os.path.join('button_icons', 'favorite.png')))
             ctk_favorite = customtkinter.CTkImage(dark_image=favorite)
+
+            file_explorer = Image.open(resource(os.path.join('button_icons', 'file.png')))
+            ctk_explorer = customtkinter.CTkImage(dark_image=file_explorer)
 
             # buttons
             self.book_link_button = customtkinter.CTkButton(self.book_window, text="Update Link", height=50,
@@ -400,6 +412,16 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                                                          fg_color=light_pink, hover_color=dark_pink, text_color=black,
                                                          command=lambda x=book, y=tag_json, z=authors_json, a=authors:
                                                          self.author_update(x, y, z, a))
+
+            self.open_in_file_explorer_button = customtkinter.CTkButton(self.book_window, text="File Explorer",
+                                                                        image=ctk_explorer,
+                                                                        height=50,
+                                                                        command=lambda
+                                                                            a=book.get_path(): open_file_location(
+                                                                            a),
+                                                                        fg_color=light_pink, hover_color=dark_pink,
+                                                                        text_color=black)
+
             self.book_read_later_button = customtkinter.CTkButton(self.book_window, text="Read Later", height=50,
                                                                   image=ctk_unread,
                                                                   command=lambda a=ctk_unread, b=ctk_read,
@@ -525,14 +547,15 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 row=4, column=2, padx=pad, pady=pad)
             self.book_read_later_button.grid(row=0, column=3, padx=pad, pady=pad)
             self.book_favorite_button.grid(row=0, column=4, padx=pad, pady=pad)
+            self.open_in_file_explorer_button.grid(row=0, column=5, padx=pad, pady=pad)
 
             # align checkbox columns
             tag_scroller.grid_columnconfigure(0, weight=1)
             tag_scroller.grid_columnconfigure(1, weight=1)
             tag_scroller.grid_columnconfigure(1, weight=1)
-            tag_scroller.grid(row=1, column=3, columnspan=2, rowspan=5, padx=pad, pady=pad)
+            tag_scroller.grid(row=1, column=3, columnspan=3, rowspan=5, padx=pad, pady=pad)
             page_scroller.grid(
-                row=6, column=0, columnspan=5, padx=pad, pady=pad)
+                row=6, column=0, columnspan=6, padx=pad, pady=pad)
 
             self.book_window.protocol(
                 'WM_DELETE_WINDOW', self.close_book_description)
