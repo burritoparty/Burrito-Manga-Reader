@@ -45,9 +45,9 @@ class ImportFrame(customtkinter.CTkFrame):
         ctk_import = customtkinter.CTkImage(dark_image=import_icon)
 
         self.book_count = customtkinter.CTkLabel(self,
-                                                   text=(f'{num_books:,}' + " Books"),
-                                                   font=("Roboto", 20),
-                                                   text_color=light_pink)
+                                                 text=(f'{num_books:,}' + " Books"),
+                                                 font=("Roboto", 20),
+                                                 text_color=light_pink)
 
         # add new book button
         self.import_book = customtkinter.CTkButton(self,
@@ -88,20 +88,22 @@ class ImportWindow(customtkinter.CTkToplevel):
                 images.append(Image.open(os.path.join(self.path, f)))
                 break
 
+            height = 800
+            width = 550
             # checking if path is valid
             if len(images) > 0:
                 w, h = images[0].size
                 if w > h:
-                    images[0].resize((275, 200))
+                    images[0].resize((height, width))
                     cover = customtkinter.CTkImage(
-                        dark_image=images[0], size=(275, 200))
+                        dark_image=images[0], size=(height, width))
                 else:
-                    images[0].resize((200, 275))
+                    images[0].resize((width, height))
                     cover = customtkinter.CTkImage(
-                        dark_image=images[0], size=(200, 275))
+                        dark_image=images[0], size=(width, height))
 
                 cover = customtkinter.CTkLabel(self, image=cover, text="")
-                cover.grid(row=0, column=3, rowspan=3, padx=20, pady=20)
+                cover.grid(row=0, column=3, rowspan=5, padx=20, pady=20)
 
                 if self.name_entry.get() == "":
                     # format the string to remove brackets, parenthesis, curly brackets and their contents
@@ -353,7 +355,6 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.author_cbox.grid(row=2, column=0)
         self.author_cbox.set(new_author)
 
-
         # # reload the cbox
         # self.author_cbox = customtkinter.CTkComboBox(self, width=750)
         # self.author_cbox.grid(row=2, column=0)
@@ -451,7 +452,6 @@ class ImportWindow(customtkinter.CTkToplevel):
         for i in load_authors['authors']:
             authors.append(i['name'])
 
-
         def check_input(event):
             value = event.widget.get()
 
@@ -470,10 +470,8 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.author_cbox.bind('<KeyRelease>', check_input)
         self.author_cbox.grid(row=2, column=0)
 
-
-
         self.tag_frame = customtkinter.CTkScrollableFrame(self, label_text="Select Tags",
-                                                          width=1600, height=575, label_text_color=light_pink)
+                                                          width=1000, height=575, label_text_color=light_pink)
         # align checkbox columns
         self.tag_frame.columnconfigure(0, weight=1)
         self.tag_frame.columnconfigure(1, weight=1)
@@ -482,7 +480,7 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.tag_frame.columnconfigure(4, weight=1)
         self.tag_frame.columnconfigure(5, weight=1)
         self.tag_frame.columnconfigure(6, weight=1)
-        self.tag_frame.grid(row=4, column=0, columnspan=5, padx=20, pady=20)
+        self.tag_frame.grid(row=4, column=0, columnspan=3, padx=20, pady=20)
 
         num_loops = 0
         r = 0
@@ -499,19 +497,42 @@ class ImportWindow(customtkinter.CTkToplevel):
             tags.append(i['name'])
 
         for i in tags:
-            self.checkbox = customtkinter.CTkCheckBox(self.tag_frame, text=i,
-                                                      checkbox_height=35, checkbox_width=35, font=("Roboto", 16),
+
+            if num_loops != 0:
+                if tags[num_loops - 1][0] < i[0]:
+                    c = 0
+                    r += 1
+                    label = customtkinter.CTkLabel(self.tag_frame, text=" " + i[0].upper() + " : ", font=("Roboto", 35),
+                                                   text_color=light_pink)
+                    label.grid(row=r, column=c, padx=0, pady=10)
+                    c += 1
+                else:
+                    c += 1
+            else:
+                label = customtkinter.CTkLabel(self.tag_frame, text=i[0].upper() + " : ", font=("Roboto", 35),
+                                               text_color=light_pink)
+                label.grid(row=0, column=0, padx=0, pady=10)
+                c += 1
+
+            num_loops += 1
+
+            self.checkbox = customtkinter.CTkCheckBox(self.tag_frame, text=i, font=("Roboto", 16),
+                                                      # checkbox_width=35, checkbox_height=35,
                                                       command=lambda x=i: self.tagged.append(x),
                                                       hover_color=light_pink, fg_color=dark_pink,
                                                       text_color=light_pink)
-            self.checkbox.grid(row=r, column=c, pady=10, padx=10, sticky='w')
+            self.checkbox.grid(row=r, column=c, padx=10, pady=10, sticky='w')
 
-            if c == 9:
+            if c == 4:
                 c = 0
                 r += 1
-            else:
-                c += 1
-            num_loops += 1
+
+            # if c == 9:
+            #     c = 0
+            #     r += 1
+            # else:
+            #     c += 1
+            # num_loops += 1
 
         self.submit_button = customtkinter.CTkButton(self, text="Submit Book",
                                                      command=lambda x=book_frame, y=tag_json, z=authors_json:
