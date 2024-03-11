@@ -1,22 +1,14 @@
 import json
-import os
 import re
 import shutil
 import time
-import tkinter
 from tkinter.filedialog import askdirectory
-
 from tkinter import *
 from tkinter import ttk
-
 import customtkinter
-from PIL import Image
-
 from Book import Book
-from CTkScrollableDropdown import *
 from Database import black, dark_pink, light_pink
 from Functions import *
-
 
 class ImportFrame(customtkinter.CTkFrame):
 
@@ -196,7 +188,6 @@ class ImportWindow(customtkinter.CTkToplevel):
                         self.link = self.link_entry.get()
 
                         # now create and store book
-
                         book = Book(self.path, self.name, self.author,
                                     self.link, self.read_later, self.favorite, self.tagged)
 
@@ -355,22 +346,6 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.author_cbox.grid(row=2, column=0)
         self.author_cbox.set(new_author)
 
-        # # reload the cbox
-        # self.author_cbox = customtkinter.CTkComboBox(self, width=750)
-        # self.author_cbox.grid(row=2, column=0)
-        # if len(authors) != 0:
-        #     CTkScrollableDropdown(self.author_cbox, values=authors, justify="left", button_color="transparent",
-        #                           resize=False, autocomplete=True,
-        #                           frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
-        #
-        #     self.author_cbox.set("")
-        #
-        # # set the new author into the combobox
-        # self.author_cbox.set(new_author)
-        #
-        # # focus the import window
-        # self.after(250, self.focus_import)
-
     def read_later_callback(self, unread, read):
         if self.read_later:
             self.read_later = False
@@ -421,28 +396,7 @@ class ImportWindow(customtkinter.CTkToplevel):
             self, placeholder_text="Enter Name", width=750)
         self.name_entry.grid(row=1, column=0, padx=20, pady=20)
 
-        # get from JSON
-        # grab from the JSON and append to array
-        # load the JSON
-        # authors = []
-        # with open(authors_json, 'r') as f:
-        #     load_authors = json.load(f)
-        #
-        # # load the tag names from the JSON into an array
-        # for i in load_authors['authors']:
-        #     authors.append(i['name'])
-        #
-        # self.author_cbox = customtkinter.CTkComboBox(self, width=750)
-        #
-        # self.author_cbox.grid(row=2, column=0)
-        #
-        # if len(authors) != 0:
-        #     CTkScrollableDropdown(self.author_cbox, values=authors, justify="left", button_color="transparent",
-        #                           resize=False, autocomplete=True,
-        #                           frame_border_color=light_pink, scrollbar_button_hover_color=light_pink)
-        #
-        #     self.author_cbox.set("")
-
+        # loading authors cbox
         authors = []
 
         with open(authors_json, 'r') as f:
@@ -517,7 +471,7 @@ class ImportWindow(customtkinter.CTkToplevel):
             num_loops += 1
 
             self.checkbox = customtkinter.CTkCheckBox(self.tag_frame, text=i, font=("Roboto", 16),
-                                                      # checkbox_width=35, checkbox_height=35,
+                                                      checkbox_width=35, checkbox_height=35,
                                                       command=lambda x=i: self.tagged.append(x),
                                                       hover_color=light_pink, fg_color=dark_pink,
                                                       text_color=light_pink)
@@ -526,13 +480,6 @@ class ImportWindow(customtkinter.CTkToplevel):
             if c == 4:
                 c = 0
                 r += 1
-
-            # if c == 9:
-            #     c = 0
-            #     r += 1
-            # else:
-            #     c += 1
-            # num_loops += 1
 
         self.submit_button = customtkinter.CTkButton(self, text="Submit Book",
                                                      command=lambda x=book_frame, y=tag_json, z=authors_json:
