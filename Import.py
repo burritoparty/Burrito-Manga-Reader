@@ -10,6 +10,7 @@ from Book import Book
 from Database import black, dark_pink, light_pink
 from Functions import *
 
+
 class ImportFrame(customtkinter.CTkFrame):
 
     def open_import_window(self, library_frame, tag_json, authors_json):
@@ -68,31 +69,26 @@ class ImportWindow(customtkinter.CTkToplevel):
         self.path = askdirectory()
         self.after(1, self.focus_import)
 
-        images = []
-        valid_images = [".jpg", ".png"]
+        images = []  # TODO redundant, remove me, gotta fix the loop below
 
         # IDK how to get the first image in this path so.... this works... :shrug:
         if self.path != '':
-            for f in os.listdir(self.path):
-                ext = os.path.splitext(f)[1]
-                if ext.lower() not in valid_images:
-                    continue
-                images.append(Image.open(os.path.join(self.path, f)))
-                break
+            images.append(Image.open(get_first_location(self.path, os.listdir(self.path))))
+            image = Image.open(get_first_location(self.path, os.listdir(self.path)))
 
             height = 800
             width = 550
             # checking if path is valid
             if len(images) > 0:
-                w, h = images[0].size
+                w, h = image.size
                 if w > h:
-                    images[0].resize((height, width))
+                    image.resize((height, width))
                     cover = customtkinter.CTkImage(
-                        dark_image=images[0], size=(height, width))
+                        dark_image=image, size=(height, width))
                 else:
-                    images[0].resize((width, height))
+                    image.resize((width, height))
                     cover = customtkinter.CTkImage(
-                        dark_image=images[0], size=(width, height))
+                        dark_image=image, size=(width, height))
 
                 cover = customtkinter.CTkLabel(self, image=cover, text="")
                 cover.grid(row=0, column=3, rowspan=5, padx=20, pady=20)
@@ -191,9 +187,13 @@ class ImportWindow(customtkinter.CTkToplevel):
                         book = Book(self.path, self.name, self.author,
                                     self.link, self.read_later, self.favorite, self.tagged)
 
-                        # copy from old path to new path
+                        # rename the files
+                        files = os.listdir(self.path)
+                        rename(self.path, files)
 
                         files = os.listdir(self.path)
+
+                        # copy from old path to new path
                         for i in files:
                             shutil.copy(os.path.join(self.path, i),
                                         os.path.join(new_path, i))

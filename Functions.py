@@ -83,6 +83,7 @@ def shorten_string(title: str):
 
     return title
 
+
 # places \n
 def indent_string(title: str):
     twentyfive = False
@@ -121,3 +122,99 @@ def indent_string(title: str):
             twohun = True
 
     return title
+
+
+# sort a dict
+def sorting(dictionary: dict):
+    new_dict = list(dictionary.keys())
+    new_dict.sort()
+    sorted_dict = {i: dictionary[i] for i in new_dict}
+
+    return sorted_dict
+
+
+# given a string, parse the start for a num and return it
+def get_num(filename: str):
+    number = ""
+    # for each character in the string
+    for char in filename:
+        # if it is a digit
+        if char.isdigit():
+            number += char
+        else:
+            break
+
+    return int(number)
+
+
+# given an array of strings, return a dictionary {num : string}
+def get_dict(files):
+    new_dict = dict()
+
+    for f in files:
+        new_dict.update({get_num(f): f})
+
+    return new_dict
+
+
+# files is an array of the file names
+def rename(directory: str, files):
+    editing_directory = directory + "/"
+    # make the new directory
+    # print(directory)
+    new_folder = os.path.join(editing_directory, "temp")
+    os.mkdir(new_folder)
+    new_folder += "/"
+
+    # load the array of string
+    for filename in os.listdir(editing_directory):
+        if filename != "temp":
+            files.append(filename)
+
+    # make the array a dict and sort it by leading numbers in the string
+    files_dict = get_dict(files)
+    files_dict = sorting(files_dict)
+
+    # for each element in the dictionary
+    for i in files_dict:
+        # the new file to make's name and directory
+        if i > 999:
+            new_file = new_folder + str(i) + ".jpg"
+        elif i > 99:
+            new_file = new_folder + "0" + str(i) + ".jpg"
+        elif i > 9:
+            new_file = new_folder + "00" + str(i) + ".jpg"
+        else:
+            new_file = new_folder + "000" + str(i) + ".jpg"
+
+        # the old file's name and directory
+        file = editing_directory + files_dict.get(i)
+        # rename the file and put it in the new folder
+        os.rename(file, new_file)
+
+    # now move all files in the new directory back up
+    for filename in os.listdir(new_folder):
+        # source to move from
+        new_file = editing_directory + "temp/" + filename
+        # dst to move to
+        old_file = editing_directory + filename
+        os.rename(new_file, old_file)
+
+    # delete the temporary folder
+    os.rmdir(editing_directory + "temp")
+
+
+# returns the location of the first item in a directory (numerically)
+def get_first_location(directory: str, files):
+    editing_directory = directory + "/"
+
+    # load the array of string
+    for filename in os.listdir(editing_directory):
+        if filename != "temp":
+            files.append(filename)
+
+    # make the array a dict and sort it by leading numbers in the string
+    files_dict = get_dict(files)
+    files_dict = sorting(files_dict)
+
+    return editing_directory + files_dict.get(1)
