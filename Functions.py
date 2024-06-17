@@ -136,12 +136,14 @@ def sorting(dictionary: dict):
 # given a string, parse the start for a num and return it
 def get_num(filename: str):
     number = ""
+    number_found = False
     # for each character in the string
     for char in filename:
         # if it is a digit
         if char.isdigit():
             number += char
-        else:
+            number_found = True
+        elif number_found:
             break
 
     return int(number)
