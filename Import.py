@@ -189,14 +189,18 @@ class ImportWindow(customtkinter.CTkToplevel):
 
                         # rename the files
                         files = os.listdir(self.path)
-                        rename(self.path, files)
-
+                        temp_path = rename(self.path, files)
+                        # get the temporary path
+                        self.path = temp_path
                         files = os.listdir(self.path)
 
                         # copy from old path to new path
                         for i in files:
                             shutil.copy(os.path.join(self.path, i),
                                         os.path.join(new_path, i))
+
+                        # remove temporary directory and it's items
+                        shutil.rmtree(self.path)
 
                         # now update object's path
                         book.path = new_path

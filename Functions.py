@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 
 from PIL import Image, ImageDraw
@@ -192,18 +193,10 @@ def rename(directory: str, files):
         # the old file's name and directory
         file = editing_directory + files_dict.get(i)
         # rename the file and put it in the new folder
-        os.rename(file, new_file)
+        shutil.copy(file, new_file)
 
-    # now move all files in the new directory back up
-    for filename in os.listdir(new_folder):
-        # source to move from
-        new_file = editing_directory + "temp/" + filename
-        # dst to move to
-        old_file = editing_directory + filename
-        os.rename(new_file, old_file)
-
-    # delete the temporary folder
-    os.rmdir(editing_directory + "temp")
+    # return the temp directory
+    return new_folder
 
 
 # returns the location of the first item in a directory (numerically)
@@ -217,6 +210,6 @@ def get_first_location(directory: str, files):
 
     # make the array a dict and sort it by leading numbers in the string
     files_dict = get_dict(files)
-    files_dict = sorting(files_dict)
+    # files_dict = sorting(files_dict)
 
     return editing_directory + files_dict.get(1)
