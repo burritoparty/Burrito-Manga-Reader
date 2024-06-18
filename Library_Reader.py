@@ -513,7 +513,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 label = customtkinter.CTkLabel(page_scroller, image=i, text="")
                 label.grid(row=r, column=c, padx=5, pady=5)
 
-                if c == 9:
+                if c == 5:
                     c = 0
                     r += 1
                 else:

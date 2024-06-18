@@ -33,8 +33,8 @@ class Book:
 
     def _get_page(self, file_name: str, is_thumbnail: bool):
         if is_thumbnail:
-            single_page_size = (175, 250)
-            double_page_size = (175, 250)
+            single_page_size = (300, 400)
+            double_page_size = (300, 400)
         else:
             single_page_size = (950, 1300)
             double_page_size = (1600, 1200)
