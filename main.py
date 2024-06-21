@@ -1,6 +1,7 @@
 import argparse
 import pathlib
 
+from Delete import *
 from Author import *
 from Database import *
 from Import import *
@@ -132,6 +133,9 @@ def main():
         num_books=num_books,
         library_json=library_json, library_path=args.mangaloc, tag_json=tags_json, authors_json=authors_json,
         bookframe=root.bookDisplayTabs, master=root)
+    root.deleteFrame = DeleteFrame(
+        library_json=library_json, authors_json=authors_json, tag_json=tags_json,
+        bookframe=root.bookDisplayTabs, master=root)
     root.tab_nav = TabNavigator(
         bookframe=root.bookDisplayTabs, tag_json=tags_json, authors_json=authors_json, master=root)
 
@@ -141,6 +145,7 @@ def main():
     root.importFrame.grid(row=3, column=0, padx=20, pady=0)
     root.bookDisplayTabs.grid(row=0, column=1, rowspan=10,
                               sticky="nsew", padx=5, pady=5)
+    root.deleteFrame.grid(row=4, column=0, padx=20, pady=20)
     root.tab_nav.grid(row=10, column=1, padx=5, pady=5)
 
     root.mainloop()
