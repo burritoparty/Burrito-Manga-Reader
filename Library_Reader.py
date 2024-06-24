@@ -1031,7 +1031,7 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                 r = 0
                 c = 0
                 num_loops = 0
-                scrollableframe = customtkinter.CTkScrollableFrame(self.filter_window, width=1550, height=500)
+                scrollableframe = customtkinter.CTkScrollableFrame(self.filter_window, width=800, height=500)
                 filter_button = customtkinter.CTkButton(self.filter_window, text="Filter",
                                                         fg_color=light_pink, hover_color=dark_pink, text_color=black,
                                                         font=("Roboto", 16),
@@ -1050,21 +1050,36 @@ class BookFrame(customtkinter.CTkScrollableFrame):
                     tags.append(i['name'])
 
                 for i in tags:
-                    checkbox = customtkinter.CTkCheckBox(scrollableframe, text=i,
-                                                         checkbox_height=35, checkbox_width=35,
-                                                         font=("Roboto", 16),
-                                                         command=lambda
-                                                             y=tagged, z=i: checking(y, z),
-                                                         hover_color=light_pink, fg_color=dark_pink,
-                                                         text_color=light_pink)
-                    checkbox.grid(row=r, column=c, pady=10, padx=10, sticky='w')
 
-                    if c == 9:
+                    if num_loops != 0:
+                        if tags[num_loops - 1][0] < i[0]:
+                            c = 0
+                            r += 1
+                            label = customtkinter.CTkLabel(scrollableframe, text=" " + i[0].upper() + " : ",
+                                                           font=("Roboto", 35),
+                                                           text_color=light_pink)
+                            label.grid(row=r, column=c, padx=0, pady=10)
+                            c += 1
+                        else:
+                            c += 1
+                    else:
+                        label = customtkinter.CTkLabel(scrollableframe, text=i[0].upper() + " : ", font=("Roboto", 35),
+                                                       text_color=light_pink)
+                        label.grid(row=0, column=0, padx=0, pady=10)
+                        c += 1
+
+                    num_loops += 1
+
+                    self.checkbox = customtkinter.CTkCheckBox(scrollableframe, text=i, font=("Roboto", 16),
+                                                              checkbox_width=35, checkbox_height=35,
+                                                              command=lambda x=i: self.tagged.append(x),
+                                                              hover_color=light_pink, fg_color=dark_pink,
+                                                              text_color=light_pink)
+                    self.checkbox.grid(row=r, column=c, padx=10, pady=10, sticky='w')
+
+                    if c == 4:
                         c = 0
                         r += 1
-                    else:
-                        c += 1
-                    num_loops += 1
 
                 self.filter_window.after(100, self.focus_filter_window)
 
