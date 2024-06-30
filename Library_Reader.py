@@ -1070,12 +1070,14 @@ class BookFrame(customtkinter.CTkScrollableFrame):
 
                     num_loops += 1
 
-                    self.checkbox = customtkinter.CTkCheckBox(scrollableframe, text=i, font=("Roboto", 16),
-                                                              checkbox_width=35, checkbox_height=35,
-                                                              command=lambda x=i: self.tagged.append(x),
-                                                              hover_color=light_pink, fg_color=dark_pink,
-                                                              text_color=light_pink)
-                    self.checkbox.grid(row=r, column=c, padx=10, pady=10, sticky='w')
+                    checkbox = customtkinter.CTkCheckBox(scrollableframe, text=i,
+                                                         checkbox_height=35, checkbox_width=35,
+                                                         font=("Roboto", 16),
+                                                         command=lambda
+                                                             y=tagged, z=i: checking(y, z),
+                                                         hover_color=light_pink, fg_color=dark_pink,
+                                                         text_color=light_pink)
+                    checkbox.grid(row=r, column=c, pady=10, padx=10, sticky='w')
 
                     if c == 4:
                         c = 0
