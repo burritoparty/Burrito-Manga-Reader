@@ -139,5 +139,3 @@ class Book:
                 cover_im.resize(PORTRAIT_COVER)
                 self.cover = customtkinter.CTkImage(
                     dark_image=cover_im, size=PORTRAIT_COVER)
-
-

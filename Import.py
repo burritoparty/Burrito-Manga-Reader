@@ -126,6 +126,9 @@ class ImportWindow(customtkinter.CTkToplevel):
 
     def finalize_book(self, book_frame, tag_json, authors_json):
 
+        # make sure the files are the right type
+        change_image_type(self.path)
+
         # making sure the author input is valid
         authors = []
         # load an array with current authors
@@ -183,9 +186,13 @@ class ImportWindow(customtkinter.CTkToplevel):
                         self.author = self.author_cbox.get()
                         self.link = self.link_entry.get()
 
+
+
                         # now create and store book
                         book = Book(self.path, self.name, self.author,
                                     self.link, self.read_later, self.favorite, self.tagged)
+
+
 
                         # rename the files
                         files = os.listdir(self.path)

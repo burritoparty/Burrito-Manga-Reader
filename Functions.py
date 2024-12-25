@@ -213,3 +213,84 @@ def get_first_location(directory: str, files):
     # files_dict = sorting(files_dict)
 
     return editing_directory + files_dict.get(1)
+
+
+# functions for import file type recognition
+def sorting(dictionary: dict):
+    new_dict = list(dictionary.keys())
+    new_dict.sort()
+    sorted_dict = {i: dictionary[i] for i in new_dict}
+
+    return sorted_dict
+
+
+# given a string, parse the start for a num and return it
+def get_num(filename: str):
+    number = ""
+    # for each character in the string
+    for char in filename:
+        # if it is a digit
+        if char.isdigit():
+            number += char
+        else:
+            break
+
+    return int(number)
+
+
+# given an array of strings, return a dictionary {num : string}
+def get_dict(files):
+    new_dict = dict()
+
+    for f in files:
+        new_dict.update({get_num(f): f})
+
+    return new_dict
+
+
+# converts all
+def change_image_type(directory):
+    directory += "/"
+
+    # make the new directory
+    new_folder = os.path.join(directory, "temp")
+    os.mkdir(new_folder)
+    new_folder += "/"
+
+    # holding filename strings
+    files = []
+
+    # load the array of string
+    for filename in os.listdir(directory):
+        if filename != "temp":
+            files.append(filename)
+
+    # make the array a dict and sort it by leading numbers in the string
+    files_dict = get_dict(files)
+    files_dict = sorting(files_dict)
+
+    # for each element in the dictionary
+    for i in files_dict:
+        # the new file to make's name and directory
+        if i > 99:
+            new_file = new_folder + str(i) + ".jpg"
+        elif i > 9:
+            new_file = new_folder + "0" + str(i) + ".jpg"
+        else:
+            new_file = new_folder + "00" + str(i) + ".jpg"
+
+        # the old file's name and directory
+        file = directory + files_dict.get(i)
+        # rename the file and put it in the new folder
+        os.rename(file, new_file)
+
+    # now move all files in the new directory back up
+    for filename in os.listdir(new_folder):
+        # source to move from
+        new_file = directory + "temp/" + filename
+        # dst to move to
+        old_file = directory + filename
+        os.rename(new_file, old_file)
+
+    # delete the temporary folder
+    os.rmdir(directory + "temp")
