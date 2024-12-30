@@ -1,6 +1,7 @@
 import os
 import shutil
 import sys
+import re
 
 from PIL import Image, ImageDraw
 
@@ -155,7 +156,7 @@ def get_dict(files):
     new_dict = dict()
 
     for f in files:
-        new_dict.update({get_num(f): f})
+        new_dict.update({get_page_number(f): f})
 
     return new_dict
 
@@ -224,18 +225,17 @@ def sorting(dictionary: dict):
     return sorted_dict
 
 
-# given a string, parse the start for a num and return it
-def get_num(filename: str):
-    number = ""
-    # for each character in the string
-    for char in filename:
-        # if it is a digit
-        if char.isdigit():
-            number += char
-        else:
-            break
+# given a string, parse for a num and return it
+def get_page_number(filename: str):
+    # Use a regular expression to find all sequences of digits
+    matches = re.findall(r'\d+', filename)
 
-    return int(number)
+    # If no matches are found, return None or raise an error
+    if not matches:
+        raise ValueError("No numeric sequences found in the filename.")
+
+    # Convert the last match to an integer and return it as the page number
+    return int(matches[-1])
 
 
 # given an array of strings, return a dictionary {num : string}
@@ -243,7 +243,7 @@ def get_dict(files):
     new_dict = dict()
 
     for f in files:
-        new_dict.update({get_num(f): f})
+        new_dict.update({get_page_number(f): f})
 
     return new_dict
 
