@@ -23,6 +23,21 @@ def main():
     if os.path.exists(args.mangaloc) is False:
         os.mkdir(args.mangaloc)
 
+    # create settings
+    settings_json = os.path.join(args.mangaloc, "settings.json")
+    if os.path.exists(settings_json) is False:
+        file = open(settings_json, "x")
+        with open(settings_json, "w") as f:
+            setting = {
+                "settings": [
+                    {
+                        "delete_import": False
+                    }
+                ]
+            }
+            json.dump(setting, f, indent=2)
+        file.close()
+
     # create database
     library_json = os.path.join(args.mangaloc, "library.json")
     if os.path.exists(library_json) is False:

@@ -2,6 +2,7 @@ import json
 import re
 import shutil
 import time
+from pathlib import Path
 from tkinter.filedialog import askdirectory
 from tkinter import *
 from tkinter import ttk
@@ -124,7 +125,7 @@ class ImportWindow(customtkinter.CTkToplevel):
     def input_tag(self, tag):
         self.tagged.append(tag)
 
-    def finalize_book(self, book_frame, tag_json, authors_json):
+    def finalize_book(self, book_frame, tag_json, authors_json, librarypath):
 
         # make sure the files are the right type
         change_image_type(self.path)
@@ -186,13 +187,11 @@ class ImportWindow(customtkinter.CTkToplevel):
                         self.author = self.author_cbox.get()
                         self.link = self.link_entry.get()
 
-
+                        ogpath = self.path
 
                         # now create and store book
                         book = Book(self.path, self.name, self.author,
                                     self.link, self.read_later, self.favorite, self.tagged)
-
-
 
                         # rename the files
                         files = os.listdir(self.path)
@@ -235,6 +234,98 @@ class ImportWindow(customtkinter.CTkToplevel):
                             # update the library count here
                             book_frame.initialize_self()
                             book_frame.load_tab(tag_json, authors_json)
+
+                        if self.delete_after.get():
+
+                            # delete the folder here
+                            # Specify the folder path to delete
+                            if os.path.exists(ogpath) and os.path.isdir(ogpath):
+                                try:
+                                    shutil.rmtree(ogpath)  # Delete the folder and all its contents
+                                    print(f"Folder '{ogpath}' has been deleted successfully.")
+                                except Exception as e:
+                                    print(f"An error occurred while deleting the folder: {e}")
+                            else:
+                                print(f"The path '{ogpath}' does not exist or is not a folder.")
+
+                            librarypath = Path(librarypath)
+                            settings_json = librarypath / "settings.json"  # Use `/` operator to append paths
+
+                            # Check if the JSON file exists
+                            if os.path.exists(settings_json):
+                                # Open and read the existing JSON file
+                                with open(settings_json, "r") as f:
+                                    try:
+                                        data = json.load(f)  # Load the JSON content
+                                    except json.JSONDecodeError:
+                                        data = {"settings": []}  # Initialize if JSON is empty or invalid
+
+                                # Update the delete_import value if the key exists
+                                updated = False
+                                for setting in data.get("settings", []):
+                                    if "delete_import" in setting:
+                                        setting["delete_import"] = True
+                                        updated = True
+
+                                # If the key doesn't exist, add it
+                                if not updated:
+                                    data["settings"].append({"delete_import": True})
+
+                                # Write the updated JSON back to the file
+                                with open(settings_json, "w") as f:
+                                    json.dump(data, f, indent=2)
+                            else:
+                                # Create the file with default settings if it doesn't exist
+                                with open(settings_json, "w") as f:
+                                    data = {
+                                        "settings": [
+                                            {
+                                                "delete_import": True
+                                            }
+                                        ]
+                                    }
+                                    json.dump(data, f, indent=2)
+
+                        else:
+
+                            librarypath = Path(librarypath)
+                            settings_json = librarypath / "settings.json"  # Use `/` operator to append paths
+
+                            # Check if the JSON file exists
+                            if os.path.exists(settings_json):
+                                # Open and read the existing JSON file
+                                with open(settings_json, "r") as f:
+                                    try:
+                                        data = json.load(f)  # Load the JSON content
+                                    except json.JSONDecodeError:
+                                        data = {"settings": []}  # Initialize if JSON is empty or invalid
+
+                                # Update the delete_import value if the key exists
+                                updated = False
+                                for setting in data.get("settings", []):
+                                    if "delete_import" in setting:
+                                        setting["delete_import"] = False
+                                        updated = True
+
+                                # If the key doesn't exist, add it
+                                if not updated:
+                                    data["settings"].append({"delete_import": False})
+
+                                # Write the updated JSON back to the file
+                                with open(settings_json, "w") as f:
+                                    json.dump(data, f, indent=2)
+                            else:
+                                # Create the file with default settings if it doesn't exist
+                                with open(settings_json, "w") as f:
+                                    data = {
+                                        "settings": [
+                                            {
+                                                "delete_import": False
+                                            }
+                                        ]
+                                    }
+                                    json.dump(data, f, indent=2)
+
 
                         self.destroy()
 
@@ -493,8 +584,9 @@ class ImportWindow(customtkinter.CTkToplevel):
                 r += 1
 
         self.submit_button = customtkinter.CTkButton(self, text="Submit Book",
-                                                     command=lambda x=book_frame, y=tag_json, z=authors_json:
-                                                     self.finalize_book(x, y, z),
+                                                     command=lambda x=book_frame, y=tag_json, z=authors_json,
+                                                                    a=library_path:
+                                                     self.finalize_book(x, y, z, a),
                                                      fg_color=light_pink, hover_color=dark_pink, text_color=black)
         self.submit_button.grid(row=1, column=1, padx=20, pady=20)
 
@@ -525,8 +617,40 @@ class ImportWindow(customtkinter.CTkToplevel):
                                                        command=lambda x=ctk_unfavorite, y=ctk_favorite:
                                                        self.favorite_callback(x, y), image=ctk_unfavorite,
                                                        fg_color=light_pink, hover_color=dark_pink, text_color=black)
-        self.read_later_button.grid(row=0, column=2, rowspan=2, padx=20, pady=20)
-        self.favorite_button.grid(row=1, column=2, rowspan=2, padx=20, pady=20)
+        self.delete_after = customtkinter.CTkCheckBox(self, text="Delete Source Folder",
+                                                      font=("Roboto", 16),
+                                                      checkbox_width=35, checkbox_height=35,
+                                                      hover_color=light_pink, fg_color=dark_pink,
+                                                      text_color=light_pink)
+        self.read_later_button.grid(row=0, column=2, padx=20, pady=20)
+        self.favorite_button.grid(row=1, column=2, padx=20, pady=20)
+        self.delete_after.grid(row=2, column=2, padx=20, pady=20)
+
+        settings_json = Path(library_path) / "settings.json"
+
+        if settings_json.exists():
+            try:
+                # Open and read the JSON file
+                with settings_json.open("r") as f:
+                    data = json.load(f)
+
+                # Check if "delete_import" is true in the settings
+                delete_import_found = False
+                for setting in data.get("settings", []):
+                    if setting.get("delete_import") is True:
+                        self.delete_after.select()
+                        delete_import_found = True
+                        break
+
+                if not delete_import_found:
+                    self.delete_after.deselect()
+
+            except json.JSONDecodeError:
+                print("Invalid JSON format.")
+                self.delete_after.deselect()
+        else:
+            print("Settings file does not exist.")
+            self.delete_after.deselect()
 
         # get the time it takes function to run then wait that long until focus + 10
         end_time = int(((time.time() - start_time) * 1000) + 10)
